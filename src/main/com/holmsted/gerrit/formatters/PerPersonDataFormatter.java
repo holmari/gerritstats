@@ -3,7 +3,6 @@ package com.holmsted.gerrit.formatters;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
-import com.holmsted.gerrit.OutputType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -125,6 +124,53 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
             }
             return builder.toString();
         }
+
+        public String getCommitsWithNPatchSets(int patchSetCountThreshold) {
+            List<Commit> exceedingCommits = new ArrayList<Commit>();
+            for (Commit commit : commits) {
+                int patchSetCount = commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
+                if (patchSetCount > patchSetCountThreshold) {
+                    exceedingCommits.add(commit);
+                }
+            }
+            Collections.sort(exceedingCommits, new PatchSetCountComparator());
+
+            StringBuilder builder = new StringBuilder();
+            for (int i = 0; i < exceedingCommits.size(); ++i) {
+                Commit commit = exceedingCommits.get(i);
+                builder.append(String.format("%s (%d)",
+                        commit.url,
+                        commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK)));
+                if (i < exceedingCommits.size() - 1) {
+                    builder.append(", ");
+                }
+            }
+            return builder.toString();
+        }
+
+        public String getAllReviewComments() {
+            StringBuilder builder = new StringBuilder();
+            for (Commit.PatchSetComment comment : commentsWritten) {
+                builder.append(comment.message + "\n");
+            }
+
+            return builder.toString();
+        }
+    }
+
+    private static class PatchSetCountComparator implements Comparator<Commit> {
+        @Override
+        public int compare(Commit left, Commit right) {
+            int leftCount = left.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
+            int rightCount = right.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
+            if (leftCount < rightCount) {
+                return 1;
+            } else if (leftCount > rightCount) {
+                return -1;
+            } else {
+                return 0;
+            }
+        }
     }
 
     private static class ReviewComparator implements Comparator<Commit.Identity> {
@@ -232,6 +278,7 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
 
     private String createCsvOutput(@Nonnull List<IdentityRecord> orderedList) {
         StringBuilder builder = new StringBuilder();
+
         builder.append(String.format("%34s\t%7s\t%16s\t%17s\t%20s\t%17s\t%20s\t%20s\t%19s\t%16s\t%16s\t%16s\t%16s\t%30s\n",
                 "Identity",
                 "Commits",
@@ -248,14 +295,13 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
                 "-2 reviews given",
                 "# of people added as reviewers"));
         for (IdentityRecord record : orderedList) {
-            builder.append(String.format("%34s\t%7d\t%16d\t%17d\t%20f\t%17d\t",
+            builder.append(String.format("%34s\t%7d\t%16d\t%17d\t%20f\t%17d\t%20f\t%20f\t%19d\t%16d\t%16d\t%16d\t%16d\t%30d\n",
                     record.identity.email,
                     record.commits.size(),
                     record.commentsWritten.size(),
                     record.commentsReceived.size(),
                     record.getReceivedCommentRatio(),
-                    record.addedAsReviewerTo.size(), Locale.getDefault()));
-            builder.append(String.format("%20f\t%20f\t%19d\t%16d\t%16d\t%16d\t%16d\t%30d\n",
+                    record.addedAsReviewerTo.size(),
                     record.getReviewCommentRatio(),
                     record.getAveragePatchSetCount(),
                     record.getMaxPatchSetCount(),
@@ -269,6 +315,7 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
     }
 
     private String createPlainOutput(@Nonnull List<IdentityRecord> orderedList) {
+        int maxPatchSetCountForList = getOutputRules().getListCommitsExceedingPatchSetCount();
         HumanReadableLineBuilder builder = new HumanReadableLineBuilder();
         for (IdentityRecord record : orderedList) {
             builder.addLine(record.identity.email);
@@ -287,6 +334,15 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
             builder.addIndentLine("# of people added as reviewers: " + record.reviewersForOwnCommits.size());
             builder.addIndentLine("Adds them as reviewers: " + record.getDisplayableMyReviewerList());
             builder.addIndentLine("They add this person as reviewer: " + record.getDisplayableAddedReviewerList());
+            if (maxPatchSetCountForList != OutputRules.INVALID_PATCH_COUNT) {
+                builder.addIndentLine(String.format("Commits exceeding %d patches: %s",
+                        maxPatchSetCountForList,
+                        record.getCommitsWithNPatchSets(maxPatchSetCountForList)));
+            }
+            if (getOutputRules().getListReviewComments()) {
+                builder.addIndentLine("Review comments: ");
+                builder.addLine(record.getAllReviewComments());
+            }
             builder.addLine("");
         }
 

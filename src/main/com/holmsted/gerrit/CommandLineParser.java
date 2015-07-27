@@ -23,7 +23,7 @@ public class CommandLineParser {
     @Nonnull
     private OutputType outputType = OutputType.PLAIN;
 
-    private int listCommitsExceedingPatchSetCount = - 1;
+    private int listCommitsExceedingPatchSetCount = OutputRules.INVALID_PATCH_COUNT;
     private boolean listReviewComments;
     private Output output = Output.PER_PERSON_DATA;
 
