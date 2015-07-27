@@ -55,12 +55,15 @@ public class CommandLineParser {
             } else if (arg.equals("--exclude") && isNotAtEnd) {
                 String[] emails = args[i + 1].split(",");
                 Collections.addAll(excludedEmails, emails);
+                ++i;
             } else if (arg.equals("--include") && isNotAtEnd) {
                 String[] emails = args[i + 1].split(",");
                 Collections.addAll(includedEmails, emails);
+                ++i;
             } else if (arg.equals("--branches") && isNotAtEnd) {
                 String[] branches = args[i + 1].split(",");
                 Collections.addAll(includedBranches, branches);
+                ++i;
             } else if (arg.equals("--output-type") && isNotAtEnd) {
                 outputType = OutputType.fromFormatName(args[i + 1]);
             }
