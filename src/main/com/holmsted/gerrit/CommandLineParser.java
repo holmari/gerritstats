@@ -7,6 +7,8 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class CommandLineParser {
 
     private String filename;
@@ -73,7 +75,7 @@ public class CommandLineParser {
                 outputType = OutputType.fromTypeString(args[i + 1]);
                 ++i;
             } else if (arg.equals("--output") && isNotAtEnd) {
-                output = Output.fromString(args[i + 1]);
+                output = checkNotNull(Output.fromString(args[i + 1]));
                 ++i;
             } else if (arg.equals("--list-comments")) {
                 listReviewComments = true;
@@ -135,6 +137,7 @@ public class CommandLineParser {
         return outputType;
     }
 
+    @Nonnull
     public Output getOutput() {
         return output;
     }

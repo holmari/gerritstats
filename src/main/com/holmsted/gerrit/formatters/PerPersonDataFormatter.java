@@ -369,6 +369,7 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
         return builder.toString();
     }
 
+    @Nonnull
     private IdentityRecord getOrCreateRecord(@Nonnull Commit.Identity identity) {
         IdentityRecord identityRecord = records.get(identity);
         if (identityRecord == null) {
