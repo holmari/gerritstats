@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class CommandLineParser {
 
@@ -86,18 +87,22 @@ public class CommandLineParser {
         return (filename != null || serverName != null) && !hasSyntaxError;
     }
 
+    @Nullable
     public String getFilename() {
         return filename;
     }
 
+    @Nullable
     public String getOutputFile() {
         return outputFile;
     }
 
+    @Nullable
     public String getServerName() {
         return serverName;
     }
 
+    @Nullable
     public String getProjectName() {
         return projectName;
     }

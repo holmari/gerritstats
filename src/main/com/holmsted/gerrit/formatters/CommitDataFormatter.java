@@ -4,6 +4,7 @@ import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
+import com.holmsted.gerrit.QueryData;
 
 import java.util.List;
 
@@ -25,7 +26,7 @@ public abstract class CommitDataFormatter {
      * Processes the list of commits and builds output for it,
      * returning it as a string.
      */
-    public abstract String invoke(@Nonnull List<Commit> commits);
+    public abstract String invoke(@Nonnull QueryData queryData);
 
     @Nonnull
     protected CommitFilter getCommitFilter() {

@@ -4,6 +4,7 @@ import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
+import com.holmsted.gerrit.QueryData;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -25,7 +26,7 @@ public class ReviewerCsvFormatter extends CommitDataFormatter {
     }
 
     @Override
-    public String invoke(@Nonnull List<Commit> commits) {
+    public String invoke(@Nonnull QueryData queryData) {
         final StringBuilder builder = new StringBuilder();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
 
@@ -46,7 +47,7 @@ public class ReviewerCsvFormatter extends CommitDataFormatter {
                 builder.append(outComment).append('\n');
             }
         };
-        visitor.visit(commits);
+        visitor.visit(queryData.getCommits());
 
         return builder.toString();
     }

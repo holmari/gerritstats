@@ -3,13 +3,17 @@ package com.holmsted.gerrit.formatters;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
+import com.holmsted.gerrit.QueryData;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
 
@@ -214,13 +218,22 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
     }
 
     @Override
-    public String invoke(@Nonnull List<Commit> commits) {
+    public String invoke(@Nonnull QueryData queryData) {
         records.clear();
+        final AtomicLong fromDate = new AtomicLong(Long.MAX_VALUE);
+        final AtomicLong toDate = new AtomicLong(Long.MIN_VALUE);
+
         CommitVisitor visitor = new CommitVisitor(getCommitFilter()) {
             @Override
             public void visitCommit(@Nonnull Commit commit) {
                 IdentityRecord ownerRecord = getOrCreateRecord(commit.owner);
                 ownerRecord.commits.add(commit);
+                if (commit.lastUpdatedDate > toDate.get()) {
+                    toDate.set(commit.lastUpdatedDate);
+                }
+                if (commit.lastUpdatedDate < fromDate.get()) {
+                    fromDate.set(commit.lastUpdatedDate);
+                }
 
                 for (Commit.Identity identity : commit.reviewers) {
                     if (!getCommitFilter().isIncluded(identity)) {
@@ -261,11 +274,18 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
                 }
             }
         };
-        visitor.visit(commits);
+        visitor.visit(queryData.getCommits());
 
         List<IdentityRecord> orderedList = new ArrayList<IdentityRecord>();
         orderedList.addAll(records.values());
         Collections.sort(orderedList, new CommentsWrittenComparator());
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        System.out.println("Project: " + queryData.getDisplayableProjectName());
+        System.out.println("Branches: " + queryData.getDisplayableBranchList());
+        System.out.println("From: " + dateFormat.format(new Date(fromDate.get())));
+        System.out.println("To: " + dateFormat.format(new Date(toDate.get())));
+        System.out.println("");
 
         switch (getOutputRules().getOutputType()) {
             case CSV:

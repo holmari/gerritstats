@@ -81,15 +81,16 @@ public class GerritStatsMain {
         GerritStatParser commitDataParser = new GerritStatParser();
         List<Commit> commits = commitDataParser.parseCommits(data);
 
+        QueryData queryData = new QueryData(commandLine, commits);
         switch (commandLine.getOutput()) {
             case REVIEW_COMMENT_CSV:
                 ReviewerCsvFormatter reviewerFormatter = new ReviewerCsvFormatter(filter, outputRules);
-                System.out.print(reviewerFormatter.invoke(commits).toString());
+                System.out.print(reviewerFormatter.invoke(queryData).toString());
                 break;
             case PER_PERSON_DATA:
             default:
                 PerPersonDataFormatter perPersonFormatter = new PerPersonDataFormatter(filter, outputRules);
-                System.out.print(perPersonFormatter.invoke(commits));
+                System.out.print(perPersonFormatter.invoke(queryData));
                 break;
         }
     }
