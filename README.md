@@ -1,6 +1,6 @@
 # GerritStats
 
-This project provides statistics from a Gerrit repository. It provides output in both CSV and plaintexts format.
+This project provides statistics from a Gerrit repository. It provides output in both CSV and plaintext format.
 
 The tool can be useful for analysing how efficiently code reviews are implemented in an organization, and how
 often cross-team code reviews are conducted.
