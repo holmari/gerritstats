@@ -2,6 +2,7 @@ package com.holmsted.gerrit.formatters;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
+import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
 
 import java.util.List;
@@ -13,11 +14,11 @@ public abstract class CommitDataFormatter {
     @Nonnull
     private final CommitFilter filter;
     @Nonnull
-    private final OutputType outputType;
+    private final OutputRules outputRules;
 
-    public CommitDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputType outputType) {
+    public CommitDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
         this.filter = filter;
-        this.outputType = outputType;
+        this.outputRules = outputRules;
     }
 
     /**
@@ -32,7 +33,7 @@ public abstract class CommitDataFormatter {
     }
 
     @Nonnull
-    protected OutputType getOutputType() {
-        return outputType;
+    protected OutputRules getOutputRules() {
+        return outputRules;
     }
 }

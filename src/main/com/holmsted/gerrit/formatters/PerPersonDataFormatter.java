@@ -2,6 +2,7 @@ package com.holmsted.gerrit.formatters;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
+import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
 
 import java.util.ArrayList;
@@ -162,8 +163,8 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
     private final Hashtable<Commit.Identity, IdentityRecord> records =
             new Hashtable<Commit.Identity, IdentityRecord>();
 
-    public PerPersonDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputType outputType) {
-        super(filter, outputType);
+    public PerPersonDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
+        super(filter, outputRules);
     }
 
     @Override
@@ -220,7 +221,7 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
         orderedList.addAll(records.values());
         Collections.sort(orderedList, new CommentsWrittenComparator());
 
-        switch (getOutputType()) {
+        switch (getOutputRules().getOutputType()) {
             case CSV:
                 return createCsvOutput(orderedList);
             case PLAIN:

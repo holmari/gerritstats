@@ -23,6 +23,10 @@ public class CommandLineParser {
     @Nonnull
     private OutputType outputType = OutputType.PLAIN;
 
+    private int listCommitsExceedingPatchSetCount = - 1;
+    private boolean listReviewComments;
+    private Output output = Output.PER_PERSON_DATA;
+
     public boolean parse(String[] args) {
         boolean hasSyntaxError = false;
         for (int i = 0; i < args.length; ++i) {
@@ -65,8 +69,18 @@ public class CommandLineParser {
                 Collections.addAll(includedBranches, branches);
                 ++i;
             } else if (arg.equals("--output-type") && isNotAtEnd) {
-                outputType = OutputType.fromFormatName(args[i + 1]);
+                outputType = OutputType.fromTypeString(args[i + 1]);
+                ++i;
+            } else if (arg.equals("--output") && isNotAtEnd) {
+                output = Output.fromString(args[i + 1]);
+                ++i;
+            } else if (arg.equals("--list-comments")) {
+                listReviewComments = true;
+            } else if (arg.equals("--list-commits-exceeding-patch-set-count") && isNotAtEnd) {
+                listCommitsExceedingPatchSetCount = Integer.parseInt(args[i + 1]);
+                ++i;
             }
+
         }
 
         return (filename != null || serverName != null) && !hasSyntaxError;
@@ -114,5 +128,17 @@ public class CommandLineParser {
     @Nonnull
     public OutputType getOutputType() {
         return outputType;
+    }
+
+    public Output getOutput() {
+        return output;
+    }
+
+    public boolean getListReviewComments() {
+        return listReviewComments;
+    }
+
+    public int getListCommitsExceedingPatchSetCount() {
+        return listCommitsExceedingPatchSetCount;
     }
 }

@@ -11,15 +11,18 @@ import file.FileWriter;
 public class GerritStatsMain {
 
     public static void main(String[] args) {
-        CommandLineParser parser = new CommandLineParser();
-        if (!parser.parse(args)) {
+        CommandLineParser commandLine = new CommandLineParser();
+        if (!commandLine.parse(args)) {
             System.err.println("Reads and outputs Gerrit statistics.");
-            System.err.println("Usage: gerritstats.jar [--file file]|"
+            System.err.println("Usage: GerritStats.jar [--file file]|"
                     + "[--server server:port [--project project] [--limit n] [--output-file file]]");
             System.err.println("      [--branches master,feature1]");
             System.err.println("      [--include joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
             System.err.println("      [--exclude joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
-            System.err.println("      [--output-format plain|csv]");
+            System.err.println("      [--output-type plain|csv]");
+            System.err.println("      [--output review-comment-csv|per-person-data]");
+            System.err.println("      [--list-commits-exceeding-patch-set-count n]");
+            System.err.println("      [--list-comments]");
             System.err.println();
             System.err.println(" --file file: read output from file");
             System.err.println(String.format(" --server url:port: read output from Gerrit server url and given port."
@@ -38,45 +41,56 @@ public class GerritStatsMain {
                     + "specified, --exclude is ignored.");
             System.err.println(" --exclude list-of-people: if specified, the comma-separated list of identities "
                     + " will be excluded from all generated statistics.");
-            System.err.println(" --output-type: if specified, the output will be created in either plain " +
-                    "or csv format. CSV is more suitable for processing with other tools.");
+            System.err.println(" --output: If specified, the output will be either a list of all review comments in "
+                    + "CSV format, or a per-person data set. Defaults to per-person-data.");
+            System.err.println("--list-commits-exceeding-patch-set-count: If specified, all commit URLs "
+                    + "exceeding the given patch set count will be listed in the per-person data.");
+            System.err.println("--list-comments: If specified, the per-person data will show a list of all "
+                    + " code review comments written by a person.");
             System.exit(1);
             return;
         }
 
+        OutputRules outputRules = new OutputRules(commandLine);
+
         CommitFilter filter = new CommitFilter();
         filter.setIncludeEmptyEmails(false);
-        filter.setIncludedEmails(parser.getIncludedEmails());
-        filter.setExcludedEmails(parser.getExcludedEmails());
-        filter.setIncludeBranches(parser.getIncludeBranches());
+        filter.setIncludedEmails(commandLine.getIncludedEmails());
+        filter.setExcludedEmails(commandLine.getExcludedEmails());
+        filter.setIncludeBranches(commandLine.getIncludeBranches());
 
-        String serverName = parser.getServerName();
+        String serverName = commandLine.getServerName();
         String data;
         if (serverName != null) {
-            GerritStatReader reader = GerritStatReader.fromCommandLine(serverName, parser.getServerPort());
-            reader.setCommitLimit(parser.getCommitLimit());
-            String projectName = parser.getProjectName();
+            GerritStatReader reader = GerritStatReader.fromCommandLine(serverName, commandLine.getServerPort());
+            reader.setCommitLimit(commandLine.getCommitLimit());
+            String projectName = commandLine.getProjectName();
             if (projectName != null) {
                 reader.setProjectName(projectName);
             }
             data = reader.readData();
 
-            String outputFile = parser.getOutputFile();
+            String outputFile = commandLine.getOutputFile();
             if (outputFile != null) {
                 FileWriter.writeFile(outputFile, data);
             }
         } else {
-            data = FileReader.readFile(parser.getFilename());
+            data = FileReader.readFile(commandLine.getFilename());
         }
 
         GerritStatParser commitDataParser = new GerritStatParser();
         List<Commit> commits = commitDataParser.parseCommits(data);
 
-        // TODO how to decide whether to output this?
-        ReviewerCsvFormatter formatter = new ReviewerCsvFormatter(filter, parser.getOutputType());
-        //System.out.print(formatter.invoke(commits).toString());
-
-        PerPersonDataFormatter perPersonFormatter = new PerPersonDataFormatter(filter, parser.getOutputType());
-        System.out.print(perPersonFormatter.invoke(commits));
+        switch (commandLine.getOutput()) {
+            case REVIEW_COMMENT_CSV:
+                ReviewerCsvFormatter reviewerFormatter = new ReviewerCsvFormatter(filter, outputRules);
+                System.out.print(reviewerFormatter.invoke(commits).toString());
+                break;
+            case PER_PERSON_DATA:
+            default:
+                PerPersonDataFormatter perPersonFormatter = new PerPersonDataFormatter(filter, outputRules);
+                System.out.print(perPersonFormatter.invoke(commits));
+                break;
+        }
     }
 }

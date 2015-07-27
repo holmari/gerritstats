@@ -16,7 +16,7 @@ public enum OutputType {
         this.formatName = formatName;
     }
 
-    public static OutputType fromFormatName(String formatName) {
+    public static OutputType fromTypeString(String formatName) {
         if (formatName.equals(CSV.formatName)) {
             return CSV;
         } else {

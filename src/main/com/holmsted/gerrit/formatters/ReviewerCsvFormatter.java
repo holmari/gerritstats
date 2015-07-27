@@ -2,6 +2,7 @@ package com.holmsted.gerrit.formatters;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
+import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
 
 import java.text.SimpleDateFormat;
@@ -19,8 +20,8 @@ import javax.annotation.Nonnull;
  */
 public class ReviewerCsvFormatter extends CommitDataFormatter {
 
-    public ReviewerCsvFormatter(@Nonnull CommitFilter filter, @Nonnull OutputType outputType) {
-        super(filter, outputType);
+    public ReviewerCsvFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
+        super(filter, outputRules);
     }
 
     @Override
