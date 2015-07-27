@@ -1,0 +1,26 @@
+apply plugin: 'java'
+apply plugin: 'maven-publish'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.json:json:20140107"
+    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.holmsted.gerrit.GerritStatsMain'
+    }
+
+    // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
