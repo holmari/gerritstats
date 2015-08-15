@@ -7,6 +7,7 @@ import com.holmsted.gerrit.OutputType;
 import com.holmsted.gerrit.QueryData;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -21,14 +22,24 @@ import javax.annotation.Nonnull;
  */
 public class ReviewerCsvFormatter extends CommitDataFormatter {
 
+    static class PatchSetCommentData {
+        long patchSetDate;
+        String reviewerEmail;
+        String authorEmail;
+
+        PatchSetCommentData(long patchSetDate) {
+            this.patchSetDate = patchSetDate;
+        }
+    }
+
     public ReviewerCsvFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
         super(filter, outputRules);
     }
 
     @Override
     public String invoke(@Nonnull QueryData queryData) {
-        final StringBuilder builder = new StringBuilder();
         final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        final List<PatchSetCommentData> dataList = new ArrayList<PatchSetCommentData>();
 
         CommitVisitor visitor = new CommitVisitor(getCommitFilter()) {
             @Override public void visitCommit(@Nonnull Commit commit) {}
@@ -39,16 +50,23 @@ public class ReviewerCsvFormatter extends CommitDataFormatter {
             @Override
             public void visitPatchSetComment(@Nonnull Commit.PatchSet patchSet,
                                              @Nonnull Commit.PatchSetComment patchSetComment) {
-                Date date = new Date(patchSet.createdOnDate);
-                String outComment = String.format("%10s %40s %40s",
-                        dateFormat.format(date),
-                        patchSetComment.reviewer.email,
-                        patchSet.author.email);
-                builder.append(outComment).append('\n');
+
+                PatchSetCommentData data = new PatchSetCommentData(patchSet.createdOnDate);
+                data.reviewerEmail = patchSetComment.reviewer.email;
+                data.authorEmail = patchSet.author.email;
+                dataList.add(data);
             }
         };
         visitor.visit(queryData.getCommits());
 
+        final StringBuilder builder = new StringBuilder();
+        for (PatchSetCommentData data : dataList) {
+            String outComment = String.format("%10s %40s %40s",
+                    dateFormat.format(new Date(data.patchSetDate)),
+                    data.reviewerEmail,
+                    data.authorEmail);
+            builder.append(outComment).append('\n');
+        }
         return builder.toString();
     }
 }
