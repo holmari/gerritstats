@@ -19,7 +19,7 @@ public class GerritStatsMain {
             System.err.println("      [--branches master,feature1]");
             System.err.println("      [--include joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
             System.err.println("      [--exclude joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
-            System.err.println("      [--output-type plain|csv]");
+            System.err.println("      [--output-type plain|csv|html]");
             System.err.println("      [--output review-comment-csv|per-person-data]");
             System.err.println("      [--list-commits-exceeding-patch-set-count n]");
             System.err.println("      [--list-comments]");

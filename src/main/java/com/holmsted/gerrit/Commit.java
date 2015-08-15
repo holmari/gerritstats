@@ -6,6 +6,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import jsonutils.JsonUtils;
 
 
@@ -23,6 +25,18 @@ public class Commit {
         public String name;
         public String email;
         public String username;
+
+        public String getName() {
+            return name;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getUsername() {
+            return username;
+        }
 
         public static Identity fromJson(JSONObject ownerJson) {
             Identity identity = new Identity();
@@ -42,6 +56,16 @@ public class Commit {
                 return email.equals(otherIdentity.email);
             } else {
                 return super.equals(other);
+            }
+        }
+
+        public int compareTo(@Nonnull Identity other) {
+            if (email != null && other.email != null) {
+                return email.compareTo(other.email);
+            } else if (username != null && other.username != null) {
+                return username.compareTo(other.username);
+            } else {
+                return 0;
             }
         }
 
@@ -115,6 +139,22 @@ public class Commit {
         public int line;
         public Identity reviewer;
         public String message;
+
+        public String getFile() {
+            return file;
+        }
+
+        public int getLine() {
+            return line;
+        }
+
+        public Identity getReviewer() {
+            return reviewer;
+        }
+
+        public String getMessage() {
+            return message;
+        }
 
         public static List<PatchSetComment> fromJson(JSONArray comments) {
             List<PatchSetComment> result = new ArrayList<PatchSetComment>();
@@ -202,6 +242,14 @@ public class Commit {
             }
         }
         return count;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public List<PatchSet> getPatchSets() {
+        return patchSets;
     }
 
     static boolean isCommit(JSONObject lineJson) {

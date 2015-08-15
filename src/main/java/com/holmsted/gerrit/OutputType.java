@@ -8,7 +8,11 @@ public enum OutputType {
     /**
      * Plain text, human readable format.
      */
-    PLAIN("plain");
+    PLAIN("plain"),
+    /**
+     *
+     */
+    HTML("html");
 
     private final String formatName;
 
@@ -19,6 +23,8 @@ public enum OutputType {
     public static OutputType fromTypeString(String formatName) {
         if (formatName.equals(CSV.formatName)) {
             return CSV;
+        } else if (formatName.equals(HTML.formatName)) {
+            return HTML;
         } else {
             return PLAIN;
         }

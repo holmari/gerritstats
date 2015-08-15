@@ -1,0 +1,69 @@
+#macro(listComma $index $listSize)
+#set ( $lastone = $listSize - 1 )
+#if( $index <= $lastone ),
+#else #end
+#end
+
+<html>
+<body>
+<head>
+</head>
+
+<h1>$identity.name ($identity.username)</h1>
+<h2>$identity.email</h2>
+
+<h3>Overall</h3>
+<p>
+Commits: $record.commits.size() <br>
+Comments written: $record.commentsWritten.size() <br>
+Comments received: $record.commentsReceived.size() <br>
+Commit/comment ratio: $record.receivedCommentRatio <br>
+Added as reviewer: $record.addedAsReviewerTo.size() <br><br>
+
+Review comment ratio: $record.reviewCommentRatio <br>
+Avg. patch set count: $record.averagePatchSetCount <br>
+Max patch set count: $record.maxPatchSetCount <br>
++2 reviews given: $record.reviewCountPlus2 <br>
++1 reviews given: $record.reviewCountPlus1 <br>
+-1 reviews given: $record.reviewCountMinus1 <br>
+-2 reviews given: $record.reviewCountMinus2 <br>
+# of people added as reviewers: $record.reviewersForOwnCommits.size() <br>
+</p>
+
+<h3>Adds them as reviewers</h3>
+<p>
+#foreach( $identity in $record.myReviewerList )
+#set ( $reviewCount = $record.reviewersForOwnCommits.get($identity) )
+    <a href="mailto:$identity.email">$identity.email</a> ($reviewCount)#listComma( $velocityCount, $record.myReviewerList.size() )
+#end
+</p>
+
+<h3>They add this person as reviewer</h3>
+<p>
+#foreach( $identity in $record.reviewRequestorList )
+#set ( $reviewCount = $record.reviewRequestorCounts.get($identity) )
+    <a href="mailto:$identity.email">$identity.email</a> ($reviewCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
+#end
+</p>
+
+#if ($outputRules.listCommitsExceedingPatchSetCount != -1)
+<h3>Commits exceeding $outputRules.listCommitsExceedingPatchSetCount patches</h3>
+<p>
+#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.listCommitsExceedingPatchSetCount) )
+#foreach( $commit in $badCommitList )
+    <a href="$commit.url">$commit.url</a> ($commit.patchSets.size())#listComma( $velocityCount, $badCommitList.size() )
+#end
+</p>
+#end
+
+<h3>Review comments</h3>
+<ul>
+#foreach( $comment in $record.commentsWritten )
+    <li>$comment.message</li>
+#end
+</ul>
+
+</p>
+
+</body>
+</html>

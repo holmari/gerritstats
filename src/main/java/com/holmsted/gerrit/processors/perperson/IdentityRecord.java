@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-class IdentityRecord {
+public class IdentityRecord {
     final Commit.Identity identity;
 
     int reviewCountPlus2;
@@ -18,13 +18,56 @@ class IdentityRecord {
     int reviewCountMinus2;
 
     final List<Commit> commits = new ArrayList<Commit>();
+
     final List<Commit> addedAsReviewerTo = new ArrayList<Commit>();
+    final Hashtable<Commit.Identity, Integer> reviewRequestors = new Hashtable<Commit.Identity, Integer>();
+
     final List<Commit.PatchSetComment> commentsWritten = new ArrayList<Commit.PatchSetComment>();
     final List<Commit.PatchSetComment> commentsReceived = new ArrayList<Commit.PatchSetComment>();
     final Hashtable<Commit.Identity, Integer> reviewersForOwnCommits = new Hashtable<Commit.Identity, Integer>();
 
     public IdentityRecord(Commit.Identity identity) {
         this.identity = identity;
+    }
+
+    public List<Commit> getCommits() {
+        return commits;
+    }
+
+    public List<Commit> getAddedAsReviewerTo() {
+        return addedAsReviewerTo;
+    }
+
+    public List<Commit.PatchSetComment> getCommentsWritten() {
+        return commentsWritten;
+    }
+
+    public List<Commit.PatchSetComment> getCommentsReceived() {
+        return commentsReceived;
+    }
+
+    public Hashtable<Commit.Identity, Integer> getReviewersForOwnCommits() {
+        return reviewersForOwnCommits;
+    }
+
+    public Hashtable<Commit.Identity, Integer> getReviewRequestorCounts() {
+        return reviewRequestors;
+    }
+
+    public int getReviewCountMinus1() {
+        return reviewCountMinus1;
+    }
+
+    public int getReviewCountMinus2() {
+        return reviewCountMinus2;
+    }
+
+    public int getReviewCountPlus1() {
+        return reviewCountPlus1;
+    }
+
+    public int getReviewCountPlus2() {
+        return reviewCountPlus2;
     }
 
     public float getReceivedCommentRatio() {
@@ -79,25 +122,24 @@ class IdentityRecord {
         }
     }
 
-    public String getDisplayableMyReviewerList() {
+    public List<Commit.Identity> getMyReviewerList() {
         List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewersForOwnCommits.keySet());
         Collections.sort(sortedIdentities, new ReviewComparator(reviewersForOwnCommits));
-        return getPrintableReviewerList(sortedIdentities, reviewersForOwnCommits);
+        return sortedIdentities;
+    }
+
+    public String getDisplayableMyReviewerList() {
+        return getPrintableReviewerList(getMyReviewerList(), reviewersForOwnCommits);
+    }
+
+    public List<Commit.Identity> getReviewRequestorList() {
+        List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewRequestors.keySet());
+        Collections.sort(sortedIdentities, new ReviewComparator(reviewRequestors));
+        return sortedIdentities;
     }
 
     public String getDisplayableAddedReviewerList() {
-        Hashtable<Commit.Identity, Integer> identities = new Hashtable<Commit.Identity, Integer>();
-        for (Commit commit : addedAsReviewerTo) {
-            Integer count = identities.get(commit.owner);
-            if (!commit.owner.equals(identity)) {
-                identities.put(commit.owner, count == null ? 1 : count + 1);
-            }
-        }
-
-        List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(identities.keySet());
-        Collections.sort(sortedIdentities, new ReviewComparator(identities));
-
-        return getPrintableReviewerList(sortedIdentities, identities);
+        return getPrintableReviewerList(getReviewRequestorList(), reviewRequestors);
     }
 
     public void addReviewerForOwnCommit(Commit.Identity identity) {
@@ -119,7 +161,7 @@ class IdentityRecord {
         return builder.toString();
     }
 
-    public String getCommitsWithNPatchSets(int patchSetCountThreshold) {
+    public List<Commit> getCommitsWithNPatchSets(int patchSetCountThreshold) {
         List<Commit> exceedingCommits = new ArrayList<Commit>();
         for (Commit commit : commits) {
             int patchSetCount = commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
@@ -128,7 +170,11 @@ class IdentityRecord {
             }
         }
         Collections.sort(exceedingCommits, new PatchSetCountComparator());
+        return exceedingCommits;
+    }
 
+    public String getPrintableCommitsWithNPatchSets(int patchSetCountThreshold) {
+        List<Commit> exceedingCommits = getCommitsWithNPatchSets(patchSetCountThreshold);
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < exceedingCommits.size(); ++i) {
             Commit commit = exceedingCommits.get(i);
@@ -149,5 +195,12 @@ class IdentityRecord {
         }
 
         return builder.toString();
+    }
+
+    public void addReviewedCommit(@Nonnull Commit commit) {
+        addedAsReviewerTo.add(commit);
+
+        Integer reviewCountForIdentity = reviewRequestors.get(commit.owner);
+        reviewRequestors.put(commit.owner, reviewCountForIdentity != null ? reviewCountForIdentity + 1 : 1);
     }
 }

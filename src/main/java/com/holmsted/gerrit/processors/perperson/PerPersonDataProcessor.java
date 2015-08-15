@@ -2,12 +2,24 @@ package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
+import com.holmsted.gerrit.Output;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
 import com.holmsted.gerrit.QueryData;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 import com.holmsted.gerrit.processors.CommitVisitor;
 
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.context.Context;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+
+import java.io.File;
+import java.io.IOError;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +27,8 @@ import java.util.Locale;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
+
+import file.FileWriter;
 
 public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
 
@@ -113,6 +127,52 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
         }
     }
 
+    static class PerPersonHtmlFormatter implements OutputFormatter<PerPersonData> {
+        private static final String DEFAULT_OUTPUT_DIR = "out";
+        private static final String TEMPLATES_RES_PATH = "templates";
+        private static final String VM_PERSON_PROFILE = TEMPLATES_RES_PATH + File.separator + "person_profile.vm";
+        private OutputRules outputRules;
+
+        public PerPersonHtmlFormatter(@Nonnull OutputRules outputRules) {
+            this.outputRules = outputRules;
+        }
+
+        @Override
+        public void format(@Nonnull PerPersonData data) {
+            File outputDir = new File(DEFAULT_OUTPUT_DIR);
+            if (!outputDir.exists() && !outputDir.mkdirs()) {
+                throw new IOError(new IOException("Cannot create output directory " + outputDir.getAbsolutePath()));
+            }
+            VelocityEngine velocity = new VelocityEngine();
+            velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+            velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+            velocity.init();
+
+            List<IdentityRecord> orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
+
+            for (IdentityRecord record : orderedList) {
+                String outputFilename = getOutputFilenameForIdentity(record.identity);
+                System.out.println("Creating " + outputFilename);
+
+                Context context = new VelocityContext();
+                context.put("outputRules", outputRules);
+                context.put("identity", record.identity);
+                context.put("record", record);
+
+                StringWriter writer = new StringWriter();
+                velocity.mergeTemplate(VM_PERSON_PROFILE, "UTF-8", context, writer);
+
+                FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
+            }
+
+            System.out.println("Output written to " + outputDir.getAbsolutePath());
+        }
+
+        private static String getOutputFilenameForIdentity(@Nonnull Commit.Identity identity) {
+            return identity.username + ".html";
+        }
+    }
+
     private final PerPersonData records = new PerPersonData();
 
     public PerPersonDataProcessor(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
@@ -147,7 +207,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
 
                     IdentityRecord reviewerRecord = getOrCreateRecord(identity);
                     if (!commit.owner.equals(reviewerRecord.identity)) {
-                        reviewerRecord.addedAsReviewerTo.add(commit);
+                        reviewerRecord.addReviewedCommit(commit);
                     }
                 }
             }
@@ -203,8 +263,10 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                 return new PerPersonCsvFormatter();
             case PLAIN:
                 return new PerPersonPlaintextFormatter(getOutputRules());
+            case HTML:
+                return new PerPersonHtmlFormatter(getOutputRules());
             default:
-                throw new UnsupportedOperationException("Unsupported case " + outputType);
+                throw new UnsupportedOperationException("Unsupported format " + outputType);
         }
     }
 
