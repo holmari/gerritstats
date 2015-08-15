@@ -85,7 +85,7 @@ public class GerritStatsMain {
         switch (commandLine.getOutput()) {
             case REVIEW_COMMENT_CSV:
                 ReviewerCsvFormatter reviewerFormatter = new ReviewerCsvFormatter(filter, outputRules);
-                System.out.print(reviewerFormatter.invoke(queryData).toString());
+                System.out.print(reviewerFormatter.invoke(queryData));
                 break;
             case PER_PERSON_DATA:
             default:
