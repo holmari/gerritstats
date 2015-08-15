@@ -15,7 +15,7 @@ public class GerritStatsMain {
         if (!commandLine.parse(args)) {
             System.err.println("Reads and outputs Gerrit statistics.");
             System.err.println("Usage: GerritStats.jar [--file file]|"
-                    + "[--server server:port [--project project] [--limit n] [--output-file file]]");
+                    + "[--server server:port [--project project] [--limit n] [--query-output-file file]]");
             System.err.println("      [--branches master,feature1]");
             System.err.println("      [--include joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
             System.err.println("      [--exclude joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
@@ -32,7 +32,7 @@ public class GerritStatsMain {
                     + "If omitted, stats will be retrieved from all projects.");
             System.err.println(" --limit n: The number of commits which to retrieve from the server. "
                     + "If omitted, stats will be retrieved until no further records are available.");
-            System.err.println(" --output-file file: if specified, the output of the query will be written into "
+            System.err.println(" --query-output-file file: if specified, the output of the query will be written into "
                     + "the specified file, to be used later with e.g. --file switch.");
             System.err.println(" --branches branches: if specified, only the comma-separated list of branches "
                     + "will be included for analysis. If omitted, all available branches will be inspected.");

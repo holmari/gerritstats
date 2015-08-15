@@ -49,7 +49,7 @@ public class CommandLineParser {
             } else if (arg.equals("--project") && isNotAtEnd) {
                 projectName = args[i + 1];
                 ++i;
-            } else if (arg.equals("--output-file") && isNotAtEnd) {
+            } else if (arg.equals("--query-output-file") && isNotAtEnd) {
                 outputFile = args[i + 1];
                 ++i;
             } else if (arg.equals("--limit") && isNotAtEnd) {
