@@ -1,14 +1,14 @@
-package com.holmsted.gerrit.processors;
+package com.holmsted.gerrit.processors.reviewers;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.QueryData;
+import com.holmsted.gerrit.processors.CommitDataProcessor;
+import com.holmsted.gerrit.processors.CommitVisitor;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -19,15 +19,27 @@ import javax.annotation.Nonnull;
  * <p>
  * date reviewer-email commit-author-email
  */
-public class ReviewerProcessor extends CommitDataProcessor {
+public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> {
 
-    static class PatchSetCommentData {
-        long patchSetDate;
-        String reviewerEmail;
-        String authorEmail;
+    static class CsvFormatter implements OutputFormatter<PatchSetCommentList> {
 
-        PatchSetCommentData(long patchSetDate) {
-            this.patchSetDate = patchSetDate;
+        private SimpleDateFormat dateFormat;
+
+        public CsvFormatter() {
+            dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
+        }
+
+        @Override
+        public void format(@Nonnull PatchSetCommentList dataList) {
+            final StringBuilder builder = new StringBuilder();
+            for (PatchSetCommentData data : dataList) {
+                String outComment = String.format("%10s %40s %40s",
+                        dateFormat.format(new Date(data.patchSetDate)),
+                        data.reviewerEmail,
+                        data.authorEmail);
+                builder.append(outComment).append('\n');
+            }
+            System.out.print(builder.toString());
         }
     }
 
@@ -35,10 +47,19 @@ public class ReviewerProcessor extends CommitDataProcessor {
         super(filter, outputRules);
     }
 
+    /**
+     * Creates a CSV text formatter regardless of the user-defined output type.
+     */
+    @Nonnull
     @Override
-    public String invoke(@Nonnull QueryData queryData) {
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        final List<PatchSetCommentData> dataList = new ArrayList<PatchSetCommentData>();
+    protected OutputFormatter<PatchSetCommentList> createOutputFormatter() {
+        return new CsvFormatter();
+    }
+
+    @Override
+    public void process(@Nonnull OutputFormatter<PatchSetCommentList> formatter,
+                        @Nonnull QueryData queryData) {
+        final PatchSetCommentList dataList = new PatchSetCommentList();
 
         CommitVisitor visitor = new CommitVisitor(getCommitFilter()) {
             @Override public void visitCommit(@Nonnull Commit commit) {}
@@ -49,7 +70,6 @@ public class ReviewerProcessor extends CommitDataProcessor {
             @Override
             public void visitPatchSetComment(@Nonnull Commit.PatchSet patchSet,
                                              @Nonnull Commit.PatchSetComment patchSetComment) {
-
                 PatchSetCommentData data = new PatchSetCommentData(patchSet.createdOnDate);
                 data.reviewerEmail = patchSetComment.reviewer.email;
                 data.authorEmail = patchSet.author.email;
@@ -58,14 +78,6 @@ public class ReviewerProcessor extends CommitDataProcessor {
         };
         visitor.visit(queryData.getCommits());
 
-        final StringBuilder builder = new StringBuilder();
-        for (PatchSetCommentData data : dataList) {
-            String outComment = String.format("%10s %40s %40s",
-                    dateFormat.format(new Date(data.patchSetDate)),
-                    data.reviewerEmail,
-                    data.authorEmail);
-            builder.append(outComment).append('\n');
-        }
-        return builder.toString();
+        formatter.format(dataList);
     }
 }

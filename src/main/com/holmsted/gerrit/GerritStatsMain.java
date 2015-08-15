@@ -1,7 +1,7 @@
 package com.holmsted.gerrit;
 
-import com.holmsted.gerrit.processors.PerPersonDataProcessor;
-import com.holmsted.gerrit.processors.ReviewerProcessor;
+import com.holmsted.gerrit.processors.perperson.PerPersonDataProcessor;
+import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
 import java.util.List;
 
@@ -85,12 +85,12 @@ public class GerritStatsMain {
         switch (commandLine.getOutput()) {
             case REVIEW_COMMENT_CSV:
                 ReviewerProcessor reviewerFormatter = new ReviewerProcessor(filter, outputRules);
-                System.out.print(reviewerFormatter.invoke(queryData));
+                reviewerFormatter.invoke(queryData);
                 break;
             case PER_PERSON_DATA:
             default:
                 PerPersonDataProcessor perPersonFormatter = new PerPersonDataProcessor(filter, outputRules);
-                System.out.print(perPersonFormatter.invoke(queryData));
+                perPersonFormatter.invoke(queryData);
                 break;
         }
     }

@@ -1,4 +1,4 @@
-package com.holmsted.gerrit.processors;
+package com.holmsted.gerrit.processors.perperson;
 
 public class HumanReadableLineBuilder {
 
