@@ -1,23 +1,19 @@
-package com.holmsted.gerrit.formatters;
+package com.holmsted.gerrit.processors;
 
-import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
-import com.holmsted.gerrit.OutputType;
 import com.holmsted.gerrit.QueryData;
-
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public abstract class CommitDataFormatter {
+public abstract class CommitDataProcessor {
 
     @Nonnull
     private final CommitFilter filter;
     @Nonnull
     private final OutputRules outputRules;
 
-    public CommitDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
+    public CommitDataProcessor(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
         this.filter = filter;
         this.outputRules = outputRules;
     }

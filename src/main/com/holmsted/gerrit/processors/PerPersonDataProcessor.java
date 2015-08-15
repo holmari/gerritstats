@@ -1,4 +1,4 @@
-package com.holmsted.gerrit.formatters;
+package com.holmsted.gerrit.processors;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.CommitFilter;
@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.Nonnull;
 
-public class PerPersonDataFormatter extends CommitDataFormatter {
+public class PerPersonDataProcessor extends CommitDataProcessor {
 
     private static class IdentityRecord {
         final Commit.Identity identity;
@@ -213,7 +213,7 @@ public class PerPersonDataFormatter extends CommitDataFormatter {
     private final Hashtable<Commit.Identity, IdentityRecord> records =
             new Hashtable<Commit.Identity, IdentityRecord>();
 
-    public PerPersonDataFormatter(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
+    public PerPersonDataProcessor(@Nonnull CommitFilter filter, @Nonnull OutputRules outputRules) {
         super(filter, outputRules);
     }
 

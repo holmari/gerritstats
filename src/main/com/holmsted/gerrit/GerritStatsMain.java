@@ -1,7 +1,7 @@
 package com.holmsted.gerrit;
 
-import com.holmsted.gerrit.formatters.PerPersonDataFormatter;
-import com.holmsted.gerrit.formatters.ReviewerCsvFormatter;
+import com.holmsted.gerrit.processors.PerPersonDataProcessor;
+import com.holmsted.gerrit.processors.ReviewerProcessor;
 
 import java.util.List;
 
@@ -84,12 +84,12 @@ public class GerritStatsMain {
         QueryData queryData = new QueryData(commandLine, commits);
         switch (commandLine.getOutput()) {
             case REVIEW_COMMENT_CSV:
-                ReviewerCsvFormatter reviewerFormatter = new ReviewerCsvFormatter(filter, outputRules);
+                ReviewerProcessor reviewerFormatter = new ReviewerProcessor(filter, outputRules);
                 System.out.print(reviewerFormatter.invoke(queryData));
                 break;
             case PER_PERSON_DATA:
             default:
-                PerPersonDataFormatter perPersonFormatter = new PerPersonDataFormatter(filter, outputRules);
+                PerPersonDataProcessor perPersonFormatter = new PerPersonDataProcessor(filter, outputRules);
                 System.out.print(perPersonFormatter.invoke(queryData));
                 break;
         }

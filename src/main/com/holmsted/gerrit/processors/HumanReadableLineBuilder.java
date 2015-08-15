@@ -1,4 +1,4 @@
-package com.holmsted.gerrit.formatters;
+package com.holmsted.gerrit.processors;
 
 public class HumanReadableLineBuilder {
 
