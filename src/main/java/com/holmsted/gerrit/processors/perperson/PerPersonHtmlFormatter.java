@@ -24,25 +24,35 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     private static final String DEFAULT_OUTPUT_DIR = "out";
     private static final String TEMPLATES_RES_PATH = "templates";
     private static final String VM_PERSON_PROFILE = TEMPLATES_RES_PATH + File.separator + "person_profile.vm";
+    private static final String VM_INDEX = TEMPLATES_RES_PATH + File.separator + "index.vm";
+
     private OutputRules outputRules;
+    private VelocityEngine velocity = new VelocityEngine();
+    private File outputDir;
 
     public PerPersonHtmlFormatter(@Nonnull OutputRules outputRules) {
         this.outputRules = outputRules;
-    }
-
-    @Override
-    public void format(@Nonnull PerPersonData data) {
-        File outputDir = new File(DEFAULT_OUTPUT_DIR);
-        if (!outputDir.exists() && !outputDir.mkdirs()) {
-            throw new IOError(new IOException("Cannot create output directory " + outputDir.getAbsolutePath()));
-        }
-        VelocityEngine velocity = new VelocityEngine();
         velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
         velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocity.init();
 
+        outputDir = new File(DEFAULT_OUTPUT_DIR);
+    }
+
+    @Override
+    public void format(@Nonnull PerPersonData data) {
+        if (!outputDir.exists() && !outputDir.mkdirs()) {
+            throw new IOError(new IOException("Cannot create output directory " + outputDir.getAbsolutePath()));
+        }
+
         List<IdentityRecord> orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
 
+        createPerPersonFiles(orderedList);
+
+        System.out.println("Output written to " + outputDir.getAbsolutePath());
+    }
+
+    private void createPerPersonFiles(@Nonnull List<IdentityRecord> orderedList) {
         for (IdentityRecord record : orderedList) {
             String outputFilename = getOutputFilenameForIdentity(record.identity);
             System.out.println("Creating " + outputFilename);
@@ -53,13 +63,14 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             context.put("record", record);
             context.put("Gerrit", GerritUtils.class);
 
-            StringWriter writer = new StringWriter();
-            velocity.mergeTemplate(VM_PERSON_PROFILE, "UTF-8", context, writer);
-
-            FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
+            writeTemplate(context, outputFilename);
         }
+    }
 
-        System.out.println("Output written to " + outputDir.getAbsolutePath());
+    private void writeTemplate(@Nonnull Context context, String outputFilename) {
+        StringWriter writer = new StringWriter();
+        velocity.mergeTemplate(VM_PERSON_PROFILE, "UTF-8", context, writer);
+        FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
     }
 
     private static String getOutputFilenameForIdentity(@Nonnull Commit.Identity identity) {
