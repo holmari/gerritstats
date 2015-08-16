@@ -1,9 +1,4 @@
-#macro(listComma $index $listSize)
-#set ( $lastone = $listSize - 1 )
-#if( $index <= $lastone ),
-#else #end
-#end
-
+#parse( "templates/macros.vm" )
 <html>
 <body>
 <head>
