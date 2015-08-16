@@ -32,6 +32,18 @@ public class IdentityRecord {
         this.identity = identity;
     }
 
+    public String getName() {
+        return identity.getName();
+    }
+
+    public String getEmail() {
+        return identity.getEmail();
+    }
+
+    public String getUsername() {
+        return identity.getUsername();
+    }
+
     public List<Commit> getCommits() {
         return commits;
     }

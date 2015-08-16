@@ -1,0 +1,27 @@
+#parse( "templates/macros.vm" )
+<html>
+<body>
+<head>
+    <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
+</head>
+
+<h2>Overview</h2>
+Project: $perPersonData.queryData.displayableProjectName <br>
+Branches: $perPersonData.queryData.displayableBranchList <br>
+From: $date.format( "yyyy-MM-dd", $perPersonData.fromDate) <br>
+To: $date.format( "yyyy-MM-dd", $perPersonData.toDate) <br>
+Users in analysis: $identities.size() <br>
+
+<h3>Identities</h3>
+<ul>
+#foreach( $identity in $identities )
+#set( $extraInfo = $identity.email )
+#if( "$!extraInfo" == "")
+    #set( $extraInfo = $identity.username )
+#end
+    <li><a href="${identity.username}.html">$identity.name ($extraInfo)</a></li>
+#end
+</ul>
+
+</body>
+</html>

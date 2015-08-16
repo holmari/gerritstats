@@ -6,6 +6,7 @@ import com.holmsted.gerrit.QueryData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -41,11 +42,11 @@ public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
         return queryData;
     }
 
-    public long getFromDate() {
-        return fromDate;
+    public Date getFromDate() {
+        return new Date(fromDate);
     }
 
-    public long getToDate() {
-        return toDate;
+    public Date getToDate() {
+        return new Date(toDate);
     }
 }
