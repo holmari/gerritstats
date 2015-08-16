@@ -51,6 +51,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             context.put("outputRules", outputRules);
             context.put("identity", record.identity);
             context.put("record", record);
+            context.put("Gerrit", GerritUtils.class);
 
             StringWriter writer = new StringWriter();
             velocity.mergeTemplate(VM_PERSON_PROFILE, "UTF-8", context, writer);

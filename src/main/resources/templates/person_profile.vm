@@ -15,8 +15,8 @@
 <h3>Overall</h3>
 <p>
 Commits: $record.commits.size() <br>
-Comments written: $record.commentsWritten.size() <br>
-Comments received: $record.commentsReceived.size() <br>
+Comments written: $record.allCommentsWritten.size() <br>
+Comments received: $record.allCommentsReceived.size() <br>
 Commit/comment ratio: $record.receivedCommentRatio <br>
 Added as reviewer: $record.addedAsReviewerTo.size() <br><br>
 
@@ -27,10 +27,9 @@ Max patch set count: $record.maxPatchSetCount <br>
 +1 reviews given: $record.reviewCountPlus1 <br>
 -1 reviews given: $record.reviewCountMinus1 <br>
 -2 reviews given: $record.reviewCountMinus2 <br>
-# of people added as reviewers: $record.reviewersForOwnCommits.size() <br>
 </p>
 
-<h3>Adds them as reviewers</h3>
+<h3>Adds them as reviewers ($record.reviewersForOwnCommits.size())</h3>
 <p>
 #foreach( $identity in $record.myReviewerList )
 #set ( $reviewCount = $record.reviewersForOwnCommits.get($identity) )
@@ -57,11 +56,20 @@ Max patch set count: $record.maxPatchSetCount <br>
 #end
 
 <h3>Review comments</h3>
-<ul>
-#foreach( $comment in $record.commentsWritten )
-    <li>$comment.message</li>
+#foreach( $commit in $record.commitsWithWrittenComments )
+    <h4><a href="$commit.url">$commit.url</a></h4>
+    <ul>
+    #foreach( $patchSet in $commit.patchSets )
+        #if ( $patchSet.author != $identity )
+            #foreach( $comment in $patchSet.comments )
+                #if ($comment.reviewer == $identity)
+                    <li><a href="$Gerrit.getUrlForComment($commit, $patchSet, $comment)" alt="$comment.file:$comment.line">$comment.message</a></li>
+                #end
+            #end
+        #end
+    #end
+    </ul>
 #end
-</ul>
 
 </p>
 

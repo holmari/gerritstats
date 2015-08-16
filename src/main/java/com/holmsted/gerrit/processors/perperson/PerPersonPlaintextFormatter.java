@@ -52,7 +52,7 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
             }
             if (outputRules.getListReviewComments()) {
                 builder.addIndentLine("Review comments: ");
-                builder.addLine(record.getAllReviewComments());
+                builder.addLine(record.getPrintableAllReviewComments());
             }
             builder.addLine("");
         }

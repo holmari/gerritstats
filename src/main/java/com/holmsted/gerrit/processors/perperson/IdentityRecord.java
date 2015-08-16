@@ -22,8 +22,10 @@ public class IdentityRecord {
     final List<Commit> addedAsReviewerTo = new ArrayList<Commit>();
     final Hashtable<Commit.Identity, Integer> reviewRequestors = new Hashtable<Commit.Identity, Integer>();
 
-    final List<Commit.PatchSetComment> commentsWritten = new ArrayList<Commit.PatchSetComment>();
-    final List<Commit.PatchSetComment> commentsReceived = new ArrayList<Commit.PatchSetComment>();
+    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsWritten =
+            new Hashtable<Commit, List<Commit.PatchSetComment>>();
+    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsReceived =
+            new Hashtable<Commit, List<Commit.PatchSetComment>>();
     final Hashtable<Commit.Identity, Integer> reviewersForOwnCommits = new Hashtable<Commit.Identity, Integer>();
 
     public IdentityRecord(Commit.Identity identity) {
@@ -38,12 +40,20 @@ public class IdentityRecord {
         return addedAsReviewerTo;
     }
 
-    public List<Commit.PatchSetComment> getCommentsWritten() {
-        return commentsWritten;
+    public List<Commit.PatchSetComment> getAllCommentsWritten() {
+        List<Commit.PatchSetComment> allComments = new ArrayList<Commit.PatchSetComment>();
+        for (List<Commit.PatchSetComment> comments : commentsWritten.values()) {
+            allComments.addAll(comments);
+        }
+        return allComments;
     }
 
-    public List<Commit.PatchSetComment> getCommentsReceived() {
-        return commentsReceived;
+    public List<Commit.PatchSetComment> getAllCommentsReceived() {
+        List<Commit.PatchSetComment> allComments = new ArrayList<Commit.PatchSetComment>();
+        for (List<Commit.PatchSetComment> comments : commentsReceived.values()) {
+            allComments.addAll(comments);
+        }
+        return allComments;
     }
 
     public Hashtable<Commit.Identity, Integer> getReviewersForOwnCommits() {
@@ -188,9 +198,9 @@ public class IdentityRecord {
         return builder.toString();
     }
 
-    public String getAllReviewComments() {
+    public String getPrintableAllReviewComments() {
         StringBuilder builder = new StringBuilder();
-        for (Commit.PatchSetComment comment : commentsWritten) {
+        for (Commit.PatchSetComment comment : getAllCommentsWritten()) {
             builder.append(comment.message).append("\n");
         }
 
@@ -202,5 +212,33 @@ public class IdentityRecord {
 
         Integer reviewCountForIdentity = reviewRequestors.get(commit.owner);
         reviewRequestors.put(commit.owner, reviewCountForIdentity != null ? reviewCountForIdentity + 1 : 1);
+    }
+
+    public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
+        List<Commit.PatchSetComment> patchSetComments = commentsWritten.get(commit);
+        if (patchSetComments == null) {
+            patchSetComments = new ArrayList<Commit.PatchSetComment>();
+        }
+        patchSetComments.add(patchSetComment);
+        commentsWritten.put(commit, patchSetComments);
+    }
+
+    public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
+        List<Commit.PatchSetComment> patchSetComments = commentsReceived.get(commit);
+        if (patchSetComments == null) {
+            patchSetComments = new ArrayList<Commit.PatchSetComment>();
+        }
+        patchSetComments.add(patchSetComment);
+        commentsReceived.put(commit, patchSetComments);
+    }
+
+    public List<Commit> getCommitsWithWrittenComments() {
+        ArrayList<Commit> commits = Collections.list(commentsWritten.keys());
+        Collections.sort(commits, new CommitDateComparator());
+        return commits;
+    }
+
+    public List<Commit.PatchSetComment> getWrittenCommentsForCommit(@Nonnull Commit commit) {
+        return commentsWritten.get(commit);
     }
 }

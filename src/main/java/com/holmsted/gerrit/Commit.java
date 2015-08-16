@@ -191,6 +191,18 @@ public class Commit {
         public int sizeInsertions;
         public int sizeDeletions;
 
+        public int getNumber() {
+            return number;
+        }
+
+        public Identity getAuthor() {
+            return author;
+        }
+
+        public List<PatchSetComment> getComments() {
+            return comments;
+        }
+
         static PatchSet fromJson(JSONObject patchSetJson) {
             PatchSet patchSet = new PatchSet();
             patchSet.number = patchSetJson.optInt("number");

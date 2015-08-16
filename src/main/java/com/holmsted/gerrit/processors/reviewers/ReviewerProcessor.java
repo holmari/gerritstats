@@ -68,7 +68,8 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> 
                                                 @Nonnull Commit.Approval approval) {}
 
             @Override
-            public void visitPatchSetComment(@Nonnull Commit.PatchSet patchSet,
+            public void visitPatchSetComment(@Nonnull Commit commit,
+                                             @Nonnull Commit.PatchSet patchSet,
                                              @Nonnull Commit.PatchSetComment patchSetComment) {
                 PatchSetCommentData data = new PatchSetCommentData(patchSet.createdOnDate);
                 data.reviewerEmail = patchSetComment.reviewer.email;
