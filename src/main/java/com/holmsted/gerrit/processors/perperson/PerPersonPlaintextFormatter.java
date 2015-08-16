@@ -48,7 +48,7 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
             if (maxPatchSetCountForList != OutputRules.INVALID_PATCH_COUNT) {
                 builder.addIndentLine(String.format("Commits exceeding %d patches: %s",
                         maxPatchSetCountForList,
-                        record.getCommitsWithNPatchSets(maxPatchSetCountForList)));
+                        record.getPrintableCommitsWithNPatchSets(maxPatchSetCountForList)));
             }
             if (outputRules.getListReviewComments()) {
                 builder.addIndentLine("Review comments: ");
