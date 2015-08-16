@@ -4,3 +4,6 @@ local.properties
 *.iml
 .idea/
 .gradle/
+
+# default output dir
+out/
