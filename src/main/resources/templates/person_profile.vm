@@ -2,6 +2,7 @@
 <html>
 <body>
 <head>
+    <title>GerritStats: $identity.name ($identity.username)</title>
 </head>
 
 <h1>$identity.name ($identity.username)</h1>
