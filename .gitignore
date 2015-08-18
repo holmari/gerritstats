@@ -7,3 +7,6 @@ local.properties
 
 # default output dir
 out/
+
+# output by velocity template engine
+velocity.log
