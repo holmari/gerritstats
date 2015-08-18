@@ -4,6 +4,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -197,6 +198,10 @@ public class Commit {
 
         public Identity getAuthor() {
             return author;
+        }
+
+        public Date getCreatedOnDate() {
+            return new Date(createdOnDate);
         }
 
         public List<PatchSetComment> getComments() {
