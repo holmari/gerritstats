@@ -84,7 +84,7 @@ Max patch set count: $record.maxPatchSetCount <br>
 
 <h3>Review comments</h3>
 #foreach( $commit in $record.commitsWithWrittenComments )
-    <h4><a href="$commit.url">$commit.url</a></h4>
+    <h4><a href="$commit.url">$commit.url</a> (Created: $date.format( "yyyy-MM-dd", $commit.createdOnDate ))</h4>
     <ul>
     #foreach( $patchSet in $commit.patchSets )
         #if ( $patchSet.author != $identity )

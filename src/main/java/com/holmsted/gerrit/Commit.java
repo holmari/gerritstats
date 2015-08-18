@@ -269,6 +269,10 @@ public class Commit {
         return patchSets;
     }
 
+    public Date getCreatedOnDate() {
+        return new Date(createdOnDate);
+    }
+
     static boolean isCommit(JSONObject lineJson) {
         return lineJson.opt("status") != null;
     }
