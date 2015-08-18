@@ -45,11 +45,18 @@ Added as reviewer: $record.addedAsReviewerTo.size() <br><br>
 
 Review comment ratio: $record.reviewCommentRatio <br>
 Avg. patch set count: $record.averagePatchSetCount <br>
-Max patch set count: $record.maxPatchSetCount <br>
+Max patch set count: $record.maxPatchSetCount <br><br>
+
 +2 reviews given: $record.reviewCountPlus2 <br>
 +1 reviews given: $record.reviewCountPlus1 <br>
 -1 reviews given: $record.reviewCountMinus1 <br>
 -2 reviews given: $record.reviewCountMinus2 <br>
++2 reviews received: $record.getReceivedReviewsForScore(2) <br>
++1 reviews received: $record.getReceivedReviewsForScore(1) <br>
+-1 reviews received: $record.getReceivedReviewsForScore(-1) <br>
+-2 reviews received: $record.getReceivedReviewsForScore(-2) <br><br>
+
+Average time in code review: $record.printableAverageTimeInCodeReview
 </p>
 
 <h3>Adds them as reviewers ($record.reviewersForOwnCommits.size())</h3>

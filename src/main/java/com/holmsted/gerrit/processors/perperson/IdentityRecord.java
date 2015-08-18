@@ -17,6 +17,8 @@ public class IdentityRecord {
     int reviewCountMinus1;
     int reviewCountMinus2;
 
+    final Hashtable<Integer, Integer> receivedReviews = new Hashtable<Integer, Integer>();
+
     final List<Commit> commits = new ArrayList<Commit>();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<Commit>();
@@ -28,12 +30,22 @@ public class IdentityRecord {
             new Hashtable<Commit, List<Commit.PatchSetComment>>();
     final Hashtable<Commit.Identity, Integer> reviewersForOwnCommits = new Hashtable<Commit.Identity, Integer>();
 
+    private long averageTimeInCodeReview;
+
     public IdentityRecord(Commit.Identity identity) {
         this.identity = identity;
     }
 
     public String getName() {
         return identity.getName();
+    }
+
+    public long getAverageTimeInCodeReview() {
+        return averageTimeInCodeReview;
+    }
+
+    public String getPrintableAverageTimeInCodeReview() {
+       return formatPrintableDuration(averageTimeInCodeReview);
     }
 
     public String getEmail() {
@@ -252,5 +264,58 @@ public class IdentityRecord {
 
     public List<Commit.PatchSetComment> getWrittenCommentsForCommit(@Nonnull Commit commit) {
         return commentsWritten.get(commit);
+    }
+
+    public int getReceivedReviewsForScore(int score) {
+        Integer value = receivedReviews.get(score);
+        return value != null ? value : 0;
+    }
+
+    public void addCommit(@Nonnull Commit commit) {
+        commits.add(commit);
+
+        for (Commit.PatchSet patchSet : commit.patchSets) {
+            for (Commit.Approval approval : patchSet.approvals) {
+                if (approval.type == null) {
+                    continue;
+                }
+                switch (approval.type) {
+                    case CODE_REVIEW: {
+                        addReceivedCodeReview(approval);
+                    }
+                    case VERIFIED:
+                        break;
+                    case SUBM: {
+                        updateAverageTimeInCodeReview(approval.grantedOnDate - commit.createdOnDate);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    private void updateAverageTimeInCodeReview(long commitTimeInCodeReviewMsec) {
+        int prevCount = commits.size() - 1;
+        long newAverage = averageTimeInCodeReview * prevCount;
+        averageTimeInCodeReview = (newAverage + commitTimeInCodeReviewMsec) / commits.size();
+    }
+
+    private void addReceivedCodeReview(@Nonnull Commit.Approval approval) {
+        Integer receivedReviewCountForValue = receivedReviews.get(approval.value);
+        if (receivedReviewCountForValue == null) {
+            receivedReviewCountForValue = 1;
+        } else {
+            receivedReviewCountForValue++;
+        }
+        receivedReviews.put(approval.value, receivedReviewCountForValue);
+    }
+
+    private static String formatPrintableDuration(long duration) {
+        int durationInSecs = (int) (duration / 1000);
+        int days = durationInSecs / (60 * 60 * 24);
+        int hours = durationInSecs / (60 * 60) % 24;
+        int minutes = durationInSecs / (60) % 60;
+
+        return String.format("%dd %dh %dmin", days, hours, minutes);
     }
 }

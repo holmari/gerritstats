@@ -30,7 +30,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
             @Override
             public void visitCommit(@Nonnull Commit commit) {
                 IdentityRecord ownerRecord = getOrCreateRecord(commit.owner);
-                ownerRecord.commits.add(commit);
+                ownerRecord.addCommit(commit);
                 if (commit.lastUpdatedDate > toDate.get()) {
                     toDate.set(commit.lastUpdatedDate);
                 }
