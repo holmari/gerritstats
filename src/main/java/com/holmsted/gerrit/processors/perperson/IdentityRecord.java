@@ -10,6 +10,20 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class IdentityRecord {
+
+    public static class ReviewerData {
+        int addedAsReviewerCount;
+        int approvalCount;
+
+        public int getAddedAsReviewerCount() {
+            return addedAsReviewerCount;
+        }
+
+        public int getApprovalCount() {
+            return approvalCount;
+        }
+    }
+
     final Commit.Identity identity;
 
     int reviewCountPlus2;
@@ -22,13 +36,14 @@ public class IdentityRecord {
     final List<Commit> commits = new ArrayList<Commit>();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<Commit>();
-    final Hashtable<Commit.Identity, Integer> reviewRequestors = new Hashtable<Commit.Identity, Integer>();
+    final Hashtable<Commit.Identity, ReviewerData> reviewRequestors = new Hashtable<Commit.Identity, ReviewerData>();
 
     final Hashtable<Commit, List<Commit.PatchSetComment>> commentsWritten =
             new Hashtable<Commit, List<Commit.PatchSetComment>>();
     final Hashtable<Commit, List<Commit.PatchSetComment>> commentsReceived =
             new Hashtable<Commit, List<Commit.PatchSetComment>>();
-    final Hashtable<Commit.Identity, Integer> reviewersForOwnCommits = new Hashtable<Commit.Identity, Integer>();
+    final Hashtable<Commit.Identity, ReviewerData> reviewersForOwnCommits =
+            new Hashtable<Commit.Identity, ReviewerData>();
 
     private long averageTimeInCodeReview;
 
@@ -80,12 +95,16 @@ public class IdentityRecord {
         return allComments;
     }
 
-    public Hashtable<Commit.Identity, Integer> getReviewersForOwnCommits() {
+    public Hashtable<Commit.Identity, ReviewerData> getReviewersForOwnCommits() {
         return reviewersForOwnCommits;
     }
 
-    public Hashtable<Commit.Identity, Integer> getReviewRequestorCounts() {
-        return reviewRequestors;
+    public ReviewerData getReviewerDataForOwnCommitFor(@Nonnull Commit.Identity identity) {
+        return reviewersForOwnCommits.get(identity);
+    }
+
+    public ReviewerData getReviewRequestorDataFor(@Nonnull Commit.Identity identity) {
+        return reviewRequestors.get(identity);
     }
 
     public int getReviewCountMinus1() {
@@ -158,7 +177,7 @@ public class IdentityRecord {
 
     public List<Commit.Identity> getMyReviewerList() {
         List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewersForOwnCommits.keySet());
-        Collections.sort(sortedIdentities, new ReviewComparator(reviewersForOwnCommits));
+        Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewersForOwnCommits));
         return sortedIdentities;
     }
 
@@ -168,7 +187,7 @@ public class IdentityRecord {
 
     public List<Commit.Identity> getReviewRequestorList() {
         List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewRequestors.keySet());
-        Collections.sort(sortedIdentities, new ReviewComparator(reviewRequestors));
+        Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewRequestors));
         return sortedIdentities;
     }
 
@@ -176,18 +195,33 @@ public class IdentityRecord {
         return getPrintableReviewerList(getReviewRequestorList(), reviewRequestors);
     }
 
-    public void addReviewerForOwnCommit(Commit.Identity identity) {
-        Integer reviewCount = reviewersForOwnCommits.get(identity);
-        reviewersForOwnCommits.put(identity, reviewCount == null ? 1 : reviewCount + 1);
+    private ReviewerData getOrCreateReviewerForOwnCommit(@Nonnull Commit.Identity identity) {
+        ReviewerData reviewerData = reviewersForOwnCommits.get(identity);
+        if (reviewerData == null) {
+            reviewerData = new ReviewerData();
+        }
+        return reviewerData;
+    }
+
+    public void addReviewerForOwnCommit(@Nonnull Commit.Identity identity) {
+        ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(identity);
+        reviewerData.addedAsReviewerCount++;
+        reviewersForOwnCommits.put(identity, reviewerData);
+    }
+
+    void addApprovalForOwnCommit(@Nonnull Commit.Identity identity) {
+        ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(identity);
+        reviewerData.approvalCount++;
+        reviewersForOwnCommits.put(identity, reviewerData);
     }
 
     private String getPrintableReviewerList(@Nonnull List<Commit.Identity> sortedIdentities,
-                                            @Nonnull Hashtable<Commit.Identity, Integer> reviewsForIdentity) {
+                                            @Nonnull Hashtable<Commit.Identity, ReviewerData> reviewsForIdentity) {
         StringBuilder builder = new StringBuilder();
         for (int i = 0; i < sortedIdentities.size(); ++i) {
             Commit.Identity identity = sortedIdentities.get(i);
             builder.append(String.format("%s (%d)",
-                    identity.toString(), reviewsForIdentity.get(identity).intValue()));
+                    identity.toString(), reviewsForIdentity.get(identity).addedAsReviewerCount));
             if (i < sortedIdentities.size() - 1) {
                 builder.append(", ");
             }
@@ -234,8 +268,13 @@ public class IdentityRecord {
     public void addReviewedCommit(@Nonnull Commit commit) {
         addedAsReviewerTo.add(commit);
 
-        Integer reviewCountForIdentity = reviewRequestors.get(commit.owner);
-        reviewRequestors.put(commit.owner, reviewCountForIdentity != null ? reviewCountForIdentity + 1 : 1);
+        ReviewerData reviewsDoneForIdentity = reviewRequestors.get(commit.owner);
+        if (reviewsDoneForIdentity == null) {
+            reviewsDoneForIdentity = new ReviewerData();
+        }
+        reviewsDoneForIdentity.addedAsReviewerCount++;
+
+        reviewRequestors.put(commit.owner, reviewsDoneForIdentity);
     }
 
     public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
@@ -273,34 +312,15 @@ public class IdentityRecord {
 
     public void addCommit(@Nonnull Commit commit) {
         commits.add(commit);
-
-        for (Commit.PatchSet patchSet : commit.patchSets) {
-            for (Commit.Approval approval : patchSet.approvals) {
-                if (approval.type == null) {
-                    continue;
-                }
-                switch (approval.type) {
-                    case CODE_REVIEW: {
-                        addReceivedCodeReview(approval);
-                    }
-                    case VERIFIED:
-                        break;
-                    case SUBM: {
-                        updateAverageTimeInCodeReview(approval.grantedOnDate - commit.createdOnDate);
-                        break;
-                    }
-                }
-            }
-        }
     }
 
-    private void updateAverageTimeInCodeReview(long commitTimeInCodeReviewMsec) {
+    void updateAverageTimeInCodeReview(long commitTimeInCodeReviewMsec) {
         int prevCount = commits.size() - 1;
         long newAverage = averageTimeInCodeReview * prevCount;
         averageTimeInCodeReview = (newAverage + commitTimeInCodeReviewMsec) / commits.size();
     }
 
-    private void addReceivedCodeReview(@Nonnull Commit.Approval approval) {
+    void addReceivedCodeReview(@Nonnull Commit.Approval approval) {
         Integer receivedReviewCountForValue = receivedReviews.get(approval.value);
         if (receivedReviewCountForValue == null) {
             receivedReviewCountForValue = 1;

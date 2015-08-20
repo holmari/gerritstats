@@ -28,7 +28,7 @@ public abstract class CommitVisitor {
                 if (!isIncluded(patchSet.author)) {
                     continue;
                 }
-                visitPatchSet(patchSet);
+                visitPatchSet(commit, patchSet);
 
                 for (Commit.Approval approval : patchSet.approvals) {
                     if (!isIncluded(approval.grantedBy)) {
@@ -56,7 +56,7 @@ public abstract class CommitVisitor {
     }
 
     public abstract void visitCommit(@Nonnull Commit commit);
-    public abstract void visitPatchSet(@Nonnull Commit.PatchSet patchSet);
+    public abstract void visitPatchSet(@Nonnull Commit commit, @Nonnull Commit.PatchSet patchSet);
     public abstract void visitApproval(@Nonnull Commit.PatchSet patchSet, @Nonnull Commit.Approval approval);
     public abstract void visitPatchSetComment(@Nonnull Commit commit,
                                               @Nonnull Commit.PatchSet patchSet,

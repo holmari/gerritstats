@@ -31,6 +31,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
             public void visitCommit(@Nonnull Commit commit) {
                 IdentityRecord ownerRecord = getOrCreateRecord(commit.owner);
                 ownerRecord.addCommit(commit);
+
                 if (commit.lastUpdatedDate > toDate.get()) {
                     toDate.set(commit.lastUpdatedDate);
                 }
@@ -54,7 +55,29 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
             }
 
             @Override
-            public void visitPatchSet(@Nonnull Commit.PatchSet patchSet) {
+            public void visitPatchSet(@Nonnull Commit commit, @Nonnull Commit.PatchSet patchSet) {
+                IdentityRecord ownerRecord = getOrCreateRecord(commit.owner);
+                for (Commit.Approval approval : patchSet.approvals) {
+                    if (approval.type == null) {
+                        continue;
+                    }
+                    switch (approval.type) {
+                        case CODE_REVIEW: {
+                            ownerRecord.addReceivedCodeReview(approval);
+                            if (getCommitFilter().isIncluded(approval.grantedBy)
+                                    && !ownerRecord.identity.equals(approval.grantedBy)) {
+                                ownerRecord.addApprovalForOwnCommit(approval.grantedBy);
+                            }
+                            break;
+                        }
+                        case VERIFIED:
+                            break;
+                        case SUBM: {
+                            ownerRecord.updateAverageTimeInCodeReview(approval.grantedOnDate - commit.createdOnDate);
+                            break;
+                        }
+                    }
+                }
             }
 
             @Override

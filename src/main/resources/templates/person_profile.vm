@@ -62,16 +62,25 @@ Average time in code review: $record.printableAverageTimeInCodeReview
 <h3>Adds them as reviewers ($record.reviewersForOwnCommits.size())</h3>
 <p>
 #foreach( $identity in $record.myReviewerList )
-#set ( $reviewCount = $record.reviewersForOwnCommits.get($identity) )
-    <a href="mailto:$identity.email">$identity.email</a> ($reviewCount)#listComma( $velocityCount, $record.myReviewerList.size() )
+#set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
+    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.myReviewerList.size() )
+#end
+</p>
+
+<h3>They give +2..-2 approvals ($record.reviewersForOwnCommits.size())</h3>
+<h4>sorted by number of times added as a reviewer</h4>
+<p>
+#foreach( $identity in $record.myReviewerList )
+#set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
+    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.approvalCount)#listComma( $velocityCount, $record.myReviewerList.size() )
 #end
 </p>
 
 <h3>They add this person as reviewer</h3>
 <p>
 #foreach( $identity in $record.reviewRequestorList )
-#set ( $reviewCount = $record.reviewRequestorCounts.get($identity) )
-    <a href="mailto:$identity.email">$identity.email</a> ($reviewCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
+#set ( $reviewerData = $record.getReviewRequestorDataFor($identity) )
+    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
 #end
 </p>
 

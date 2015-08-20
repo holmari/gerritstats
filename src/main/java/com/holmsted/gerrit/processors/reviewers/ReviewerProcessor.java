@@ -63,7 +63,8 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> 
 
         CommitVisitor visitor = new CommitVisitor(getCommitFilter()) {
             @Override public void visitCommit(@Nonnull Commit commit) {}
-            @Override public void visitPatchSet(@Nonnull Commit.PatchSet patchSet) {}
+            @Override public void visitPatchSet(@Nonnull Commit commit,
+                                                @Nonnull Commit.PatchSet patchSet) {}
             @Override public void visitApproval(@Nonnull Commit.PatchSet patchSet,
                                                 @Nonnull Commit.Approval approval) {}
 

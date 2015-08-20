@@ -5,16 +5,19 @@ import com.holmsted.gerrit.Commit;
 import java.util.Comparator;
 import java.util.Hashtable;
 
-class ReviewComparator implements Comparator<Commit.Identity> {
-    private Hashtable<Commit.Identity, Integer> reviewsForIdentity;
-    public ReviewComparator(Hashtable<Commit.Identity, Integer> reviewsForIdentity) {
+/**
+ * Sorts reviewers in order of addition.
+ */
+class ReviewerAddedCountComparator implements Comparator<Commit.Identity> {
+    private Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
+    public ReviewerAddedCountComparator(Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity) {
         this.reviewsForIdentity = reviewsForIdentity;
     }
 
     @Override
     public int compare(Commit.Identity left, Commit.Identity right) {
-        Integer reviewCountLeft = reviewsForIdentity.get(left);
-        Integer reviewCountRight = reviewsForIdentity.get(right);
+        int reviewCountLeft = reviewsForIdentity.get(left).addedAsReviewerCount;
+        int reviewCountRight = reviewsForIdentity.get(right).addedAsReviewerCount;
         if (reviewCountLeft < reviewCountRight) {
             return 1;
         } else if (reviewCountLeft > reviewCountRight) {
