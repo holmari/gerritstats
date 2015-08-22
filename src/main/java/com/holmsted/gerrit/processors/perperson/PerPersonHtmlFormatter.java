@@ -16,7 +16,6 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -57,7 +56,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             throw new IOError(new IOException("Cannot create output directory " + outputDir.getAbsolutePath()));
         }
 
-        List<IdentityRecord> orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
+        IdentityRecordList orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
 
         baseContext.put("perPersonData", data);
         createIndex(orderedList);
@@ -87,13 +86,13 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         return stream;
     }
 
-    private void createIndex(@Nonnull List<IdentityRecord> identities) {
+    private void createIndex(@Nonnull IdentityRecordList identities) {
         Context context = new VelocityContext(baseContext);
         context.put("identities", identities);
         writeTemplate(context, VM_INDEX, INDEX_OUTPUT_NAME);
     }
 
-    private void createPerPersonFiles(@Nonnull List<IdentityRecord> orderedList) {
+    private void createPerPersonFiles(@Nonnull IdentityRecordList orderedList) {
         for (IdentityRecord record : orderedList) {
             String outputFilename = getOutputFilenameForIdentity(record.identity);
 

@@ -5,7 +5,6 @@ import com.holmsted.gerrit.QueryData;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -21,7 +20,7 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
 
     @Override
     public void format(@Nonnull PerPersonData data) {
-        List<IdentityRecord> orderedList = data.toOrderedList(new CommentsWrittenComparator());
+        IdentityRecordList orderedList = data.toOrderedList(new CommentsWrittenComparator());
 
         printHeader(data);
 

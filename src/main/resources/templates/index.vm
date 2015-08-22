@@ -1,10 +1,20 @@
 #parse( "templates/macros.vm" )
 <!DOCTYPE html>
 <meta charset="utf-8">
-<html>
+<style>
+.node {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.link {
+    stroke: #999;
+    stroke-opacity: .6;
+}
+</style>
 <body>
+<script src="res/d3.min.js"></script>
 <head>
-    <script src="res/d3.min.js" charset="utf-8"></script>
     <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
 </head>
 
@@ -26,5 +36,202 @@ Users in analysis: $identities.size() <br>
 #end
 </ul>
 
+<h3>Proximity graph</h3>
+<div id="proximityGraph">
+</div>
+
+<script>
+var identityGraph = {
+    "nodes": [
+#foreach ($identity in $identities )
+    {"name": "$identity.name", "commits": $identity.commits.size()},
+#end
+    ],
+    "links":[
+#foreach ($identity in $identities )
+     #set( $index = $velocityCount - 1 )
+         #foreach ( $reviewer in $identity.myReviewerList )
+             #set ( $reviewerData = $identity.getReviewerDataForOwnCommitFor($reviewer) )
+             #if ($reviewerData.approvalCount != 0 )
+                 {"source":$index, "target":$identities.getIndexOfIdentity($reviewer), "value":$reviewerData.approvalCount },
+             #end
+         #end
+     #end
+         ]
+    }
+</script>
+
+<script>
+
+function getMaxLinkValue(graph) {
+    return graph.links.reduce(function(previousValue, currentValue, index, links) {
+        return Math.max(previousValue, currentValue.value);
+    }, -1);
+}
+
+/**
+ * Filter out the links that are below the given relative percentage, between [0..1].
+ * For example, if relativeThreshold is 0.1, all links that have under 10% of the maximum
+ * interaction are filtered out.
+ */
+function filterLinks(links, maxLinkValue, relativeThreshold) {
+    return links.filter(function(currentLink, index, array) {
+        return (currentLink.value / maxLinkValue) >= relativeThreshold;
+    }, []);
+}
+
+function getConnectionCount(nodeIndex, links) {
+    var connectionCount = 0;
+    for (var i = 0; i < links.length; ++i) {
+        if (links[i].source.index == nodeIndex || links[i].target.index == nodeIndex) {
+            connectionCount += links[i].value;
+        }
+    }
+    return connectionCount;
+}
+
+function isDefined(variable) {
+    return typeof variable !== 'undefined';
+}
+
+function safeIncrement(initialValue, toAdd) {
+    return !isDefined(initialValue) ? toAdd : initialValue + toAdd;
+}
+
+function createConnectionsPerIndexTable(links) {
+    var connectionsPerIndex = [];
+    for (var i = 0; i < links.length; ++i) {
+        var connectionCount = links[i].value;
+        var sourceConnections = connectionsPerIndex[links[i].source];
+        var targetConnections = connectionsPerIndex[links[i].target];
+        connectionsPerIndex[links[i].source] = safeIncrement(sourceConnections, connectionCount);
+        connectionsPerIndex[links[i].target] = safeIncrement(targetConnections, connectionCount);
+    }
+    return connectionsPerIndex;
+}
+
+function numberComparator(left, right) {
+    return left - right;
+}
+
+function filterObjectArray(objectList, key) {
+    return objectList.map(function(currentValue, index, array) {
+        return currentValue[key];
+    }, []);
+}
+
+function getMaxValueFromArray(list) {
+    return list.reduce(function(previousValue, currentValue, index, array) {
+        return Math.max(previousValue, currentValue);
+    }, -1);
+}
+
+function getMedianValueFromArrayExcludingZeroes(list) {
+    var sortedList = list.slice().filter(function(currentValue, index, array) {
+        return currentValue !== undefined;
+    })
+    .sort(numberComparator);
+    var lastZero = sortedList.lastIndexOf(0);
+    if (lastZero == -1) {
+        lastZero = 0;
+    }
+    return sortedList[lastZero + Math.floor((sortedList.length - lastZero) / 2)];
+}
+
+function mapConnectionsToColor(relativeConnectionCount, colors) {
+    var colorIndex = Math.min(colors.length - 1, Math.floor(relativeConnectionCount * colors.length));
+    return colors[colorIndex];
+}
+
+function createProximityGraph(identityGraph) {
+    var width = 1200;
+    var height = 800;
+
+    var proximityGraphSvg = d3.select("#proximityGraph").append("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    var maxLinkValue = getMaxLinkValue(identityGraph);
+
+    var nodes = identityGraph.nodes;
+    var links = filterLinks(identityGraph.links, maxLinkValue, relativeLinkValueThreshold);
+
+    var connectionsPerIndex = createConnectionsPerIndexTable(links);
+    var maxConnectionCount = getMaxValueFromArray(connectionsPerIndex);
+    var medianConnectionCount = getMedianValueFromArrayExcludingZeroes(connectionsPerIndex);
+
+    var commitList = filterObjectArray(nodes, "commits").slice().sort(numberComparator);
+    var medianCommitCount = getMedianValueFromArrayExcludingZeroes(commitList);
+    var maxCommitCount =  getMaxValueFromArray(commitList);
+
+    var lowConnectionColors = [
+        "#e6550d", // less connections
+        "#fd8d3c",
+        "#fdae6b",
+        "#fdd0a2", // more connections
+    ];
+
+    var highConnectionColors = [
+        "#c7e9c0", // less connections
+        "#a1d99b",
+        "#74c476",
+        "#31a354", // more connections
+    ];
+
+    var force = d3.layout.force()
+        .size([width, height])
+        .charge(-450)
+        .nodes(nodes)
+        .links(links)
+        .linkDistance(45)
+        .linkStrength(function(d) {
+            return 0.1 + (d.value / maxLinkValue);
+        })
+        .start();
+
+    var link = proximityGraphSvg.selectAll(".link")
+        .data(links)
+        .enter().append("line")
+        .attr("class", "link")
+        .style("stroke-width", function(d) { return 10 * (d.value / maxLinkValue); });
+
+    var node = proximityGraphSvg.selectAll(".node")
+        .data(nodes)
+        .enter().append("circle")
+        .attr("class", "node")
+        .attr("r", function(d) {
+            return 3 + 2 * Math.sqrt(d.commits / medianCommitCount);
+        })
+        .style("fill", function(d) {
+            var connectionCount = getConnectionCount(d.index, links);
+            var relativeConnectionCount = connectionCount / medianConnectionCount;
+            if (relativeConnectionCount >= 1) {
+                relativeConnectionCount = connectionCount / maxConnectionCount;
+                return mapConnectionsToColor(relativeConnectionCount, highConnectionColors);
+            } else {
+                return mapConnectionsToColor(relativeConnectionCount, lowConnectionColors);
+            }
+        })
+        .call(force.drag);
+
+    node.append("title")
+        .text(function(d) { return d.name; });
+
+
+    force.on("tick", function() {
+             link.attr("x1", function(d) { return d.source.x; })
+                 .attr("y1", function(d) { return d.source.y; })
+                 .attr("x2", function(d) { return d.target.x; })
+                 .attr("y2", function(d) { return d.target.y; })
+             node.attr("cx", function(d) { return d.x; })
+                 .attr("cy", function(d) { return d.y; });
+    });
+}
+
+// Filter out all the connections that are below the given threshold
+var relativeLinkValueThreshold = 0.1;
+
+createProximityGraph(identityGraph);
+
+</script>
 </body>
-</html>

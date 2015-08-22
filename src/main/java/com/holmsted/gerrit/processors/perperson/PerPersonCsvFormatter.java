@@ -2,7 +2,6 @@ package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 
-import java.util.List;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -11,7 +10,7 @@ class PerPersonCsvFormatter implements CommitDataProcessor.OutputFormatter<PerPe
 
     @Override
     public void format(@Nonnull PerPersonData data) {
-        List<IdentityRecord> orderedList = data.toOrderedList(new CommentsWrittenComparator());
+        IdentityRecordList orderedList = data.toOrderedList(new CommentsWrittenComparator());
 
         PerPersonPlaintextFormatter.printHeader(data);
 

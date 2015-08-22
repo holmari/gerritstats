@@ -3,12 +3,10 @@ package com.holmsted.gerrit.processors.perperson;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.QueryData;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -18,8 +16,8 @@ public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
     private long fromDate;
     private long toDate;
 
-    public List<IdentityRecord> toOrderedList(Comparator<? super IdentityRecord> comparator) {
-        List<IdentityRecord> orderedList = new ArrayList<IdentityRecord>();
+    public IdentityRecordList toOrderedList(Comparator<? super IdentityRecord> comparator) {
+        IdentityRecordList orderedList = new IdentityRecordList();
         orderedList.addAll(values());
         Collections.sort(orderedList, comparator);
         return orderedList;
