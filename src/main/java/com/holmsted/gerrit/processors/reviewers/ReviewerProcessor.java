@@ -32,6 +32,10 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> 
         @Override
         public void format(@Nonnull PatchSetCommentList dataList) {
             final StringBuilder builder = new StringBuilder();
+            builder.append(String.format("%10s %40s %40s",
+                    "Date",
+                    "Reviewed by",
+                    "Authored by")).append('\n');
             for (PatchSetCommentData data : dataList) {
                 String outComment = String.format("%10s %40s %40s",
                         dateFormat.format(new Date(data.patchSetDate)),
