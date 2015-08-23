@@ -26,7 +26,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     private static final String RES_OUTPUT_DIR = "res";
     private static final String INDEX_OUTPUT_NAME = "index.html";
 
-
     private static final String TEMPLATES_RES_PATH = "templates";
     private static final String VM_PERSON_PROFILE = TEMPLATES_RES_PATH + File.separator + "person_profile.vm";
     private static final String VM_INDEX = TEMPLATES_RES_PATH + File.separator + "index.vm";
@@ -69,6 +68,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
 
     private void copyResources() {
         copyFileToResources("d3.min.js");
+        copyFileToResources("style.css");
     }
 
     private void copyFileToResources(String filename) {

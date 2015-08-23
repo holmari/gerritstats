@@ -1,0 +1,103 @@
+body {
+    font: 16px/1.5em "Helvetica Neue", Helvetica, sans-serif;
+    margin: 2em 6em 4em 1em;
+}
+
+h1 {
+    color: #555;
+    font-size: 64px;
+    font-weight: 300;
+    letter-spacing: -2px;
+    margin-top: 20px;
+    margin-bottom: 0em;
+}
+
+h2 {
+    font-size: 2em;
+    font-weight: 200;
+    margin-top: 20px;
+    margin-left: 0.1em;
+}
+
+h3 {
+    font-size: 1.5em;
+    font-weight: 200;
+    margin-top: 20px;
+    margin-left: 0.1em;
+}
+
+h3.withSubtitle {
+    margin-bottom:0.2em;
+}
+
+h4 {
+    font-size: 1.25em;
+    font-weight: 200;
+}
+
+h2 + div {
+    margin-left: 1em;
+}
+
+pre {
+    display: inline;
+    font-family: monospace;
+    white-space: pre;
+}
+
+a {
+  color: steelblue;
+}
+
+a:not(:hover) {
+  text-decoration: none;
+}
+
+.subtitleH1 {
+    font-size: 1.25em;
+    font-weight: 200;
+    margin-top: 1em;
+    margin-bottom: 0em;
+    margin-left: 1.5em;
+}
+
+.subtitleH3 {
+    font-size: 1.0em;
+    font-weight: 200;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    margin-left: 1.5em;
+}
+
+.proximityGraphNode {
+    stroke: #fff;
+    stroke-width: 1.5px;
+}
+
+.proximityGraphLink {
+    stroke: #999;
+    stroke-opacity: .6;
+}
+
+.commentChartBar {
+  fill: steelblue;
+}
+
+.commentChartBar:hover {
+  fill: brown;
+}
+
+.commentChartAxis {
+  font: 10px sans-serif;
+}
+
+.commentChartAxis path,
+.commentChartAxis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.commentChartAxis path {
+  display: none;
+}

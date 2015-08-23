@@ -1,31 +1,25 @@
 #parse( "templates/macros.vm" )
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-.node {
-    stroke: #fff;
-    stroke-width: 1.5px;
-}
-
-.link {
-    stroke: #999;
-    stroke-opacity: .6;
-}
-</style>
 <body>
 <script src="res/d3.min.js"></script>
 <head>
+    <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
 </head>
-
+<h1>Gerrit Statistics</h1>
+<div class="subtitleH1">for $perPersonData.queryData.displayableProjectName</div>
+<br>
 <h2>Overview</h2>
-Project: $perPersonData.queryData.displayableProjectName <br>
+<div>
 Branches: $perPersonData.queryData.displayableBranchList <br>
 From: $date.format( "yyyy-MM-dd", $perPersonData.fromDate) <br>
 To: $date.format( "yyyy-MM-dd", $perPersonData.toDate) <br>
 Users in analysis: $identities.size() <br>
+</div>
 
 <h3>Identities</h3>
+<div>
 <ul>
 #foreach( $identity in $identities )
 #set( $extraInfo = $identity.email )
@@ -35,6 +29,7 @@ Users in analysis: $identities.size() <br>
     <li><a href="${identity.username}.html">$identity.name ($extraInfo)</a></li>
 #end
 </ul>
+</div>
 
 <h3>Proximity graph</h3>
 <div id="proximityGraph">
@@ -192,13 +187,13 @@ function createProximityGraph(identityGraph) {
     var link = proximityGraphSvg.selectAll(".link")
         .data(links)
         .enter().append("line")
-        .attr("class", "link")
+        .attr("class", "proximityGraphLink")
         .style("stroke-width", function(d) { return 10 * (d.value / maxLinkValue); });
 
     var node = proximityGraphSvg.selectAll(".node")
         .data(nodes)
         .enter().append("circle")
-        .attr("class", "node")
+        .attr("class", "proximityGraphNode")
         .attr("r", function(d) {
             return 3 + 2 * Math.sqrt(d.commits / medianCommitCount);
         })
@@ -216,7 +211,6 @@ function createProximityGraph(identityGraph) {
 
     node.append("title")
         .text(function(d) { return d.name; });
-
 
     force.on("tick", function() {
              link.attr("x1", function(d) { return d.source.x; })

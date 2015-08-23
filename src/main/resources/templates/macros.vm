@@ -3,14 +3,3 @@
 #if( $index <= $lastone ),
 #else #end
 #end
-
-<html>
-<body>
-<head>
-    <title>GerritStats</title>
-</head>
-
-
-
-</body>
-</html>

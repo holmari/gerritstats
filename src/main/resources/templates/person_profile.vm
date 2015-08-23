@@ -1,34 +1,10 @@
 #parse( "templates/macros.vm" )
 <!DOCTYPE html>
 <meta charset="utf-8">
-<style>
-
-.bar {
-  fill: steelblue;
-}
-
-.bar:hover {
-  fill: brown;
-}
-
-.axis {
-  font: 10px sans-serif;
-}
-
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
-}
-
-.x.axis path {
-  display: none;
-}
-</style>
 <body>
 <script src="res/d3.min.js"></script>
 <head>
+    <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats: $identity.name ($identity.username)</title>
 </head>
 
@@ -67,8 +43,8 @@ Average time in code review: $record.printableAverageTimeInCodeReview
 #end
 </p>
 
-<h3>They give +2..-2 approvals ($record.reviewersForOwnCommits.size())</h3>
-<h4>sorted by number of times added as a reviewer</h4>
+<h3 class="withSubtitle">They give +2..-2 approvals ($record.reviewersForOwnCommits.size())</h3>
+<div class="subtitleH3">sorted by number of times added as a reviewer</div>
 <p>
 #foreach( $identity in $record.myReviewerList )
 #set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
@@ -197,12 +173,12 @@ function createFrequencyTable(comments) {
     y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
     commentsPerDaySvg.append("g")
-      .attr("class", "x axis")
+      .attr("class", "x commentChartAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
     commentsPerDaySvg.append("g")
-      .attr("class", "y axis")
+      .attr("class", "y commentChartAxis")
       .call(yAxis)
     .append("text")
       .attr("transform", "rotate(-90)")
@@ -216,7 +192,7 @@ function createFrequencyTable(comments) {
     commentsPerDaySvg.selectAll(".bar")
         .data(data)
       .enter().append("rect")
-        .attr("class", "bar")
+        .attr("class", "commentChartBar")
         .attr("x", function(d) { return x(d.date); })
         .attr("width", barWidth)
         .attr("y", function(d) { return y(d.count); })
