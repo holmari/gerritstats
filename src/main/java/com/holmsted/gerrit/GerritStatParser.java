@@ -11,7 +11,7 @@ import jsonutils.JsonUtils;
 public class GerritStatParser {
 
     public List<Commit> parseCommits(String jsonCommitData) {
-        List<Commit> commits = new ArrayList<Commit>();
+        List<Commit> commits = new ArrayList<>();
         String[] lines = jsonCommitData.split("\n");
         for (String line : lines) {
             try {

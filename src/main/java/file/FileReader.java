@@ -25,8 +25,6 @@ public class FileReader {
             }
             reader.close();
             return output.toString();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

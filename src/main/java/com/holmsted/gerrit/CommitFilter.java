@@ -8,9 +8,9 @@ import javax.annotation.Nullable;
 
 public class CommitFilter {
 
-    private final List<String> includedEmails = new ArrayList<String>();
-    private final List<String> excludedEmails = new ArrayList<String>();
-    private final List<String> includedBranches = new ArrayList<String>();
+    private final List<String> includedEmails = new ArrayList<>();
+    private final List<String> excludedEmails = new ArrayList<>();
+    private final List<String> includedBranches = new ArrayList<>();
 
     private boolean includeEmptyEmails;
 

@@ -7,7 +7,7 @@ import javax.annotation.Nonnull;
 
 public class QueryData {
     private final CommandLineParser commandLine;
-    private final List<Commit> commits = new ArrayList<Commit>();
+    private final List<Commit> commits = new ArrayList<>();
 
     QueryData(@Nonnull CommandLineParser commandLine, @Nonnull List<Commit> commits) {
         this.commandLine = commandLine;
@@ -26,7 +26,7 @@ public class QueryData {
             } else if (filename != null) {
                 return String.format("all data from file %s", filename);
             } else {
-                return String.format("[unknown]");
+                return "[unknown]";
             }
         }
     }

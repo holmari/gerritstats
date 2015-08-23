@@ -31,19 +31,16 @@ public class IdentityRecord {
     int reviewCountMinus1;
     int reviewCountMinus2;
 
-    final Hashtable<Integer, Integer> receivedReviews = new Hashtable<Integer, Integer>();
+    final Hashtable<Integer, Integer> receivedReviews = new Hashtable<>();
 
-    final List<Commit> commits = new ArrayList<Commit>();
+    final List<Commit> commits = new ArrayList<>();
 
-    final List<Commit> addedAsReviewerTo = new ArrayList<Commit>();
-    final Hashtable<Commit.Identity, ReviewerData> reviewRequestors = new Hashtable<Commit.Identity, ReviewerData>();
+    final List<Commit> addedAsReviewerTo = new ArrayList<>();
+    final Hashtable<Commit.Identity, ReviewerData> reviewRequestors = new Hashtable<>();
 
-    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsWritten =
-            new Hashtable<Commit, List<Commit.PatchSetComment>>();
-    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsReceived =
-            new Hashtable<Commit, List<Commit.PatchSetComment>>();
-    final Hashtable<Commit.Identity, ReviewerData> reviewersForOwnCommits =
-            new Hashtable<Commit.Identity, ReviewerData>();
+    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsWritten = new Hashtable<>();
+    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsReceived = new Hashtable<>();
+    final Hashtable<Commit.Identity, ReviewerData> reviewersForOwnCommits = new Hashtable<>();
 
     private long averageTimeInCodeReview;
 
@@ -80,7 +77,7 @@ public class IdentityRecord {
     }
 
     public List<Commit.PatchSetComment> getAllCommentsWritten() {
-        List<Commit.PatchSetComment> allComments = new ArrayList<Commit.PatchSetComment>();
+        List<Commit.PatchSetComment> allComments = new ArrayList<>();
         for (List<Commit.PatchSetComment> comments : commentsWritten.values()) {
             allComments.addAll(comments);
         }
@@ -88,7 +85,7 @@ public class IdentityRecord {
     }
 
     public List<Commit.PatchSetComment> getAllCommentsReceived() {
-        List<Commit.PatchSetComment> allComments = new ArrayList<Commit.PatchSetComment>();
+        List<Commit.PatchSetComment> allComments = new ArrayList<>();
         for (List<Commit.PatchSetComment> comments : commentsReceived.values()) {
             allComments.addAll(comments);
         }
@@ -176,7 +173,7 @@ public class IdentityRecord {
     }
 
     public List<Commit.Identity> getMyReviewerList() {
-        List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewersForOwnCommits.keySet());
+        List<Commit.Identity> sortedIdentities = new ArrayList<>(reviewersForOwnCommits.keySet());
         Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewersForOwnCommits));
         return sortedIdentities;
     }
@@ -186,7 +183,7 @@ public class IdentityRecord {
     }
 
     public List<Commit.Identity> getReviewRequestorList() {
-        List<Commit.Identity> sortedIdentities = new ArrayList<Commit.Identity>(reviewRequestors.keySet());
+        List<Commit.Identity> sortedIdentities = new ArrayList<>(reviewRequestors.keySet());
         Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewRequestors));
         return sortedIdentities;
     }
@@ -230,7 +227,7 @@ public class IdentityRecord {
     }
 
     public List<Commit> getCommitsWithNPatchSets(int patchSetCountThreshold) {
-        List<Commit> exceedingCommits = new ArrayList<Commit>();
+        List<Commit> exceedingCommits = new ArrayList<>();
         for (Commit commit : commits) {
             int patchSetCount = commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
             if (patchSetCount > patchSetCountThreshold) {
@@ -280,7 +277,7 @@ public class IdentityRecord {
     public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
         List<Commit.PatchSetComment> patchSetComments = commentsWritten.get(commit);
         if (patchSetComments == null) {
-            patchSetComments = new ArrayList<Commit.PatchSetComment>();
+            patchSetComments = new ArrayList<>();
         }
         patchSetComments.add(patchSetComment);
         commentsWritten.put(commit, patchSetComments);
@@ -289,7 +286,7 @@ public class IdentityRecord {
     public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
         List<Commit.PatchSetComment> patchSetComments = commentsReceived.get(commit);
         if (patchSetComments == null) {
-            patchSetComments = new ArrayList<Commit.PatchSetComment>();
+            patchSetComments = new ArrayList<>();
         }
         patchSetComments.add(patchSetComment);
         commentsReceived.put(commit, patchSetComments);

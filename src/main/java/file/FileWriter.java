@@ -19,8 +19,6 @@ public class FileWriter {
             Writer writer = new BufferedWriter(new OutputStreamWriter(outputStream, "UTF-8"));
             writer.write(contents);
             writer.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -37,8 +35,6 @@ public class FileWriter {
                 outputStream.write(buffer, 0, readBytes);
             }
             outputStream.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }

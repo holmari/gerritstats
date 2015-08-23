@@ -13,7 +13,7 @@ public class JsonUtils {
     }
 
     public static List<String> readStringArray(JSONArray array) {
-        List<String> list = new ArrayList<String>();
+        List<String> list = new ArrayList<>();
         for (int i = 0; i < array.length(); ++i) {
             list.add(array.getString(i));
         }

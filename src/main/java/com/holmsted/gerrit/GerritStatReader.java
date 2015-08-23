@@ -18,7 +18,7 @@ public class GerritStatReader {
 
     private final String serverName;
     private final int port;
-    private List<String> projectNames = new ArrayList<String>();
+    private List<String> projectNames = new ArrayList<>();
     private int perQueryCommitLimit = NO_COMMIT_LIMIT;
     private int overallCommitLimit = NO_COMMIT_LIMIT;
 
@@ -107,9 +107,7 @@ public class GerritStatReader {
                 }
 
                 return new GerritOutput(output.toString());
-            } catch (IOException e) {
-                e.printStackTrace();
-            } catch (InterruptedException e) {
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
 

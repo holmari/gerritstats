@@ -18,11 +18,11 @@ public class CommandLineParser {
     private String outputFile;
     private int limit = GerritStatReader.NO_COMMIT_LIMIT;
     @Nonnull
-    private final List<String> excludedEmails = new ArrayList<String>();
+    private final List<String> excludedEmails = new ArrayList<>();
     @Nonnull
-    private final List<String> includedBranches = new ArrayList<String>();
+    private final List<String> includedBranches = new ArrayList<>();
     @Nonnull
-    private final List<String> includedEmails = new ArrayList<String>();
+    private final List<String> includedEmails = new ArrayList<>();
     @Nonnull
     private OutputType outputType = OutputType.HTML;
 

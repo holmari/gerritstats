@@ -144,7 +144,7 @@ public class Commit {
         }
 
         public static List<Approval> fromJson(JSONArray approvals) {
-            List<Approval> result = new ArrayList<Approval>();
+            List<Approval> result = new ArrayList<>();
             if (approvals != null) {
                 for (int i = 0; i < approvals.length(); ++i) {
                     result.add(Approval.fromJson(approvals.getJSONObject(i)));
@@ -187,7 +187,7 @@ public class Commit {
         }
 
         public static List<PatchSetComment> fromJson(JSONArray comments) {
-            List<PatchSetComment> result = new ArrayList<PatchSetComment>();
+            List<PatchSetComment> result = new ArrayList<>();
             if (comments != null) {
                 for (int i = 0; i < comments.length(); ++i) {
                     result.add(PatchSetComment.fromJson(comments.getJSONObject(i)));
@@ -209,15 +209,15 @@ public class Commit {
     public static class PatchSet {
         public int number;
         public String revision;
-        public final List<String> parents = new ArrayList<String>();
+        public final List<String> parents = new ArrayList<>();
         public String ref;
         public Identity uploader;
         public long createdOnDate;
         public Identity author;
         public boolean isDraft;
         public PatchSetKind kind;
-        public final List<Approval> approvals = new ArrayList<Approval>();
-        public final List<PatchSetComment> comments = new ArrayList<PatchSetComment>();
+        public final List<Approval> approvals = new ArrayList<>();
+        public final List<PatchSetComment> comments = new ArrayList<>();
         public int sizeInsertions;
         public int sizeDeletions;
 
@@ -276,9 +276,9 @@ public class Commit {
     public boolean isOpen;
     public String status;
 
-    public final List<Identity> reviewers = new ArrayList<Identity>();
-    public final List<ChangeComment> comments = new ArrayList<ChangeComment>();
-    public final List<PatchSet> patchSets = new ArrayList<PatchSet>();
+    public final List<Identity> reviewers = new ArrayList<>();
+    public final List<ChangeComment> comments = new ArrayList<>();
+    public final List<PatchSet> patchSets = new ArrayList<>();
 
     public int getPatchSetCountForKind(PatchSetKind kind) {
         int count = 0;
