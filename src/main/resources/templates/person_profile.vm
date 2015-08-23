@@ -9,30 +9,35 @@
 </head>
 
 <h1>$identity.name ($identity.username)</h1>
-<h2>$identity.email</h2>
+<div class="subtitleH1">$identity.email</div>
 
 <h3>Overall</h3>
 <p>
-Commits: $record.commits.size() <br>
-Comments written: $record.allCommentsWritten.size() <br>
-Comments received: $record.allCommentsReceived.size() <br>
-Commit/comment ratio: $record.receivedCommentRatio <br>
-Added as reviewer: $record.addedAsReviewerTo.size() <br><br>
+<table>
+    <tr><th>Commits</th><td>$record.commits.size()</td></tr>
+    <tr><th>Comments written</th><td>$record.allCommentsWritten.size()</td></tr>
+    <tr><th>Comments received</th><td>$record.allCommentsReceived.size()</td></tr>
+    <tr><th>Commit/comment ratio</th><td>$record.receivedCommentRatio</td></tr>
+    <tr><th>Added as reviewer</th><td>$record.addedAsReviewerTo.size()</td></tr>
+    <tr><td>&nbsp;</td></tr>
+    <tr><th>Review comment ratio</th><td>$record.reviewCommentRatio</td></tr>
+    <tr><th>Max patch set count</th><td>$record.maxPatchSetCount</td></tr>
+</table>
 
-Review comment ratio: $record.reviewCommentRatio <br>
-Avg. patch set count: $record.averagePatchSetCount <br>
-Max patch set count: $record.maxPatchSetCount <br><br>
+<table>
+	<tr><th>+2 reviews given</th><td>$record.reviewCountPlus2</td></tr>
+	<tr><th>+1 reviews given</th><td>$record.reviewCountPlus1</td></tr>
+	<tr><th>-1 reviews given</th><td>$record.reviewCountMinus1</td></tr>
+	<tr><th>-2 reviews given</th><td>$record.reviewCountMinus2</td></tr>
+	<tr><th>+2 reviews received</th><td>$record.getReceivedReviewsForScore(2)</td></tr>
+	<tr><th>+1 reviews received</th><td>$record.getReceivedReviewsForScore(1)</td></tr>
+	<tr><th>-1 reviews received</th><td>$record.getReceivedReviewsForScore(-1)</td></tr>
+	<tr><th>-2 reviews received</th><td>$record.getReceivedReviewsForScore(-2)</td></tr>
+</table>
 
-+2 reviews given: $record.reviewCountPlus2 <br>
-+1 reviews given: $record.reviewCountPlus1 <br>
--1 reviews given: $record.reviewCountMinus1 <br>
--2 reviews given: $record.reviewCountMinus2 <br>
-+2 reviews received: $record.getReceivedReviewsForScore(2) <br>
-+1 reviews received: $record.getReceivedReviewsForScore(1) <br>
--1 reviews received: $record.getReceivedReviewsForScore(-1) <br>
--2 reviews received: $record.getReceivedReviewsForScore(-2) <br><br>
-
-Average time in code review: $record.printableAverageTimeInCodeReview
+<table>
+    <tr><th>Average time in code review</th><td>$record.printableAverageTimeInCodeReview</td></tr>
+</table>
 </p>
 
 <h3>Adds them as reviewers ($record.reviewersForOwnCommits.size())</h3>

@@ -46,11 +46,20 @@ pre {
 }
 
 a {
-  color: steelblue;
+    color: steelblue;
 }
 
 a:not(:hover) {
-  text-decoration: none;
+    text-decoration: none;
+}
+
+table {
+    margin-bottom: 1em;
+}
+
+th {
+    text-align: left;
+    padding-right: 1em;
 }
 
 .subtitleH1 {
