@@ -24,7 +24,7 @@ public class CommandLineParser {
     @Nonnull
     private final List<String> includedEmails = new ArrayList<String>();
     @Nonnull
-    private OutputType outputType = OutputType.PLAIN;
+    private OutputType outputType = OutputType.HTML;
 
     private int listCommitsExceedingPatchSetCount = OutputRules.INVALID_PATCH_COUNT;
     private boolean listReviewComments;

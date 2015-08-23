@@ -41,6 +41,8 @@ public class GerritStatsMain {
                     + "specified, --exclude is ignored.");
             System.err.println(" --exclude list-of-people: if specified, the comma-separated list of identities "
                     + " will be excluded from all generated statistics.");
+            System.err.println(" --output-type: if specified, the output will be provided in the specified format."
+                    + "Defaults to HTML.");
             System.err.println(" --output: If specified, the output will be either a list of all review comments in "
                     + "CSV format, or a per-person data set. Defaults to per-person-data.");
             System.err.println("--list-commits-exceeding-patch-set-count: If specified, all commit URLs "
