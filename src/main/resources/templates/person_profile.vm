@@ -69,6 +69,65 @@
 <div id="commentsPerDay">
 </div>
 
+<h3>Per-month stats</h3>
+
+<table class="perMonthStats">
+#foreach( $year in $record.commits.yearRange )
+
+	<tr><th colspan="13" class="monthlyCommitYearTitle">$year</th></tr>
+    <tr><th></th>
+        <th>Jan</th>
+        <th>Feb</th>
+        <th>Mar</th>
+        <th>Apr</th>
+        <th>May</th>
+        <th>Jun</th>
+        <th>Jul</th>
+        <th>Aug</th>
+        <th>Sep</th>
+        <th>Oct</th>
+        <th>Nov</th>
+        <th>Dec</th>
+    </tr>
+    <tr>
+        <th>Commits</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.commits.getPrintableMonthlyItemCount($year, $month)</td>
+#end
+    </tr>
+	<tr>
+	    <th>Comments</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.allCommentsWritten.getPrintableMonthlyItemCount($year, $month)</td>
+#end
+	</tr>
+	<tr>
+	    <th>Commits MoM %</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.commits.getDisplayableMonthOnMonthChange($year, $month)</td>
+#end
+	</tr>
+    <tr>
+	    <th>Commits QoQ %</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.commits.getDisplayableQuarterOnQuarterChange($year, $month)</td>
+#end
+	</tr>
+    <tr>
+        <th>Comments MoM %</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.allCommentsWritten.getDisplayableMonthOnMonthChange($year, $month)</td>
+#end
+	</tr>
+	<tr>
+	    <th>Comments QoQ %</th>
+#foreach( $month in $record.allCommentsWritten.monthsInYear )
+        <td>$record.allCommentsWritten.getDisplayableQuarterOnQuarterChange($year, $month)</td>
+#end
+	</tr>
+#end
+</table>
+
 #if ($outputRules.listCommitsExceedingPatchSetCount != -1)
 <h3>Commits exceeding $outputRules.listCommitsExceedingPatchSetCount patches</h3>
 <p>

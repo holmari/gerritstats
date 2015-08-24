@@ -78,6 +78,16 @@ th {
     margin-left: 1.5em;
 }
 
+.monthlyCommitYearTitle {
+    font-size: 1.5em;
+    font-weight: 300;
+    padding-top: 20px;
+}
+
+.perMonthStats tr th {
+    min-width: 75px;
+}
+
 .proximityGraphNode {
     stroke: #fff;
     stroke-width: 1.5px;

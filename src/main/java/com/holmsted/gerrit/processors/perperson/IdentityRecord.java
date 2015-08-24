@@ -1,6 +1,8 @@
 package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
+import com.holmsted.gerrit.DatedCommitList;
+import com.holmsted.gerrit.DatedPatchSetCommentList;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,13 +35,13 @@ public class IdentityRecord {
 
     final Hashtable<Integer, Integer> receivedReviews = new Hashtable<>();
 
-    final List<Commit> commits = new ArrayList<>();
+    final DatedCommitList commits = new DatedCommitList();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<>();
     final Hashtable<Commit.Identity, ReviewerData> reviewRequestors = new Hashtable<>();
 
-    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsWritten = new Hashtable<>();
-    final Hashtable<Commit, List<Commit.PatchSetComment>> commentsReceived = new Hashtable<>();
+    final PatchSetCommentTable commentsWritten = new PatchSetCommentTable();
+    final PatchSetCommentTable commentsReceived = new PatchSetCommentTable();
     final Hashtable<Commit.Identity, ReviewerData> reviewersForOwnCommits = new Hashtable<>();
 
     private long averageTimeInCodeReview;
@@ -68,7 +70,7 @@ public class IdentityRecord {
         return identity.getUsername();
     }
 
-    public List<Commit> getCommits() {
+    public DatedCommitList getCommits() {
         return commits;
     }
 
@@ -76,12 +78,8 @@ public class IdentityRecord {
         return addedAsReviewerTo;
     }
 
-    public List<Commit.PatchSetComment> getAllCommentsWritten() {
-        List<Commit.PatchSetComment> allComments = new ArrayList<>();
-        for (List<Commit.PatchSetComment> comments : commentsWritten.values()) {
-            allComments.addAll(comments);
-        }
-        return allComments;
+    public DatedPatchSetCommentList getAllCommentsWritten() {
+        return commentsWritten.getAllComments();
     }
 
     public List<Commit.PatchSetComment> getAllCommentsReceived() {
@@ -275,21 +273,11 @@ public class IdentityRecord {
     }
 
     public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
-        List<Commit.PatchSetComment> patchSetComments = commentsWritten.get(commit);
-        if (patchSetComments == null) {
-            patchSetComments = new ArrayList<>();
-        }
-        patchSetComments.add(patchSetComment);
-        commentsWritten.put(commit, patchSetComments);
+        commentsWritten.addCommentForCommit(commit, patchSetComment);
     }
 
     public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
-        List<Commit.PatchSetComment> patchSetComments = commentsReceived.get(commit);
-        if (patchSetComments == null) {
-            patchSetComments = new ArrayList<>();
-        }
-        patchSetComments.add(patchSetComment);
-        commentsReceived.put(commit, patchSetComments);
+        commentsReceived.addCommentForCommit(commit, patchSetComment);
     }
 
     public List<Commit> getCommitsWithWrittenComments() {

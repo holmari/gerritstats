@@ -19,9 +19,9 @@ import javax.annotation.Nonnull;
  * <p>
  * date reviewer-email commit-author-email
  */
-public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> {
+public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentDataList> {
 
-    static class CsvFormatter implements OutputFormatter<PatchSetCommentList> {
+    static class CsvFormatter implements OutputFormatter<PatchSetCommentDataList> {
 
         private SimpleDateFormat dateFormat;
 
@@ -30,7 +30,7 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> 
         }
 
         @Override
-        public void format(@Nonnull PatchSetCommentList dataList) {
+        public void format(@Nonnull PatchSetCommentDataList dataList) {
             final StringBuilder builder = new StringBuilder();
             builder.append(String.format("%10s %40s %40s",
                     "Date",
@@ -56,14 +56,14 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentList> 
      */
     @Nonnull
     @Override
-    protected OutputFormatter<PatchSetCommentList> createOutputFormatter() {
+    protected OutputFormatter<PatchSetCommentDataList> createOutputFormatter() {
         return new CsvFormatter();
     }
 
     @Override
-    public void process(@Nonnull OutputFormatter<PatchSetCommentList> formatter,
+    public void process(@Nonnull OutputFormatter<PatchSetCommentDataList> formatter,
                         @Nonnull QueryData queryData) {
-        final PatchSetCommentList dataList = new PatchSetCommentList();
+        final PatchSetCommentDataList dataList = new PatchSetCommentDataList();
 
         CommitVisitor visitor = new CommitVisitor(getCommitFilter()) {
             @Override public void visitCommit(@Nonnull Commit commit) {}
