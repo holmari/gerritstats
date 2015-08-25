@@ -46,7 +46,8 @@ public class GerritStatsMain {
             System.err.println(" --output: If specified, the output will be either a list of all review comments in "
                     + "CSV format, or a per-person data set. Defaults to per-person-data.");
             System.err.println("--commit-patch-set-count-threshold: If specified, all commit URLs "
-                    + "exceeding the given patch set count will be listed in the per-person data.");
+                    + "exceeding the given patch set count will be listed in the per-person data. Defaults to 5."
+                    + "If -1 is set, no listing is provided.");
             System.err.println("--list-comments: If specified, the per-person data will show a list of all "
                     + " code review comments written by a person.");
             System.exit(1);

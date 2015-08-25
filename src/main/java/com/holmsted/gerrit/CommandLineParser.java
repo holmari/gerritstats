@@ -26,7 +26,7 @@ public class CommandLineParser {
     @Nonnull
     private OutputType outputType = OutputType.HTML;
 
-    private int commitPatchSetCountThreshold = OutputRules.INVALID_PATCH_COUNT;
+    private int commitPatchSetCountThreshold = 5;
     private boolean listReviewComments;
     private Output output = Output.PER_PERSON_DATA;
 
