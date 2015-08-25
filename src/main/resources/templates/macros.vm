@@ -1,5 +1,17 @@
 #macro(listComma $index $listSize)
-#set ( $lastone = $listSize - 1 )
+#set( $lastone = $listSize - 1 )
 #if( $index <= $lastone ),
 #else #end
+#end
+
+#macro(identityHref $identity)
+    #if( $identity.hasEmail() )
+        <a href="mailto:$identity.email">$identity.email</a>
+    #else
+        #if ( !$identity.hasUsername() )
+            Unknown user
+        #else
+            $identity.username
+        #end
+    #end
 #end

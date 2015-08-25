@@ -44,7 +44,7 @@
 <p>
 #foreach( $identity in $record.myReviewerList )
 #set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
-    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.myReviewerList.size() )
+    #identityHref( $identity ) ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.myReviewerList.size() )
 #end
 </p>
 
@@ -53,7 +53,7 @@
 <p>
 #foreach( $identity in $record.myReviewerList )
 #set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
-    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.approvalCount)#listComma( $velocityCount, $record.myReviewerList.size() )
+    #identityHref( $identity ) ($reviewerData.approvalCount)#listComma( $velocityCount, $record.myReviewerList.size() )
 #end
 </p>
 
@@ -61,7 +61,7 @@
 <p>
 #foreach( $identity in $record.reviewRequestorList )
 #set ( $reviewerData = $record.getReviewRequestorDataFor($identity) )
-    <a href="mailto:$identity.email">$identity.email</a> ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
+    #identityHref( $identity ) ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
 #end
 </p>
 

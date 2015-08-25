@@ -1,5 +1,7 @@
 package com.holmsted.gerrit;
 
+import com.google.common.base.Strings;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -26,6 +28,14 @@ public class Commit {
         public String name;
         public String email;
         public String username;
+
+        public boolean hasEmail() {
+            return !Strings.isNullOrEmpty(email);
+        }
+
+        public boolean hasUsername() {
+            return !Strings.isNullOrEmpty(username);
+        }
 
         public String getName() {
             return name;

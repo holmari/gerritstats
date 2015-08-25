@@ -1,5 +1,6 @@
 package com.holmsted.gerrit.processors.perperson;
 
+import com.google.common.base.Strings;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
@@ -113,6 +114,11 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     }
 
     private static String getOutputFilenameForIdentity(@Nonnull Commit.Identity identity) {
-        return identity.username + ".html";
+        String filename = identity.getUsername();
+        if (Strings.isNullOrEmpty(filename)) {
+            filename = identity.getEmail();
+            filename = filename.substring(0, filename.indexOf('@')).replace(".", "_");
+        }
+        return filename + ".html";
     }
 }
