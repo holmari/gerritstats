@@ -26,7 +26,7 @@ public class CommandLineParser {
     @Nonnull
     private OutputType outputType = OutputType.HTML;
 
-    private int listCommitsExceedingPatchSetCount = OutputRules.INVALID_PATCH_COUNT;
+    private int commitPatchSetCountThreshold = OutputRules.INVALID_PATCH_COUNT;
     private boolean listReviewComments;
     private Output output = Output.PER_PERSON_DATA;
 
@@ -79,8 +79,8 @@ public class CommandLineParser {
                 ++i;
             } else if (arg.equals("--list-comments")) {
                 listReviewComments = true;
-            } else if (arg.equals("--list-commits-exceeding-patch-set-count") && isNotAtEnd) {
-                listCommitsExceedingPatchSetCount = Integer.parseInt(args[i + 1]);
+            } else if (arg.equals("--commit-patch-set-count-threshold") && isNotAtEnd) {
+                commitPatchSetCountThreshold = Integer.parseInt(args[i + 1]);
                 ++i;
             }
 
@@ -146,7 +146,7 @@ public class CommandLineParser {
         return listReviewComments;
     }
 
-    public int getListCommitsExceedingPatchSetCount() {
-        return listCommitsExceedingPatchSetCount;
+    public int getCommitPatchSetCountThreshold() {
+        return commitPatchSetCountThreshold;
     }
 }

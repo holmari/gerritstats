@@ -66,7 +66,7 @@
 </p>
 
 <h3>Review comments per day</h3>
-<div id="commentsPerDay">
+<div id="commentsPerDaySvg">
 </div>
 
 <h3>Per-month stats</h3>
@@ -128,14 +128,18 @@
 #end
 </table>
 
-#if ($outputRules.listCommitsExceedingPatchSetCount != -1)
-<h3>Commits exceeding $outputRules.listCommitsExceedingPatchSetCount patches</h3>
+#if ($outputRules.commitPatchSetCountThreshold != -1)
+<h3>Commits exceeding $outputRules.commitPatchSetCountThreshold patches</h3>
 <p>
-#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.listCommitsExceedingPatchSetCount) )
+#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.commitPatchSetCountThreshold) )
 #foreach( $commit in $badCommitList )
     <a href="$commit.url">$commit.url</a> ($commit.getPatchSetCountForKind("REWORK"))#listComma( $velocityCount, $badCommitList.size() )
 #end
 </p>
+
+<div id="badCommitsSvg">
+</div>
+
 #end
 
 <h3>Review comments</h3>
@@ -169,37 +173,15 @@
     #end
 #end
 	];
-    var x_domain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"), new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
+
+#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.commitPatchSetCountThreshold) )
+    var badCommits = [
+#foreach( $commit in $badCommitList )
+    {date: new Date("$date.format( "yyyy-MM-dd", $commit.createdOnDate )"), count: $commit.getPatchSetCountForKind("REWORK")},
+#end
+	];
 </script>
 <script>
-var margin = {top: 20, right: 20, bottom: 30, left: 40};
-var width = 800 - margin.left - margin.right;
-var height = 400 - margin.top - margin.bottom;
-
-var x = d3.time.scale()
-    .domain(x_domain)
-    .range([0, width]);
-
-var y = d3.scale.linear()
-    .range([height, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom")
-    .ticks(d3.time.weeks(x_domain[0], x_domain[1]).length)
-    .tickFormat(d3.time.format("%W"))
-
-var yAxis = d3.svg.axis()
-    .scale(y)
-    .orient("left")
-    .ticks(10)
-    .tickFormat(d3.format("d"))
-
-var commentsPerDaySvg = d3.select("#commentsPerDay").append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 /**
   * Processes the data into the following format:
@@ -230,18 +212,45 @@ function groupReviewCommentsByDate(comments) {
     return data;
 }
 
-function createFrequencyTable(comments) {
-    var data = groupReviewCommentsByDate(comments);
+function createFrequencyTable(svgId, x_domain, data) {
+    var margin = {top: 20, right: 20, bottom: 30, left: 40};
+    var width = 800 - margin.left - margin.right;
+    var height = 400 - margin.top - margin.bottom;
+
+    var x = d3.time.scale()
+        .domain(x_domain)
+        .range([0, width]);
+
+    var y = d3.scale.linear()
+        .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+        .scale(x)
+        .orient("bottom")
+        .ticks(d3.time.weeks(x_domain[0], x_domain[1]).length)
+        .tickFormat(d3.time.format("%W"))
+
+    var yAxis = d3.svg.axis()
+        .scale(y)
+        .orient("left")
+        .ticks(10)
+        .tickFormat(d3.format("d"))
+
+    var svg = d3.select(svgId).append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     x.domain(x_domain);
     y.domain([0, d3.max(data, function(d) { return d.count; })]);
 
-    commentsPerDaySvg.append("g")
+    svg.append("g")
       .attr("class", "x commentChartAxis")
       .attr("transform", "translate(0," + height + ")")
       .call(xAxis);
 
-    commentsPerDaySvg.append("g")
+    svg.append("g")
       .attr("class", "y commentChartAxis")
       .call(yAxis)
     .append("text")
@@ -253,7 +262,7 @@ function createFrequencyTable(comments) {
 
     var totalDaysInDomain = d3.time.days(x_domain[0], x_domain[1]);
     var barWidth = width / totalDaysInDomain.length;
-    commentsPerDaySvg.selectAll(".bar")
+    svg.selectAll(".bar")
         .data(data)
       .enter().append("rect")
         .attr("class", "commentChartBar")
@@ -265,8 +274,11 @@ function createFrequencyTable(comments) {
         .text(function(d) { return d.date });
 };
 
-createFrequencyTable(comments);
+var xDomain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"),
+               new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
+createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(comments));
 
+createFrequencyTable("#badCommitsSvg", xDomain, badCommits);
 
 </script>
 </body>

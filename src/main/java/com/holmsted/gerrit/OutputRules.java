@@ -16,8 +16,8 @@ public class OutputRules {
         return commandLine.getListReviewComments();
     }
 
-    public int getListCommitsExceedingPatchSetCount() {
-        return commandLine.getListCommitsExceedingPatchSetCount();
+    public int getCommitPatchSetCountThreshold() {
+        return commandLine.getCommitPatchSetCountThreshold();
     }
 
     public OutputType getOutputType() {

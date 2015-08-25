@@ -21,7 +21,7 @@ public class GerritStatsMain {
             System.err.println("      [--exclude joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
             System.err.println("      [--output-type plain|csv|html]");
             System.err.println("      [--output review-comment-csv|per-person-data]");
-            System.err.println("      [--list-commits-exceeding-patch-set-count n]");
+            System.err.println("      [--commit-patch-set-count-threshold n]");
             System.err.println("      [--list-comments]");
             System.err.println();
             System.err.println(" --file file: read output from file");
@@ -45,7 +45,7 @@ public class GerritStatsMain {
                     + "Defaults to HTML.");
             System.err.println(" --output: If specified, the output will be either a list of all review comments in "
                     + "CSV format, or a per-person data set. Defaults to per-person-data.");
-            System.err.println("--list-commits-exceeding-patch-set-count: If specified, all commit URLs "
+            System.err.println("--commit-patch-set-count-threshold: If specified, all commit URLs "
                     + "exceeding the given patch set count will be listed in the per-person data.");
             System.err.println("--list-comments: If specified, the per-person data will show a list of all "
                     + " code review comments written by a person.");

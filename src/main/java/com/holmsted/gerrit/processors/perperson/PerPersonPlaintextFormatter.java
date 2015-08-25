@@ -24,7 +24,7 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
 
         printHeader(data);
 
-        int maxPatchSetCountForList = outputRules.getListCommitsExceedingPatchSetCount();
+        int maxPatchSetCountForList = outputRules.getCommitPatchSetCountThreshold();
         HumanReadableLineBuilder builder = new HumanReadableLineBuilder();
         for (IdentityRecord record : orderedList) {
             builder.addLine(record.identity.email);
