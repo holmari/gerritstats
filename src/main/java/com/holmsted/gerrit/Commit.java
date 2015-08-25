@@ -280,6 +280,10 @@ public class Commit {
     public final List<ChangeComment> comments = new ArrayList<>();
     public final List<PatchSet> patchSets = new ArrayList<>();
 
+    public int getPatchSetCountForKind(String kind) {
+        return getPatchSetCountForKind(PatchSetKind.valueOf(kind));
+    }
+
     public int getPatchSetCountForKind(PatchSetKind kind) {
         int count = 0;
         for (PatchSet patchSet : patchSets) {

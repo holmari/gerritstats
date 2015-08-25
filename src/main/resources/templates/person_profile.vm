@@ -133,7 +133,7 @@
 <p>
 #set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.listCommitsExceedingPatchSetCount) )
 #foreach( $commit in $badCommitList )
-    <a href="$commit.url">$commit.url</a> ($commit.patchSets.size())#listComma( $velocityCount, $badCommitList.size() )
+    <a href="$commit.url">$commit.url</a> ($commit.getPatchSetCountForKind("REWORK"))#listComma( $velocityCount, $badCommitList.size() )
 #end
 </p>
 #end
