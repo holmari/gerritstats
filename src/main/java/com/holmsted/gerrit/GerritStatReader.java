@@ -1,5 +1,7 @@
 package com.holmsted.gerrit;
 
+import com.google.common.base.Strings;
+
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -8,6 +10,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 import jsonutils.JsonUtils;
 
@@ -37,7 +41,7 @@ public class GerritStatReader {
         private boolean moreChanges;
         private int lastLineStartIndex = -1;
 
-        public GerritOutput(String output) {
+        public GerritOutput(@Nonnull String output) {
             this.output = output;
             int lastLineBreak = output.lastIndexOf('\n');
             if (lastLineBreak != -1) {
@@ -65,7 +69,7 @@ public class GerritStatReader {
 
         @Override
         public String toString() {
-            return output.substring(0, lastLineStartIndex);
+            return (lastLineStartIndex != -1) ? output.substring(0, lastLineStartIndex) : output;
         }
     }
 
@@ -106,7 +110,7 @@ public class GerritStatReader {
                     return null;
                 }
 
-                return new GerritOutput(output.toString());
+                return new GerritOutput(Strings.nullToEmpty(output.toString()));
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
