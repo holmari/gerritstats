@@ -116,8 +116,13 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     private static String getOutputFilenameForIdentity(@Nonnull Commit.Identity identity) {
         String filename = identity.getUsername();
         if (Strings.isNullOrEmpty(filename)) {
-            filename = identity.getEmail();
-            filename = filename.substring(0, filename.indexOf('@')).replace(".", "_");
+            filename = Strings.nullToEmpty(identity.getEmail()).replace(".", "_");
+            int atMarkIndex = filename.indexOf('@');
+            if (atMarkIndex != -1) {
+                filename = filename.substring(0, atMarkIndex);
+            } else {
+                filename = "anonymous_coward";
+            }
         }
         return filename + ".html";
     }
