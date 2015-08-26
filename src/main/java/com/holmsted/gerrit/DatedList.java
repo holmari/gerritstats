@@ -64,14 +64,17 @@ public class DatedList<T> extends ArrayList<T> {
         if (!isDateWithinRange(year, month)) {
             return "";
         }
-
-        if (month > 1) {
-            return itemsPerYear.get(year).getDisplayableMonthOnMonthChange(month);
+        YearlyItemList<T> items = itemsPerYear.get(year);
+        if (items == null) {
+            return MonthlyTimeFormat.formatFloat(Float.NaN);
         }
 
-        YearlyItemList items = itemsPerYear.get(year);
+        if (month > 1) {
+            return items.getDisplayableMonthOnMonthChange(month);
+        }
+
         YearlyItemList prevYearItems = itemsPerYear.get(year - 1);
-        if (prevYearItems == null || items == null) {
+        if (prevYearItems == null) {
             return MonthlyTimeFormat.formatFloat(Float.NaN);
         } else {
             int itemsForLastMonthOfPrevYear = prevYearItems.getMonthlyItemCount(12);
@@ -84,15 +87,18 @@ public class DatedList<T> extends ArrayList<T> {
         if (!isDateWithinRange(year, month)) {
             return "";
         }
+        YearlyItemList<T> items = itemsPerYear.get(year);
+        if (items == null) {
+            return MonthlyTimeFormat.formatFloat(Float.NaN);
+        }
 
         int quarter = MonthlyTimeFormat.monthToQuarter(month);
         if (quarter > 0) {
-            return itemsPerYear.get(year).getDisplayableQuarterOnQuarterChange(month);
+            return items.getDisplayableQuarterOnQuarterChange(month);
         }
 
-        YearlyItemList items = itemsPerYear.get(year);
         YearlyItemList prevYearItems = itemsPerYear.get(year - 1);
-        if (prevYearItems == null || items == null) {
+        if (prevYearItems == null) {
             return MonthlyTimeFormat.formatFloat(Float.NaN);
         } else {
             int itemsForLastQuarterOfPrevYear = prevYearItems.getQuarterlyItemCount(3);
@@ -105,8 +111,14 @@ public class DatedList<T> extends ArrayList<T> {
         if (!isDateWithinRange(year, month)) {
             return "";
         }
-        YearlyItemList<T> ts = itemsPerYear.get(year);
-        return itemsPerYear.get(year).getPrintableMonthlyItemCount(month);
+        YearlyItemList<T> itemsPerYear = this.itemsPerYear.get(year);
+        if (itemsPerYear == null) {
+            // When used with templates, this is only possible
+            // if someone committed e.g. in 2013, and in 2015, but not in 2014
+            return "0";
+        } else {
+            return itemsPerYear.getPrintableMonthlyItemCount(month);
+        }
     }
 
     public static int[] getMonthsInYear() {
