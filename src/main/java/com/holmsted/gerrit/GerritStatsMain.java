@@ -22,7 +22,6 @@ public class GerritStatsMain {
             System.err.println("      [--output-type plain|csv|html]");
             System.err.println("      [--output review-comment-csv|per-person-data]");
             System.err.println("      [--commit-patch-set-count-threshold n]");
-            System.err.println("      [--list-comments]");
             System.err.println();
             System.err.println(" --file file: read output from file");
             System.err.println(String.format(" --server url:port: read output from Gerrit server url and given port."
@@ -48,8 +47,6 @@ public class GerritStatsMain {
             System.err.println("--commit-patch-set-count-threshold: If specified, all commit URLs "
                     + "exceeding the given patch set count will be listed in the per-person data. Defaults to 5."
                     + "If -1 is set, no listing is provided.");
-            System.err.println("--list-comments: If specified, the per-person data will show a list of all "
-                    + " code review comments written by a person.");
             System.exit(1);
             return;
         }

@@ -12,10 +12,6 @@ public class OutputRules {
         this.commandLine = commandLine;
     }
 
-    public boolean getListReviewComments() {
-        return commandLine.getListReviewComments();
-    }
-
     public int getCommitPatchSetCountThreshold() {
         return commandLine.getCommitPatchSetCountThreshold();
     }

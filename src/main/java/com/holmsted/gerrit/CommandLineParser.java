@@ -27,7 +27,6 @@ public class CommandLineParser {
     private OutputType outputType = OutputType.HTML;
 
     private int commitPatchSetCountThreshold = 5;
-    private boolean listReviewComments;
     private Output output = Output.PER_PERSON_DATA;
 
     public boolean parse(String[] args) {
@@ -77,8 +76,6 @@ public class CommandLineParser {
             } else if (arg.equals("--output") && isNotAtEnd) {
                 output = checkNotNull(Output.fromString(args[i + 1]));
                 ++i;
-            } else if (arg.equals("--list-comments")) {
-                listReviewComments = true;
             } else if (arg.equals("--commit-patch-set-count-threshold") && isNotAtEnd) {
                 commitPatchSetCountThreshold = Integer.parseInt(args[i + 1]);
                 ++i;
@@ -140,10 +137,6 @@ public class CommandLineParser {
     @Nonnull
     public Output getOutput() {
         return output;
-    }
-
-    public boolean getListReviewComments() {
-        return listReviewComments;
     }
 
     public int getCommitPatchSetCountThreshold() {

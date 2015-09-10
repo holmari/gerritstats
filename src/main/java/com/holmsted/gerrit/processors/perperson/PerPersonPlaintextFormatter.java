@@ -48,10 +48,6 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
                         maxPatchSetCountForList,
                         record.getPrintableCommitsWithNPatchSets(maxPatchSetCountForList)));
             }
-            if (outputRules.getListReviewComments()) {
-                builder.addIndentLine("Review comments: ");
-                builder.addLine(record.getPrintableAllReviewComments());
-            }
             builder.addLine("");
         }
 
