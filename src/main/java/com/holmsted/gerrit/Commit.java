@@ -248,7 +248,7 @@ public class Commit {
             try {
                 patchSet.kind = PatchSetKind.valueOf(patchSetKind);
             } catch (IllegalArgumentException e) {
-                System.err.println("Unknown patch set kind " + patchSetKind);
+                System.err.println("Unknown patch set kind '" + patchSetKind + "'");
             }
 
             patchSet.approvals.addAll(Approval.fromJson(patchSetJson.optJSONArray("approvals")));

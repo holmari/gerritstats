@@ -19,9 +19,10 @@ public class GerritStatsMain {
             System.err.println("      [--branches master,feature1]");
             System.err.println("      [--include joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
             System.err.println("      [--exclude joe@root.com,jeff@foo.bar..,xyzzy@inter.net]");
+            System.err.println("      [--commit-patch-set-count-threshold n]");
             System.err.println("      [--output-type plain|csv|html]");
             System.err.println("      [--output review-comment-csv|per-person-data]");
-            System.err.println("      [--commit-patch-set-count-threshold n]");
+            System.err.println("      [--output-dir outputDir]");
             System.err.println();
             System.err.println(" --file file: read output from file");
             System.err.println(String.format(" --server url:port: read output from Gerrit server url and given port."
@@ -40,13 +41,15 @@ public class GerritStatsMain {
                     + "specified, --exclude is ignored.");
             System.err.println(" --exclude list-of-people: if specified, the comma-separated list of identities "
                     + " will be excluded from all generated statistics.");
+            System.err.println("--commit-patch-set-count-threshold: If specified, all commit URLs "
+                    + "exceeding the given patch set count will be listed in the per-person data. Defaults to 5."
+                    + "If -1 is set, no listing is provided.");
             System.err.println(" --output-type: if specified, the output will be provided in the specified format."
                     + "Defaults to HTML.");
             System.err.println(" --output: If specified, the output will be either a list of all review comments in "
                     + "CSV format, or a per-person data set. Defaults to per-person-data.");
-            System.err.println("--commit-patch-set-count-threshold: If specified, all commit URLs "
-                    + "exceeding the given patch set count will be listed in the per-person data. Defaults to 5."
-                    + "If -1 is set, no listing is provided.");
+            System.err.println("--output-dir: If specified, the output will be generated into the given directory. "
+                    + "Defaults to out/.");
             System.exit(1);
             return;
         }

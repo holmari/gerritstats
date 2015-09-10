@@ -1,5 +1,6 @@
 package com.holmsted.gerrit;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +11,8 @@ import javax.annotation.Nullable;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class CommandLineParser {
+
+    private static final String DEFAULT_OUTPUT_DIR = "out";
 
     private String filename;
     private String serverName;
@@ -28,6 +31,8 @@ public class CommandLineParser {
 
     private int commitPatchSetCountThreshold = 5;
     private Output output = Output.PER_PERSON_DATA;
+    @Nonnull
+    private String outputDir = DEFAULT_OUTPUT_DIR;
 
     public boolean parse(String[] args) {
         boolean hasSyntaxError = false;
@@ -76,14 +81,23 @@ public class CommandLineParser {
             } else if (arg.equals("--output") && isNotAtEnd) {
                 output = checkNotNull(Output.fromString(args[i + 1]));
                 ++i;
+            } else if (arg.equals("--output-dir") && isNotAtEnd) {
+                outputDir = resolveOutputDir(checkNotNull(args[i + 1]));
             } else if (arg.equals("--commit-patch-set-count-threshold") && isNotAtEnd) {
                 commitPatchSetCountThreshold = Integer.parseInt(args[i + 1]);
                 ++i;
             }
-
         }
 
         return (filename != null || serverName != null) && !hasSyntaxError;
+    }
+
+    @Nonnull
+    private static String resolveOutputDir(@Nonnull String path) {
+        if (path.startsWith("~" + File.separator)) {
+            path = System.getProperty("user.home") + path.substring(1);
+        }
+        return path;
     }
 
     @Nullable
@@ -137,6 +151,11 @@ public class CommandLineParser {
     @Nonnull
     public Output getOutput() {
         return output;
+    }
+
+    @Nonnull
+    public String getOutputDir() {
+        return outputDir;
     }
 
     public int getCommitPatchSetCountThreshold() {

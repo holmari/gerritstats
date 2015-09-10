@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import file.FileWriter;
 
 class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
-    private static final String DEFAULT_OUTPUT_DIR = "out";
     private static final String RES_OUTPUT_DIR = "res";
     private static final String INDEX_OUTPUT_NAME = "index.html";
 
@@ -46,7 +45,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         baseContext.put("date", new ComparisonDateTool());
         baseContext.put("outputRules", outputRules);
 
-        outputDir = new File(DEFAULT_OUTPUT_DIR);
+        outputDir = new File(outputRules.getOutputDir());
         resOutputDir = new File(outputDir.getAbsolutePath() + File.separator + RES_OUTPUT_DIR);
     }
 
