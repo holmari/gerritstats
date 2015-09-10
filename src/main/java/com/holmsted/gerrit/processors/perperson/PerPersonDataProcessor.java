@@ -62,7 +62,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                         continue;
                     }
                     switch (approval.type) {
-                        case CODE_REVIEW: {
+                        case Commit.Approval.TYPE_CODE_REVIEW: {
                             ownerRecord.addReceivedCodeReview(approval);
                             if (getCommitFilter().isIncluded(approval.grantedBy)
                                     && !ownerRecord.identity.equals(approval.grantedBy)) {
@@ -70,12 +70,12 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                             }
                             break;
                         }
-                        case VERIFIED:
-                            break;
-                        case SUBM: {
+                        case Commit.Approval.TYPE_SUBM: {
                             ownerRecord.updateAverageTimeInCodeReview(approval.grantedOnDate - commit.createdOnDate);
                             break;
                         }
+                        default:
+                            break;
                     }
                 }
             }

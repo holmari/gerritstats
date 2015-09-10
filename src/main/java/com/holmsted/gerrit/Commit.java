@@ -118,36 +118,16 @@ public class Commit {
     }
 
     public static class Approval {
-        public ApprovalType type;
+
+        public static final String TYPE_CODE_REVIEW = "Code-Review";
+        public static final String TYPE_VERIFIED = "Verified";
+        public static final String TYPE_SUBM = "SUBM";
+
+        public String type;
         public String description;
         public int value;
         public long grantedOnDate;
         public Identity grantedBy;
-
-        public enum ApprovalType {
-            CODE_REVIEW("Code-Review"),
-            VERIFIED("Verified"),
-            SUBM("SUBM");
-
-            private String name;
-
-            ApprovalType(String name) {
-                this.name = name;
-            }
-
-            static ApprovalType fromString(String type) {
-                if (CODE_REVIEW.name.equals(type)) {
-                    return CODE_REVIEW;
-                } else if (VERIFIED.name.equals(type)) {
-                    return VERIFIED;
-                } else if (SUBM.name.equals(type)) {
-                    return SUBM;
-                } else {
-                    System.err.println("Unsupported approvalType " + type);
-                    return null;
-                }
-            }
-        }
 
         public Date getGrantedOnDate() {
             return new Date(grantedOnDate);
@@ -165,7 +145,7 @@ public class Commit {
 
         public static Approval fromJson(JSONObject approvalJson) {
             Approval approval = new Approval();
-            approval.type = ApprovalType.fromString(approvalJson.optString("type"));
+            approval.type = approvalJson.optString("type");
             approval.description = approvalJson.optString("description");
             approval.value = approvalJson.optInt("value");
             approval.grantedOnDate = approvalJson.optLong("grantedOn") * SEC_TO_MSEC;
