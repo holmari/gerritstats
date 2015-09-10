@@ -23,10 +23,10 @@ public enum OutputType {
     public static OutputType fromTypeString(String formatName) {
         if (formatName.equals(CSV.formatName)) {
             return CSV;
-        } else if (formatName.equals(HTML.formatName)) {
-            return HTML;
-        } else {
+        } else if (formatName.equals(PLAIN.formatName)) {
             return PLAIN;
+        } else {
+            return HTML;
         }
     }
 }

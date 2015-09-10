@@ -35,7 +35,7 @@ Once you have the data, you can start to play around with the output. You can e.
 when looking at e.g. team-level review practices.
 
 ```
-java -jar GerritStats.jar --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com
+java -jar GerritStats.jar --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
 ```
 
 The above command will give you output as illustrated below:
