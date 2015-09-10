@@ -17,7 +17,6 @@ public class PatchSetCommentTable extends Hashtable<Commit, List<Commit.PatchSet
             new DateTimeProvider<Commit.PatchSetComment>() {
         @Override
         public long getDate(@Nonnull Commit.PatchSetComment comment) {
-            // This can be a bit dangerous if
             return commentToCommit.get(comment).createdOnDate;
         }
     };
