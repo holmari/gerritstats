@@ -235,7 +235,13 @@ public class Commit {
             patchSet.ref = patchSetJson.optString("ref");
             patchSet.uploader = Identity.fromJson(patchSetJson.optJSONObject("uploader"));
             patchSet.createdOnDate = patchSetJson.optLong("createdOn") * SEC_TO_MSEC;
-            patchSet.author = Identity.fromJson(patchSetJson.optJSONObject("author"));
+
+            JSONObject authorJson = patchSetJson.optJSONObject("author");
+            if (authorJson != null) {
+                patchSet.author = Identity.fromJson(authorJson);
+            } else {
+                patchSet.author = patchSet.uploader;
+            }
             patchSet.isDraft = patchSetJson.optBoolean("isDraft");
 
             String patchSetKind = patchSetJson.optString("kind");
