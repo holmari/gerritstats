@@ -1,5 +1,7 @@
 package com.holmsted.gerrit;
 
+import com.google.common.base.Joiner;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +17,8 @@ public class QueryData {
     }
 
     public String getDisplayableProjectName() {
-        return String.format("all data from file %s", commandLine.getFilename());
+        List<String> filenames = commandLine.getFilenames();
+        return String.format("all data from file(s) %s", Joiner.on(", ").join(filenames));
     }
 
     public String getDisplayableBranchList() {
@@ -24,15 +27,7 @@ public class QueryData {
             return "(all branches)";
         }
 
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < includeBranches.size(); ++i) {
-            builder.append(includeBranches.get(i));
-            if (i < includeBranches.size() - 1) {
-                builder.append(", ");
-            }
-        }
-
-        return builder.toString();
+        return Joiner.on(", ").join(includeBranches);
     }
 
     public List<Commit> getCommits() {

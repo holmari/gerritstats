@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -33,10 +32,12 @@ public class CommandLineParser {
         }
     }
 
-    @Parameter(names = "--file",
-            description = "Read output from file. The file must be a json file created by GerritStatsDownloader.",
+    @Parameter(names = {"-f", "--file", "--files"},
+            description = "Read output from comma-separated list of files. The files must be in json format, "
+                    + "created by GerritStatsDownloader.",
             required = true)
-    private String filename;
+    @Nonnull
+    private List<String> filenames = new ArrayList<>();
 
     @Parameter(names = "--exclude",
             description = "If specified, the comma-separated list of identities "
@@ -75,7 +76,7 @@ public class CommandLineParser {
             converter = OutputConverter.class)
     private Output output = Output.PER_PERSON_DATA;
 
-    @Parameter(names = "--output-dir",
+    @Parameter(names = {"-o", "--output-dir"},
             description = "The output will be generated into the given directory.")
     @Nonnull
     private String outputDir = DEFAULT_OUTPUT_DIR;
@@ -90,7 +91,7 @@ public class CommandLineParser {
             return false;
         }
 
-        return filename != null;
+        return !filenames.isEmpty();
     }
 
     @Nonnull
@@ -102,8 +103,8 @@ public class CommandLineParser {
     }
 
     @Nonnull
-    public String getFilename() {
-        return checkNotNull(filename);
+    public List<String> getFilenames() {
+        return filenames;
     }
 
     @Nonnull
