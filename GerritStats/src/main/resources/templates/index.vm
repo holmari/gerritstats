@@ -3,10 +3,14 @@
 <meta charset="utf-8">
 <body>
 <script src="res/d3.min.js"></script>
+<script src="res/jquery.min.js"></script>
+<script src="res/jquery.tablesorter.min.js"></script>
+<script src="res/numeral.min.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
 </head>
+
 <h1>Gerrit Statistics</h1>
 #set( $dataSetName = $perPersonData.queryData.displayableProjectName )
 #set( $filenames = $perPersonData.queryData.filenames)
@@ -30,11 +34,38 @@ Users in analysis: $identities.size() <br>
 
 <h3>Identities</h3>
 <div>
-<ul>
+<table id="identities">
+    <thead>
+        <th>Name</th>
+        <th>+2<br>given</th>
+        <th>+1<br>given</th>
+        <th>-1<br>given</th>
+        <th>-2<br>given</th>
+        <th>Comments<br>written</th>
+        <th>Comments<br>received</th>
+        <th>Commits</th>
+        <th>Commit/comment<br>ratio</th>
+        <th>Review<br>comment<br>ratio</th>
+        <th>Added as<br>reviewer</th>
+        <th>Average time<br>in review</th>
+    </thead>
 #foreach( $identity in $identities )
-    <li><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></li>
+    <tr>
+        <td><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
+        <td>$identity.reviewCountPlus2</td>
+        <td>$identity.reviewCountPlus1</td>
+        <td>$identity.reviewCountMinus1</td>
+        <td>$identity.reviewCountMinus2</td>
+        <td>$identity.allCommentsWritten.size()</td>
+        <td>$identity.allCommentsReceived.size()</td>
+        <td>$identity.commits.size()</td>
+        <td><script>document.write(numeral($identity.receivedCommentRatio).format('0.000'))</script></td>
+        <td><script>document.write(numeral($identity.reviewCommentRatio).format('0.000'))</script></td>
+        <td>$identity.addedAsReviewerTo.size()</td>
+        <td>$identity.printableAverageTimeInCodeReview</td>
+    </tr>
 #end
-</ul>
+</table>
 </div>
 
 <h3>Proximity graph</h3>
@@ -232,6 +263,10 @@ function createProximityGraph(identityGraph) {
 var relativeLinkValueThreshold = 0.1;
 
 createProximityGraph(identityGraph);
+
+$(document).ready(function() {
+    $("#identities").tablesorter();
+});
 
 </script>
 </body>

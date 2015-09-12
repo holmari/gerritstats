@@ -1,7 +1,6 @@
 package com.holmsted.gerrit.processors.perperson;
 
-import com.google.common.base.Strings;
-import com.holmsted.gerrit.Commit;
+import com.holmsted.file.FileWriter;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 
@@ -20,8 +19,6 @@ import java.io.StringWriter;
 
 import javax.annotation.Nonnull;
 
-import com.holmsted.file.FileWriter;
-
 class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
     private static final String RES_OUTPUT_DIR = "res";
     private static final String INDEX_OUTPUT_NAME = "index.html";
@@ -29,6 +26,13 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     private static final String TEMPLATES_RES_PATH = "templates";
     private static final String VM_PERSON_PROFILE = TEMPLATES_RES_PATH + File.separator + "person_profile.vm";
     private static final String VM_INDEX = TEMPLATES_RES_PATH + File.separator + "index.vm";
+    private static final String[] HTML_RESOURCES = {
+            "d3.min.js",
+            "style.css",
+            "jquery.min.js",
+            "jquery.tablesorter.min.js",
+            "numeral.min.js"
+    };
 
     private VelocityEngine velocity = new VelocityEngine();
     private Context baseContext = new VelocityContext();
@@ -61,14 +65,15 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         createIndex(orderedList);
         createPerPersonFiles(orderedList);
 
-        copyResources();
+        copyFilesToResources(HTML_RESOURCES);
 
         System.out.println("Output written to " + outputDir.getAbsolutePath() + File.separator + INDEX_OUTPUT_NAME);
     }
 
-    private void copyResources() {
-        copyFileToResources("d3.min.js");
-        copyFileToResources("style.css");
+    private void copyFilesToResources(String... filenames) {
+        for (String filename : filenames) {
+            copyFileToResources(filename);
+        }
     }
 
     private void copyFileToResources(String filename) {
