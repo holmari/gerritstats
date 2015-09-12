@@ -8,7 +8,17 @@
     <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
 </head>
 <h1>Gerrit Statistics</h1>
-<div class="subtitleH1">for $perPersonData.queryData.displayableProjectName</div>
+#set( $dataSetName = $perPersonData.queryData.displayableProjectName )
+#set( $filenames = $perPersonData.queryData.filenames)
+#set( $fileCount = $filenames.size() )
+
+#if( $fileCount > 20 )
+#set( $firstFile = $filenames.get(0) )
+#set( $lastFileIndex = $fileCount - 1 )
+#set( $lastFile = $filenames.get($lastFileIndex) )
+    #set( $dataSetName = ${filenames.size()} + " files, from " + $firstFile + " to " + $lastFile )
+#end
+<div class="subtitleH1">for $dataSetName</div>
 <br>
 <h2>Overview</h2>
 <div>

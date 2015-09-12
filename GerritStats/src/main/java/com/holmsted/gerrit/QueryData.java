@@ -21,6 +21,10 @@ public class QueryData {
         return String.format("all data from file(s) %s", Joiner.on(", ").join(filenames));
     }
 
+    public List<String> getFilenames() {
+        return commandLine.getFilenames();
+    }
+
     public String getDisplayableBranchList() {
         List<String> includeBranches = commandLine.getIncludeBranches();
         if (includeBranches.isEmpty()) {
