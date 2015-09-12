@@ -129,7 +129,8 @@
 </table>
 
 #if ($outputRules.commitPatchSetCountThreshold != -1)
-<h3>Commits exceeding $outputRules.commitPatchSetCountThreshold patches</h3>
+<h3 class="withSubtitle">Commits exceeding $outputRules.commitPatchSetCountThreshold patches</h3>
+<div class="subtitleH3">only includes commits that were reworked over $outputRules.commitPatchSetCountThreshold times after the initial review, and then submitted.</div>
 <p>
 #set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.commitPatchSetCountThreshold) )
 #foreach( $commit in $badCommitList )

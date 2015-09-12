@@ -243,7 +243,12 @@ public class IdentityRecord {
         List<Commit> exceedingCommits = new ArrayList<>();
         for (Commit commit : commits) {
             int patchSetCount = commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
-            if (patchSetCount > patchSetCountThreshold) {
+            if (patchSetCount <= patchSetCountThreshold) {
+                continue;
+            }
+            int firstNonAuthorCommentPatchSetIndex = commit.getFirstPatchSetIndexWithNonAuthorReview();
+            if (firstNonAuthorCommentPatchSetIndex != -1
+                    && commit.getPatchSets().size() - firstNonAuthorCommentPatchSetIndex > patchSetCountThreshold) {
                 exceedingCommits.add(commit);
             }
         }

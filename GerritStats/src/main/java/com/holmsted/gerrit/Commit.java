@@ -289,6 +289,18 @@ public class Commit {
         return count;
     }
 
+    public int getFirstPatchSetIndexWithNonAuthorReview() {
+        for (int i = 0; i < patchSets.size(); ++i) {
+            PatchSet patchSet = patchSets.get(i);
+            for (PatchSetComment comment : patchSet.comments) {
+                if (!owner.equals(comment.reviewer)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     public String getUrl() {
         return url;
     }
