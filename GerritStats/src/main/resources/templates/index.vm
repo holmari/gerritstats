@@ -63,7 +63,7 @@ Users in analysis: $identities.size() <br>
             <td><script>document.write(numeral($identity.receivedCommentRatio).format('0.000'))</script></td>
             <td><script>document.write(numeral($identity.reviewCommentRatio).format('0.000'))</script></td>
             <td>$identity.addedAsReviewerTo.size()</td>
-            <td>$identity.printableAverageTimeInCodeReview</td>
+            <td data-unixtime="$identity.averageTimeInCodeReview">$identity.printableAverageTimeInCodeReview</td>
         </tr>
 #end
     </tbody>
@@ -266,7 +266,24 @@ var relativeLinkValueThreshold = 0.1;
 createProximityGraph(identityGraph);
 
 $(document).ready(function() {
-    $("#identities").tablesorter();
+    $.tablesorter.addParser({
+        id: 'timeInReview',
+        is: function(s) {
+            return false;
+        },
+        format: function(s, table, cell, cellIndex) {
+            return $(cell).attr("data-unixtime");
+        },
+        type: 'numeric'
+    });
+
+    $("#identities").tablesorter({
+        headers: {
+            11: {
+                sorter:'timeInReview'
+            }
+        }
+    });
 });
 
 </script>
