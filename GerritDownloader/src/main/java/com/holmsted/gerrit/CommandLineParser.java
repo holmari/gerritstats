@@ -19,11 +19,6 @@ public class CommandLineParser {
         private String serverName;
         private int serverPort;
 
-        @Override
-        public String toString() {
-            return "None";
-        }
-
         public static class Converter implements IStringConverter<ServerAndPort> {
             @Override
             public ServerAndPort convert(String value) {
@@ -40,16 +35,16 @@ public class CommandLineParser {
     }
 
     @Parameter(names = "--server",
-            description = "read output from Gerrit server url and given port. If port is omitted, defaults to 29418.",
+            description = "Read output from Gerrit server URL and given port, in format server:port. "
+                    + "If port is omitted, defaults to 29418.",
             arity = 1,
             required = true,
             converter = ServerAndPort.Converter.class)
-    @Nonnull
-    private final ServerAndPort serverAndPort = new ServerAndPort();
+    private ServerAndPort serverAndPort;
 
     @Parameter(names = "--project",
-            description = "specifies the Gerrit project from which to retrieve stats. "
-            + "If omitted, stats will be retrieved from all projects.")
+            description = "The Gerrit project from which to retrieve stats. "
+                    + "If omitted, stats will be retrieved from all projects.")
     private String projectName;
 
     @Parameter(names = "--output-file",
@@ -72,7 +67,7 @@ public class CommandLineParser {
             return false;
         }
 
-        return serverAndPort.serverName != null;
+        return getServerName() != null;
     }
 
     @Nonnull
@@ -90,7 +85,7 @@ public class CommandLineParser {
 
     @Nullable
     public String getServerName() {
-        return serverAndPort.serverName;
+        return serverAndPort != null ? serverAndPort.serverName : null;
     }
 
     @Nullable
@@ -99,7 +94,7 @@ public class CommandLineParser {
     }
 
     public int getServerPort() {
-        return serverAndPort.serverPort;
+        return serverAndPort != null ? serverAndPort.serverPort : 0;
     }
 
     public int getCommitLimit() {
