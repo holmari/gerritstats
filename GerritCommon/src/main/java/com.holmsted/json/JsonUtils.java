@@ -1,4 +1,4 @@
-package jsonutils;
+package com.holmsted.json;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

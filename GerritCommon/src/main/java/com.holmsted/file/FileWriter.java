@@ -1,4 +1,4 @@
-package file;
+package com.holmsted.file;
 
 import java.io.BufferedWriter;
 import java.io.File;

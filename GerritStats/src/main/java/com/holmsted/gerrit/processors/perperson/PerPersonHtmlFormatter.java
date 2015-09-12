@@ -20,7 +20,7 @@ import java.io.StringWriter;
 
 import javax.annotation.Nonnull;
 
-import file.FileWriter;
+import com.holmsted.file.FileWriter;
 
 class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
     private static final String RES_OUTPUT_DIR = "res";

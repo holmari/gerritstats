@@ -13,7 +13,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import jsonutils.JsonUtils;
+import com.holmsted.json.JsonUtils;
 
 public class GerritStatReader {
 

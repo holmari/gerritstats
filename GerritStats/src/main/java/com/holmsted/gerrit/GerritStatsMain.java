@@ -5,8 +5,7 @@ import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
 import java.util.List;
 
-import file.FileReader;
-import file.FileWriter;
+import com.holmsted.file.FileReader;
 
 public class GerritStatsMain {
 
@@ -27,24 +26,7 @@ public class GerritStatsMain {
         filter.setExcludedEmails(commandLine.getExcludedEmails());
         filter.setIncludeBranches(commandLine.getIncludeBranches());
 
-        String serverName = commandLine.getServerName();
-        String data;
-        if (serverName != null) {
-            GerritStatReader reader = GerritStatReader.fromCommandLine(serverName, commandLine.getServerPort());
-            reader.setCommitLimit(commandLine.getCommitLimit());
-            String projectName = commandLine.getProjectName();
-            if (projectName != null) {
-                reader.setProjectName(projectName);
-            }
-            data = reader.readData();
-
-            String outputFile = commandLine.getOutputFile();
-            if (outputFile != null) {
-                FileWriter.writeFile(outputFile, data);
-            }
-        } else {
-            data = FileReader.readFile(commandLine.getFilename());
-        }
+        String data = FileReader.readFile(commandLine.getFilename());
 
         GerritStatParser commitDataParser = new GerritStatParser();
         List<Commit> commits = commitDataParser.parseCommits(data);

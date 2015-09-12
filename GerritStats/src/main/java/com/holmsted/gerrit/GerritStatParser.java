@@ -6,7 +6,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import jsonutils.JsonUtils;
+import com.holmsted.json.JsonUtils;
 
 public class GerritStatParser {
 

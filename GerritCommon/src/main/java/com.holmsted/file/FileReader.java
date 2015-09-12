@@ -1,4 +1,4 @@
-package file;
+package com.holmsted.file;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,9 +7,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 
+import javax.annotation.Nonnull;
+
 public class FileReader {
 
-    public static String readFile(String filename) {
+    public static String readFile(@Nonnull String filename) {
         File dataFile = new File(filename);
         FileInputStream inputStream;
         try {

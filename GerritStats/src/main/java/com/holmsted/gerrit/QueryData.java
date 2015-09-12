@@ -16,18 +16,11 @@ public class QueryData {
 
     public String getDisplayableProjectName() {
         String projectName = commandLine.getProjectName();
-        String serverName = commandLine.getServerName();
         String filename = commandLine.getFilename();
         if (projectName != null) {
             return projectName;
         } else {
-            if (serverName != null) {
-                return String.format("all projects at %s", serverName);
-            } else if (filename != null) {
-                return String.format("all data from file %s", filename);
-            } else {
-                return "[unknown]";
-            }
+            return String.format("all data from file %s", filename);
         }
     }
 

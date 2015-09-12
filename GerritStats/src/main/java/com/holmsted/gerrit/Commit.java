@@ -11,8 +11,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import jsonutils.JsonUtils;
-
+import com.holmsted.json.JsonUtils;
 
 public class Commit {
     private static final long SEC_TO_MSEC = 1000;

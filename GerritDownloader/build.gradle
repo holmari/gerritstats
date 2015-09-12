@@ -1,0 +1,14 @@
+dependencies {
+    compile group: 'com.beust', name: 'jcommander', version: '1.48'
+
+    compile project(':GerritCommon')
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.holmsted.gerrit.GerritStatsDownloaderMain'
+    }
+
+    // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
+    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+}
