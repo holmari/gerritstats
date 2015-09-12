@@ -22,11 +22,7 @@ Users in analysis: $identities.size() <br>
 <div>
 <ul>
 #foreach( $identity in $identities )
-#set( $extraInfo = $identity.email )
-#if( "$!extraInfo" == "")
-    #set( $extraInfo = $identity.username )
-#end
-    <li><a href="${identity.username}.html">$identity.name ($extraInfo)</a></li>
+    <li><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></li>
 #end
 </ul>
 </div>

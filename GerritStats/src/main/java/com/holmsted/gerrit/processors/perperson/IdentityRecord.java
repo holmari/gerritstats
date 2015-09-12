@@ -1,5 +1,6 @@
 package com.holmsted.gerrit.processors.perperson;
 
+import com.google.common.base.Strings;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
@@ -68,6 +69,20 @@ public class IdentityRecord {
 
     public String getUsername() {
         return identity.getUsername();
+    }
+
+    public String getOutputFilename() {
+        String filename = identity.getUsername();
+        if (Strings.isNullOrEmpty(filename)) {
+            filename = Strings.nullToEmpty(identity.getEmail()).replace(".", "_");
+            int atMarkIndex = filename.indexOf('@');
+            if (atMarkIndex != -1) {
+                filename = filename.substring(0, atMarkIndex);
+            } else {
+                filename = "anonymous_coward";
+            }
+        }
+        return filename + ".html";
     }
 
     public DatedCommitList getCommits() {

@@ -94,7 +94,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
 
     private void createPerPersonFiles(@Nonnull IdentityRecordList orderedList) {
         for (IdentityRecord record : orderedList) {
-            String outputFilename = getOutputFilenameForIdentity(record.identity);
+            String outputFilename = record.getOutputFilename();
 
             Context context = new VelocityContext(baseContext);
             context.put("identity", record.identity);
@@ -110,19 +110,5 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         StringWriter writer = new StringWriter();
         velocity.mergeTemplate(templateName, "UTF-8", context, writer);
         FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
-    }
-
-    private static String getOutputFilenameForIdentity(@Nonnull Commit.Identity identity) {
-        String filename = identity.getUsername();
-        if (Strings.isNullOrEmpty(filename)) {
-            filename = Strings.nullToEmpty(identity.getEmail()).replace(".", "_");
-            int atMarkIndex = filename.indexOf('@');
-            if (atMarkIndex != -1) {
-                filename = filename.substring(0, atMarkIndex);
-            } else {
-                filename = "anonymous_coward";
-            }
-        }
-        return filename + ".html";
     }
 }

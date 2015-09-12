@@ -4,12 +4,35 @@
 #else #end
 #end
 
+#macro(printableName $identity)
+    #set( $printableName = $identity.name )
+    #if( "$!printableName" == "")
+        #set( $printableName = "Anonymous Coward" )
+    #end
+    $printableName
+#end
+
+#macro(wrapWithParenthesesIfNotEmpty $text)
+    #if( "$!text" != "")
+        #set( $text = "($text)" )
+    #end
+    $text
+#end
+
+#macro(printableExtraInfo $identity)
+    #set( $extraInfo = $identity.email )
+    #if( "$!extraInfo" == "")
+        #set( $extraInfo = $identity.username )
+    #end
+    #wrapWithParenthesesIfNotEmpty( $extraInfo )
+#end
+
 #macro(identityHref $identity)
     #if( $identity.hasEmail() )
         <a href="mailto:$identity.email">$identity.email</a>
     #else
         #if ( !$identity.hasUsername() )
-            Unknown user
+            Anonymous Coward
         #else
             $identity.username
         #end

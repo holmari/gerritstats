@@ -8,7 +8,7 @@
     <title>GerritStats: $identity.name ($identity.username)</title>
 </head>
 
-<h1>$identity.name ($identity.username)</h1>
+<h1>#printableName( $identity ) #wrapWithParenthesesIfNotEmpty( $identity.username )</h1>
 <div class="subtitleH1">$identity.email</div>
 
 <h3>Overall</h3>
