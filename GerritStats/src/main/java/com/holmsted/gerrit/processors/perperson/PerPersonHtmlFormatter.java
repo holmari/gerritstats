@@ -31,7 +31,9 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             "style.css",
             "jquery.min.js",
             "jquery.tablesorter.min.js",
-            "numeral.min.js"
+            "numeral.min.js",
+            "bootstrap.css",
+            "bootstrap.min.js"
     };
 
     private VelocityEngine velocity = new VelocityEngine();

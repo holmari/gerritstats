@@ -6,7 +6,9 @@
 <script src="res/jquery.min.js"></script>
 <script src="res/jquery.tablesorter.min.js"></script>
 <script src="res/numeral.min.js"></script>
+<script src="res/bootstrap.min.js"></script>
 <head>
+    <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
 </head>
@@ -32,9 +34,7 @@ To: $date.format( "yyyy-MM-dd", $perPersonData.toDate) <br>
 Users in analysis: $identities.size() <br>
 </div>
 
-<h3>Identities</h3>
-<div>
-<table id="identities">
+<table id="identities" class="table table-striped">
     <thead>
         <th>Name</th>
         <th>+2<br>given</th>
@@ -49,24 +49,25 @@ Users in analysis: $identities.size() <br>
         <th>Added as<br>reviewer</th>
         <th>Average time<br>in review</th>
     </thead>
+    <tbody>
 #foreach( $identity in $identities )
-    <tr>
-        <td><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
-        <td>$identity.reviewCountPlus2</td>
-        <td>$identity.reviewCountPlus1</td>
-        <td>$identity.reviewCountMinus1</td>
-        <td>$identity.reviewCountMinus2</td>
-        <td>$identity.allCommentsWritten.size()</td>
-        <td>$identity.allCommentsReceived.size()</td>
-        <td>$identity.commits.size()</td>
-        <td><script>document.write(numeral($identity.receivedCommentRatio).format('0.000'))</script></td>
-        <td><script>document.write(numeral($identity.reviewCommentRatio).format('0.000'))</script></td>
-        <td>$identity.addedAsReviewerTo.size()</td>
-        <td>$identity.printableAverageTimeInCodeReview</td>
-    </tr>
+        <tr>
+            <td><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
+            <td>$identity.reviewCountPlus2</td>
+            <td>$identity.reviewCountPlus1</td>
+            <td>$identity.reviewCountMinus1</td>
+            <td>$identity.reviewCountMinus2</td>
+            <td>$identity.allCommentsWritten.size()</td>
+            <td>$identity.allCommentsReceived.size()</td>
+            <td>$identity.commits.size()</td>
+            <td><script>document.write(numeral($identity.receivedCommentRatio).format('0.000'))</script></td>
+            <td><script>document.write(numeral($identity.reviewCommentRatio).format('0.000'))</script></td>
+            <td>$identity.addedAsReviewerTo.size()</td>
+            <td>$identity.printableAverageTimeInCodeReview</td>
+        </tr>
 #end
+    </tbody>
 </table>
-</div>
 
 <h3>Proximity graph</h3>
 <div id="proximityGraph">
