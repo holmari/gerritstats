@@ -20,7 +20,7 @@
     <tr><th>Comments / commit</th><td>$record.receivedCommentRatio</td></tr>
     <tr><th>Added as reviewer</th><td>$record.addedAsReviewerTo.size()</td></tr>
     <tr><td>&nbsp;</td></tr>
-    <tr><th>Review comment ratio</th><td>$record.reviewCommentRatio</td></tr>
+    <tr><th>Comments / review request</th><td>$record.reviewCommentRatio</td></tr>
     <tr><th>Max patch set count</th><td>$record.maxPatchSetCount</td></tr>
 </table>
 

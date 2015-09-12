@@ -44,8 +44,8 @@ Users in analysis: $identities.size() <br>
         <th>Comments<br>written</th>
         <th>Comments<br>received</th>
         <th>Commits</th>
-        <th>Comments / commit</th>
-        <th>Review<br>comment<br>ratio</th>
+        <th>Comments<br>/ commit</th>
+        <th>Comments<br>/ review<br>requests</th>
         <th>Added as<br>reviewer</th>
         <th>Average time<br>in review</th>
     </thead>
