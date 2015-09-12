@@ -1,9 +1,13 @@
 # GerritStats
 
-This project displays statistics from a Gerrit repository. It provides output in HTML, CSV, plaintext formats.
+This project provides tools to display statistics from a Gerrit repository. It generates output in HTML, CSV and plaintext formats.
 
-The tool can be useful for analysing how efficiently code reviews are implemented in an organization, and how
-often cross-team code reviews are conducted.
+The tool can be useful for analysing how efficiently code reviews are implemented in an organization, and how often cross-team code reviews are conducted.
+
+There are two separate tools:
+
+* GerritDownloader, which downloads JSON data from the server
+* GerritStats, which parses the json output provided by GerritDownloader.
 
 ## How to build
 
@@ -14,17 +18,24 @@ often cross-team code reviews are conducted.
 ## How to execute
 
 ```
-java -jar build/libs/GerritStats.jar
+java -jar GerritDownloader/build/libs/GerritDownloader.jar
 ```
 
-Lists all command line options.
+Lists all command line options for the data download tool.
+
+```
+java -jar GerritStats/build/libs/GerritStats.jar
+```
+
+Lists all command line options for the statistics generator.
+
 
 ## How to execute: saving data locally
 
-Because fetching data from Gerrit can take a while, it's best if you first fetch the data locally, like so:
+Fetching data from Gerrit can take a while. Use GerritDownloader to get the JSON output from the server so that you can parse it later:
 
 ```
-java -jar build/libs/GerritStats.jar --server gerrit.instance.on.inter.nets --project YourProjectName --limit 7500 --output-file gerrit-json-out.txt 
+java -jar GerritDownloader/build/libs/GerritDownloader.jar --server gerrit.instance.on.inter.nets --project YourProjectName --limit 7500 --output-file gerrit-json-out.txt
 ```
 
 The above command will download all data from the given Gerrit server and given project, and store it in the given output file.
@@ -68,6 +79,7 @@ java -jar GerritStats.jar --file gerrit-json-out.txt --branches master --include
 ```
 
 The output of the command looks like this:
+
 ```
 Project: all data from file /Users/holmsted/dev/GerritStats/out-.txt
 Branches: master
