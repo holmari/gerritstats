@@ -134,7 +134,7 @@ public class IdentityRecord {
     }
 
     public float getReceivedCommentRatio() {
-        int receivedComments = commentsReceived.size();
+        int receivedComments = getAllCommentsReceived().size();
         int commitCount = commits.size();
         if (commitCount > 0) {
             return (float) receivedComments / commitCount;

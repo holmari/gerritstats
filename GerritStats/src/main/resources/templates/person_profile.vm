@@ -17,7 +17,7 @@
     <tr><th>Commits</th><td>$record.commits.size()</td></tr>
     <tr><th>Comments written</th><td>$record.allCommentsWritten.size()</td></tr>
     <tr><th>Comments received</th><td>$record.allCommentsReceived.size()</td></tr>
-    <tr><th>Commit/comment ratio</th><td>$record.receivedCommentRatio</td></tr>
+    <tr><th>Comments / commit</th><td>$record.receivedCommentRatio</td></tr>
     <tr><th>Added as reviewer</th><td>$record.addedAsReviewerTo.size()</td></tr>
     <tr><td>&nbsp;</td></tr>
     <tr><th>Review comment ratio</th><td>$record.reviewCommentRatio</td></tr>
