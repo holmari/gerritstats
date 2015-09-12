@@ -106,7 +106,11 @@ comments and links back to the reviews.
 java -jar GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
-The index page will provide you with a graph that illustrates how developers are connected to each other:
+The index page will provide you with a sortable overview table of some of the core statistics, similar to the plaintext CSV output.
+
+![Overview table of all developers](doc/overview_table.png)
+
+The index page also contais a graph that illustrates how developers are connected to each other:
 
 ![Proximity graph for the given branch and given set of identities](doc/proximity_graph.png)
 
