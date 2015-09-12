@@ -23,4 +23,9 @@ public enum Output {
             return PER_PERSON_DATA;
         }
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

@@ -29,4 +29,9 @@ public enum OutputType {
             return HTML;
         }
     }
+
+    @Override
+    public String toString() {
+        return formatName;
+    }
 }

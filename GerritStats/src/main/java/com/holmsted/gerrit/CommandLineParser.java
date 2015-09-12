@@ -38,14 +38,9 @@ public class CommandLineParser {
             required = true)
     private String filename;
 
-    @Parameter(names = "--project",
-            description = "specifies the Gerrit project from which to retrieve stats. "
-            + "If omitted, stats will be retrieved from all projects.")
-    private String projectName;
-
     @Parameter(names = "--exclude",
             description = "If specified, the comma-separated list of identities "
-                    + " will be excluded from all generated statistics.")
+                    + "will be excluded from all generated statistics.")
     @Nonnull
     private final List<String> excludedEmails = new ArrayList<>();
     @Parameter(names = "--branches",
@@ -62,7 +57,7 @@ public class CommandLineParser {
     private final List<String> includedEmails = new ArrayList<>();
 
     @Parameter(names = "--output-type",
-            description = "If specified, the output will be provided in the specified format. Defaults to HTML.",
+            description = "If specified, the output will be provided in the specified format.",
             arity = 1,
             converter = OutputTypeConverter.class)
     @Nonnull
@@ -109,11 +104,6 @@ public class CommandLineParser {
     @Nonnull
     public String getFilename() {
         return checkNotNull(filename);
-    }
-
-    @Nullable
-    public String getProjectName() {
-        return projectName;
     }
 
     @Nonnull

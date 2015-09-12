@@ -15,13 +15,7 @@ public class QueryData {
     }
 
     public String getDisplayableProjectName() {
-        String projectName = commandLine.getProjectName();
-        String filename = commandLine.getFilename();
-        if (projectName != null) {
-            return projectName;
-        } else {
-            return String.format("all data from file %s", filename);
-        }
+        return String.format("all data from file %s", commandLine.getFilename());
     }
 
     public String getDisplayableBranchList() {
