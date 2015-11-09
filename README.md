@@ -46,7 +46,7 @@ Once you have the data, you can start to play around with the output. You can e.
 when looking at e.g. team-level review practices.
 
 ```
-java -jar GerritStats.jar --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
+java -jar GerritStats/build/libs/GerritStats.jar --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
 ```
 
 The above command will give you output as illustrated below:
@@ -75,7 +75,7 @@ joe.developer@inter.nets
 If you want to do some processing on the data with Excel or similar tools, a CSV format might be convenient for import.
 
 ```
-java -jar GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --output-type csv
+java -jar GerritStats/build/libs/GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --output-type csv
 ```
 
 The output of the command looks like this:
@@ -103,7 +103,7 @@ based on how many review comments they write to each other, as well as a per-dev
 comments and links back to the reviews.
 
 ```
-java -jar GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
+java -jar GerritStats/build/libs/GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
 The index page will provide you with a sortable overview table of some of the core statistics, similar to the plaintext CSV output.
