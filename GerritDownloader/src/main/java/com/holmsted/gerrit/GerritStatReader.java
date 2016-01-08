@@ -205,13 +205,10 @@ public class GerritStatReader {
 
     private String createProjectNameList() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < projectNames.size(); ++i) {
-            String projectName = projectNames.get(i);
-            builder.append("project:").append(projectName);
-            if (i < projectNames.size() - 1) {
-                builder.append(' ');
-            }
+        for (String projectName : projectNames) {
+            builder.append("project:").append(projectName).append(" ");
         }
+        builder.setLength(builder.length() - 1);
         return builder.toString();
     }
 }
