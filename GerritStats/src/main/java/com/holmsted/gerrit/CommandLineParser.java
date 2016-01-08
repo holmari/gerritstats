@@ -16,8 +16,6 @@ import java.util.jar.Manifest;
 
 import javax.annotation.Nonnull;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 @SuppressWarnings("unused")
 public class CommandLineParser {
 
