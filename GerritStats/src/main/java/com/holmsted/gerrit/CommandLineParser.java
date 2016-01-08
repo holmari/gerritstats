@@ -143,5 +143,6 @@ public class CommandLineParser {
 
     public void printUsage() {
         jCommander.usage();
+        System.out.println("Options preceded by an asterisk are required.");
     }
 }
