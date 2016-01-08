@@ -95,18 +95,28 @@ public class GerritStatReader {
                 System.out.println(command);
 
                 Process exec = runtime.exec(command, null);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(exec.getInputStream()));
-                StringBuilder output = new StringBuilder();
+
                 char[] buffer = new char[1024];
                 int readChars;
-                while ((readChars = reader.read(buffer)) != -1) {
+
+                BufferedReader readerOut = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+                StringBuilder output = new StringBuilder();
+                while ((readChars = readerOut.read(buffer)) != -1) {
                     output.append(String.copyValueOf(buffer, 0, readChars));
                 }
-                reader.close();
+                readerOut.close();
+
+                BufferedReader readerErr = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
+                StringBuilder error = new StringBuilder();
+                while ((readChars = readerErr.read(buffer)) != -1) {
+                    error.append(String.copyValueOf(buffer, 0, readChars));
+                }
+                readerErr.close();
 
                 int errorCode = exec.waitFor();
                 if (errorCode != 0) {
-                    System.err.println("Process exited with return code " + errorCode);
+                    System.err.println("Process exited with return code " + errorCode + " and output:");
+                    System.err.println(error);
                     return null;
                 }
 
