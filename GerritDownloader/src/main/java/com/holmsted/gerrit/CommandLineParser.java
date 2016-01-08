@@ -9,6 +9,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
 
@@ -48,9 +50,9 @@ public class CommandLineParser {
     private ServerAndPort serverAndPort;
 
     @Parameter(names = {"-p", "--project"},
-            description = "The Gerrit project from which to retrieve stats. "
+            description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
                     + "If omitted, stats will be retrieved from all projects.")
-    private String projectName;
+    private List<String> projectNames = new ArrayList<>();
 
     @Parameter(names = {"-o", "--output-file"},
             description = "The file into which the json output will be written into.",
@@ -107,8 +109,8 @@ public class CommandLineParser {
     }
 
     @Nullable
-    public String getProjectName() {
-        return projectName;
+    public List<String> getProjectNames() {
+        return projectNames;
     }
 
     public int getServerPort() {

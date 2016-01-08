@@ -165,9 +165,8 @@ public class GerritStatReader {
         overallCommitLimit = overallLimit;
     }
 
-    public void setProjectNames(String... projectNames) {
-        this.projectNames.clear();
-        Collections.addAll(this.projectNames, projectNames);
+    public void setProjectNames(List<String> projectNames) {
+        this.projectNames = projectNames;
     }
 
     /**
@@ -204,9 +203,9 @@ public class GerritStatReader {
     }
 
     private String createProjectNameList() {
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder = new StringBuilder("project:^");
         for (String projectName : projectNames) {
-            builder.append("project:").append(projectName).append(" ");
+            builder.append(projectName).append("|");
         }
         builder.setLength(builder.length() - 1);
         return builder.toString();
