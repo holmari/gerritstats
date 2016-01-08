@@ -39,7 +39,7 @@ public class CommandLineParser {
         }
     }
 
-    @Parameter(names = "--server",
+    @Parameter(names = {"-s", "--server"},
             description = "Read output from Gerrit server URL and given port, in format server:port. "
                     + "If port is omitted, defaults to 29418.",
             arity = 1,
@@ -47,17 +47,17 @@ public class CommandLineParser {
             converter = ServerAndPort.Converter.class)
     private ServerAndPort serverAndPort;
 
-    @Parameter(names = "--project",
+    @Parameter(names = {"-p", "--project"},
             description = "The Gerrit project from which to retrieve stats. "
                     + "If omitted, stats will be retrieved from all projects.")
     private String projectName;
 
-    @Parameter(names = "--output-file",
+    @Parameter(names = {"-o", "--output-file"},
             description = "The file into which the json output will be written into.",
             required = true)
     private String outputFile;
 
-    @Parameter(names = "--limit",
+    @Parameter(names = {"-l", "--limit"},
             description = "The number of commits which to retrieve from the server. "
             + "If omitted, stats will be retrieved until no further records are available.")
     private int limit = GerritStatReader.NO_COMMIT_LIMIT;
