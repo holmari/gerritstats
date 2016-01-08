@@ -119,7 +119,7 @@ public class GerritStatReader {
         }
 
         private String createStartOffsetArg() {
-            return startOffset != 0 ? "--start " + String.valueOf(startOffset) + " " : " ";
+            return startOffset != 0 ? "--start " + String.valueOf(startOffset) + " " : "";
         }
     }
 
