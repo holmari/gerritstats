@@ -204,10 +204,14 @@ public class GerritStatReader {
 
     private String createProjectNameList() {
         StringBuilder builder = new StringBuilder("project:^");
-        for (String projectName : projectNames) {
-            builder.append(projectName).append("|");
+        if (projectNames.isEmpty()) {
+            builder.append(".*");
+        } else {
+            for (String projectName : projectNames) {
+                builder.append(projectName).append("|");
+            }
+            builder.setLength(builder.length() - 1);
         }
-        builder.setLength(builder.length() - 1);
         return builder.toString();
     }
 }
