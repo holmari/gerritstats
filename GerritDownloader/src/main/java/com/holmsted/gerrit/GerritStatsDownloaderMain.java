@@ -24,8 +24,12 @@ public class GerritStatsDownloaderMain {
         }
 
         String data = reader.readData();
-        String outputFile = checkNotNull(commandLine.getOutputFile());
-        FileWriter.writeFile(outputFile, data);
-        System.out.println("Wrote output to " + outputFile);
+        if (data.isEmpty()) {
+            System.out.println("No output was generated.");
+        } else {
+            String outputFile = checkNotNull(commandLine.getOutputFile());
+            FileWriter.writeFile(outputFile, data);
+            System.out.println("Wrote output to " + outputFile);
+        }
     }
 }
