@@ -2,6 +2,8 @@ package com.holmsted.gerrit;
 
 import com.holmsted.file.FileWriter;
 
+import java.util.List;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GerritStatsDownloaderMain {
@@ -18,14 +20,15 @@ public class GerritStatsDownloaderMain {
         String serverName = checkNotNull(commandLine.getServerName());
         GerritStatReader reader = GerritStatReader.fromCommandLine(serverName, commandLine.getServerPort());
         reader.setCommitLimit(commandLine.getCommitLimit());
-        String projectName = commandLine.getProjectName();
-        if (projectName != null) {
-            reader.setProjectName(projectName);
-        }
+        reader.setProjectNames(commandLine.getProjectNames());
 
         String data = reader.readData();
-        String outputFile = checkNotNull(commandLine.getOutputFile());
-        FileWriter.writeFile(outputFile, data);
-        System.out.println("Wrote output to " + outputFile);
+        if (data.isEmpty()) {
+            System.out.println("No output was generated.");
+        } else {
+            String outputFile = checkNotNull(commandLine.getOutputFile());
+            FileWriter.writeFile(outputFile, data);
+            System.out.println("Wrote output to " + outputFile);
+        }
     }
 }

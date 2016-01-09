@@ -6,6 +6,13 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -34,7 +41,7 @@ public class CommandLineParser {
         }
     }
 
-    @Parameter(names = "--server",
+    @Parameter(names = {"-s", "--server"},
             description = "Read output from Gerrit server URL and given port, in format server:port. "
                     + "If port is omitted, defaults to 29418.",
             arity = 1,
@@ -42,23 +49,36 @@ public class CommandLineParser {
             converter = ServerAndPort.Converter.class)
     private ServerAndPort serverAndPort;
 
-    @Parameter(names = "--project",
-            description = "The Gerrit project from which to retrieve stats. "
+    @Parameter(names = {"-p", "--project"},
+            description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
                     + "If omitted, stats will be retrieved from all projects.")
-    private String projectName;
+    private List<String> projectNames = new ArrayList<>();
 
-    @Parameter(names = "--output-file",
+    @Parameter(names = {"-o", "--output-file"},
             description = "The file into which the json output will be written into.",
             required = true)
     private String outputFile;
 
-    @Parameter(names = "--limit",
+    @Parameter(names = {"-l", "--limit"},
             description = "The number of commits which to retrieve from the server. "
             + "If omitted, stats will be retrieved until no further records are available.")
     private int limit = GerritStatReader.NO_COMMIT_LIMIT;
 
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
+
+    public CommandLineParser() {
+        URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
+        URL url = loader.findResource("META-INF/MANIFEST.MF");
+        try {
+            Manifest manifest = new Manifest(url.openStream());
+            Attributes attr = manifest.getMainAttributes();
+            String mainClass = attr.getValue(Attributes.Name.MAIN_CLASS);
+            jCommander.setProgramName(mainClass);
+        } catch (IOException e) {
+            // Ignore.
+        }
+    }
 
     public boolean parse(String[] args) {
         try {
@@ -89,8 +109,8 @@ public class CommandLineParser {
     }
 
     @Nullable
-    public String getProjectName() {
-        return projectName;
+    public List<String> getProjectNames() {
+        return projectNames;
     }
 
     public int getServerPort() {
@@ -103,5 +123,6 @@ public class CommandLineParser {
 
     public void printUsage() {
         jCommander.usage();
+        System.out.println("Options preceded by an asterisk are required.");
     }
 }

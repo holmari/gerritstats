@@ -6,12 +6,15 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 import javax.annotation.Nonnull;
-
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @SuppressWarnings("unused")
 public class CommandLineParser {
@@ -84,6 +87,19 @@ public class CommandLineParser {
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
 
+    public CommandLineParser() {
+        URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
+        URL url = loader.findResource("META-INF/MANIFEST.MF");
+        try {
+            Manifest manifest = new Manifest(url.openStream());
+            Attributes attr = manifest.getMainAttributes();
+            String mainClass = attr.getValue(Attributes.Name.MAIN_CLASS);
+            jCommander.setProgramName(mainClass);
+        } catch (IOException e) {
+            // Ignore.
+        }
+    }
+
     public boolean parse(String[] args) {
         try {
             jCommander.parse(args);
@@ -143,5 +159,6 @@ public class CommandLineParser {
 
     public void printUsage() {
         jCommander.usage();
+        System.out.println("Options preceded by an asterisk are required.");
     }
 }

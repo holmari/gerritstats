@@ -95,18 +95,28 @@ public class GerritStatReader {
                 System.out.println(command);
 
                 Process exec = runtime.exec(command, null);
-                BufferedReader reader = new BufferedReader(new InputStreamReader(exec.getInputStream()));
-                StringBuilder output = new StringBuilder();
+
                 char[] buffer = new char[1024];
                 int readChars;
-                while ((readChars = reader.read(buffer)) != -1) {
+
+                BufferedReader readerOut = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+                StringBuilder output = new StringBuilder();
+                while ((readChars = readerOut.read(buffer)) != -1) {
                     output.append(String.copyValueOf(buffer, 0, readChars));
                 }
-                reader.close();
+                readerOut.close();
+
+                BufferedReader readerErr = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
+                StringBuilder error = new StringBuilder();
+                while ((readChars = readerErr.read(buffer)) != -1) {
+                    error.append(String.copyValueOf(buffer, 0, readChars));
+                }
+                readerErr.close();
 
                 int errorCode = exec.waitFor();
                 if (errorCode != 0) {
-                    System.err.println("Process exited with return code " + errorCode);
+                    System.err.println("Process exited with return code " + errorCode + " and output:");
+                    System.err.println(error);
                     return null;
                 }
 
@@ -119,7 +129,7 @@ public class GerritStatReader {
         }
 
         private String createStartOffsetArg() {
-            return startOffset != 0 ? "--start " + String.valueOf(startOffset) + " " : " ";
+            return startOffset != 0 ? "--start " + String.valueOf(startOffset) + " " : "";
         }
     }
 
@@ -155,9 +165,8 @@ public class GerritStatReader {
         overallCommitLimit = overallLimit;
     }
 
-    public void setProjectNames(String... projectNames) {
-        this.projectNames.clear();
-        Collections.addAll(this.projectNames, projectNames);
+    public void setProjectNames(List<String> projectNames) {
+        this.projectNames = projectNames;
     }
 
     /**
@@ -194,13 +203,14 @@ public class GerritStatReader {
     }
 
     private String createProjectNameList() {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < projectNames.size(); ++i) {
-            String projectName = projectNames.get(i);
-            builder.append("project:").append(projectName);
-            if (i < projectNames.size() - 1) {
-                builder.append(' ');
+        StringBuilder builder = new StringBuilder("project:^");
+        if (projectNames.isEmpty()) {
+            builder.append(".*");
+        } else {
+            for (String projectName : projectNames) {
+                builder.append(projectName).append("|");
             }
+            builder.setLength(builder.length() - 1);
         }
         return builder.toString();
     }
