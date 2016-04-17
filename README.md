@@ -18,27 +18,34 @@ There are two separate tools:
 ## How to execute
 
 ```
-java -jar GerritDownloader/build/libs/GerritDownloader.jar
+./gerrit_downloader.sh
+
 ```
 
 Lists all command line options for the data download tool.
 
 ```
-java -jar GerritStats/build/libs/GerritStats.jar
+./gerrit_stats.sh
 ```
 
 Lists all command line options for the statistics generator.
-
 
 ## How to execute: saving data locally
 
 Fetching data from Gerrit can take a while. Use GerritDownloader to get the JSON output from the server so that you can parse it later:
 
 ```
-java -jar GerritDownloader/build/libs/GerritDownloader.jar --server gerrit.instance.on.inter.nets --project YourProjectName --limit 7500 --output-file gerrit-json-out.txt
+./gerrit_downloader.sh --server gerrit.instance.on.inter.nets --project YourProjectName --limit 7500 --output-dir gerrit_out/
 ```
 
-The above command will download all data from the given Gerrit server and given project, and store it in the given output file.
+The above command will download all data from the given Gerrit server and given project, and store the data in .json format in the given output directory.
+
+If you have multiple projects in Gerrit and want to take a look at all the data, omit the --project argument. This will download data for all projects you have
+access to:
+
+```
+./gerrit_downloader.sh --server gerrit.instance.on.inter.nets --output-dir gerrit_out/
+```
 
 ## How to execute: plaintext output
 
@@ -46,7 +53,7 @@ Once you have the data, you can start to play around with the output. You can e.
 when looking at e.g. team-level review practices.
 
 ```
-java -jar GerritStats/build/libs/GerritStats.jar --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
+./gerrit_stats.sh --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
 ```
 
 The above command will give you output as illustrated below:
@@ -75,13 +82,13 @@ joe.developer@inter.nets
 If you want to do some processing on the data with Excel or similar tools, a CSV format might be convenient for import.
 
 ```
-java -jar GerritStats/build/libs/GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --output-type csv
+./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --output-type csv
 ```
 
 The output of the command looks like this:
 
 ```
-Project: all data from file /Users/holmsted/dev/GerritStats/out-.txt
+Project: all data from file /Users/holmsted/dev/GerritStats/out.txt
 Branches: master
 From: 2014-10-23
 To: 2015-08-21
@@ -103,7 +110,7 @@ based on how many review comments they write to each other, as well as a per-dev
 comments and links back to the reviews.
 
 ```
-java -jar GerritStats/build/libs/GerritStats.jar --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
+./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
 The index page will provide you with a sortable overview table of some of the core statistics, similar to the plaintext CSV output.

@@ -54,10 +54,11 @@ public class CommandLineParser {
                     + "If omitted, stats will be retrieved from all projects.")
     private List<String> projectNames = new ArrayList<>();
 
-    @Parameter(names = {"-o", "--output-file"},
-            description = "The file into which the json output will be written into.",
+    @Parameter(names = {"-o", "--output-dir"},
+            description = "The directory into which the json output will be written into. "
+                    + "If multiple projects are specified, each is downloaded into its own file.",
             required = true)
-    private String outputFile;
+    private String outputDir;
 
     @Parameter(names = {"-l", "--limit"},
             description = "The number of commits which to retrieve from the server. "
@@ -99,8 +100,8 @@ public class CommandLineParser {
     }
 
     @Nullable
-    public String getOutputFile() {
-        return outputFile;
+    public String getOutputDir() {
+        return outputDir;
     }
 
     @Nullable

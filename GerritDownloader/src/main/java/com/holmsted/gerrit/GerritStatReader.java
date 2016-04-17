@@ -1,38 +1,24 @@
 package com.holmsted.gerrit;
 
 import com.google.common.base.Strings;
+import com.holmsted.json.JsonUtils;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import javax.annotation.Nonnull;
 
-import com.holmsted.json.JsonUtils;
-
 public class GerritStatReader {
 
-    public static final int GERRIT_DEFAULT_PORT = 29418;
     public static final int NO_COMMIT_LIMIT = -1;
 
-    private final String serverName;
-    private final int port;
-    private List<String> projectNames = new ArrayList<>();
+    private GerritServer gerritServer;
+    private String projectName;
     private int perQueryCommitLimit = NO_COMMIT_LIMIT;
     private int overallCommitLimit = NO_COMMIT_LIMIT;
-
-    public static GerritStatReader fromCommandLine(String serverName, int serverPort) {
-        if (serverPort != 0) {
-            return new GerritStatReader(serverName, serverPort);
-        } else {
-            return new GerritStatReader(serverName);
-        }
-    }
 
     class GerritOutput {
         private String output;
@@ -91,7 +77,9 @@ public class GerritStatReader {
                                 + "--comments "
                                 + createStartOffsetArg()
                                 + createLimitArg(),
-                        String.valueOf(port), serverName, projectNameList);
+                        String.valueOf(gerritServer.getPort()),
+                        gerritServer.getServerName(),
+                        projectNameList);
                 System.out.println(command);
 
                 Process exec = runtime.exec(command, null);
@@ -133,19 +121,12 @@ public class GerritStatReader {
         }
     }
 
-    public GerritStatReader(String serverName) {
-        this.serverName = serverName;
-        port = GERRIT_DEFAULT_PORT;
-    }
-
-    public GerritStatReader(String serverName, int port) {
-        this.serverName = serverName;
-        this.port = port;
+    public GerritStatReader(@Nonnull GerritServer gerritServer) {
+        this.gerritServer = gerritServer;
     }
 
     public void setProjectName(String projectName) {
-        projectNames.clear();
-        projectNames.add(projectName);
+        this.projectName = projectName;
     }
 
     /**
@@ -165,18 +146,14 @@ public class GerritStatReader {
         overallCommitLimit = overallLimit;
     }
 
-    public void setProjectNames(List<String> projectNames) {
-        this.projectNames = projectNames;
-    }
-
     /**
      * Reads the data in json format from gerrit.
      */
     public String readData() {
         if (overallCommitLimit != NO_COMMIT_LIMIT) {
-            System.out.println("Reading data from " + serverName + " for last " + overallCommitLimit + " commits");
+            System.out.println("Reading data from " + gerritServer + " for last " + overallCommitLimit + " commits");
         } else {
-            System.out.println("Reading all commit data from " + serverName);
+            System.out.println("Reading all commit data from " + gerritServer);
         }
 
         GerritDataReader connection = new GerritDataReader();
@@ -204,14 +181,10 @@ public class GerritStatReader {
 
     private String createProjectNameList() {
         StringBuilder builder = new StringBuilder("project:^");
-        if (projectNames.isEmpty()) {
-            builder.append(".*");
-        } else {
-            for (String projectName : projectNames) {
-                builder.append(projectName).append("|");
-            }
-            builder.setLength(builder.length() - 1);
+        if (projectName.isEmpty()) {
+            throw new IllegalStateException("No project name defined!");
         }
+        builder.append(projectName);
         return builder.toString();
     }
 }
