@@ -8,10 +8,14 @@ import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import javax.annotation.Nonnull;
+
 public class FileWriter {
 
     public static void writeFile(String filename, String contents) {
         File dataFile = new File(filename);
+        mkdirsForFile(dataFile);
+
         FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(dataFile);
@@ -25,6 +29,8 @@ public class FileWriter {
 
     public static void writeFile(String filename, InputStream inputStream) {
         File dataFile = new File(filename);
+        mkdirsForFile(dataFile);
+
         FileOutputStream outputStream;
         try {
             outputStream = new FileOutputStream(dataFile);
@@ -36,6 +42,14 @@ public class FileWriter {
             outputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void mkdirsForFile(@Nonnull File file) {
+        File path = new File(file.getParent());
+        if (!path.exists() && !path.mkdirs()) {
+            throw new IllegalArgumentException(
+                    "Path did not exist and could not be created: '" + path.getAbsolutePath() + "'");
         }
     }
 }
