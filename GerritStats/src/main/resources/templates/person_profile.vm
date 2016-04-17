@@ -4,6 +4,7 @@
 <body>
 <script src="res/d3.min.js"></script>
 <head>
+    <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats: $identity.name ($identity.username)</title>
 </head>
