@@ -1,12 +1,18 @@
+#Gradle
 bin/
 build/
 local.properties
-*.iml
-.idea/
 .gradle/
 
-# default output dir
+# Default output dir
 out/
 
-# output by velocity template engine
+# IntelliJ IDEA
+*.iml
+.idea/
+
+# OS X
+.DS_Store
+
+# Velocity template engine
 velocity.log
