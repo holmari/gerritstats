@@ -7,6 +7,7 @@
 <script src="res/jquery.tablesorter.min.js"></script>
 <script src="res/numeral.min.js"></script>
 <script src="res/bootstrap.min.js"></script>
+<script src="res/gerritstats.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
@@ -52,7 +53,7 @@ Users in analysis: $identities.size() <br>
     <tbody>
 #foreach( $identity in $identities )
         <tr>
-            <td><a href="$identity.outputFilename">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
+            <td><a href="${identity.filenameStem}.html">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
             <td>$identity.reviewCountPlus2</td>
             <td>$identity.reviewCountPlus1</td>
             <td>$identity.reviewCountMinus1</td>

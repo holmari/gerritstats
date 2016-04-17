@@ -1,6 +1,14 @@
 package com.holmsted.gerrit.processors.perperson;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.holmsted.file.FileWriter;
+import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 
@@ -16,6 +24,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.lang.reflect.Type;
 
 import javax.annotation.Nonnull;
 
@@ -33,7 +42,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             "jquery.tablesorter.min.js",
             "numeral.min.js",
             "bootstrap.css",
-            "bootstrap.min.js"
+            "bootstrap.min.js",
+            "gerritstats.js"
     };
 
     private VelocityEngine velocity = new VelocityEngine();
@@ -100,15 +110,45 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     }
 
     private void createPerPersonFiles(@Nonnull IdentityRecordList orderedList) {
-        for (IdentityRecord record : orderedList) {
-            String outputFilename = record.getOutputFilename();
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(PatchSetCommentTable.class, new PatchSetCommentTableSerializer())
+                .create();
 
+        for (IdentityRecord record : orderedList) {
             Context context = new VelocityContext(baseContext);
             context.put("identity", record.identity);
             context.put("record", record);
 
-            writeTemplate(context, VM_PERSON_PROFILE, outputFilename);
+            String htmlOutputFilename = record.getFilenameStem() + ".html";
+            writeTemplate(context, VM_PERSON_PROFILE, htmlOutputFilename);
+
+            writeJsonFile(record, gson);
         }
+    }
+
+    /**
+     * Writes a .js file with a json object for the given identity record.
+     *
+     *
+     * Ideally, pure .json files would be written,but it's not easily possible
+     * to load json files locally from the pages without a web server to serve the
+     * requests.
+     *
+     * See e.g. http://stackoverflow.com/questions/7346563/loading-local-json-file
+     */
+    private void writeJsonFile(@Nonnull IdentityRecord record, @Nonnull Gson gson) {
+        String outputFilename = record.getFilenameStem() + ".js";
+        System.out.println("Creating " + outputFilename);
+
+        StringWriter writer = new StringWriter();
+        writer.write(String.format("userdata['%s'] = %s;",
+                record.getFilenameStem(),
+                gson.toJson(record)));
+
+        FileWriter.writeFile(outputDir.getPath()
+                + File.separator + "userdata"
+                + File.separator + outputFilename, writer.toString());
     }
 
     private void writeTemplate(@Nonnull Context context, String templateName, String outputFilename) {
@@ -117,5 +157,22 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         StringWriter writer = new StringWriter();
         velocity.mergeTemplate(templateName, "UTF-8", context, writer);
         FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
+    }
+
+    private static class PatchSetCommentTableSerializer implements JsonSerializer<PatchSetCommentTable> {
+
+        @Override
+        public JsonElement serialize(PatchSetCommentTable table,
+                                     Type typeOfSrc,
+                                     JsonSerializationContext context) {
+            JsonArray tableJson = new JsonArray();
+            for (Commit key : table.keySet()) {
+                JsonObject pair = new JsonObject();
+                pair.add("commit", context.serialize(key));
+                pair.add("commentsByUser", context.serialize(table.get(key)));
+                tableJson.add(pair);
+            }
+            return tableJson;
+        }
     }
 }

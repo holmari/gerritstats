@@ -3,6 +3,9 @@
 <meta charset="utf-8">
 <body>
 <script src="res/d3.min.js"></script>
+<script src="res/jquery.min.js"></script>
+<script src="res/gerritstats.js"></script>
+<script src="userdata/${record.filenameStem}.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />

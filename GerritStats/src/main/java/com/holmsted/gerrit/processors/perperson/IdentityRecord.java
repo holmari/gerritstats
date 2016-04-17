@@ -71,7 +71,7 @@ public class IdentityRecord {
         return identity.getUsername();
     }
 
-    public String getOutputFilename() {
+    public String getFilenameStem() {
         String filename = identity.getUsername();
         if (Strings.isNullOrEmpty(filename)) {
             filename = Strings.nullToEmpty(identity.getEmail()).replace(".", "_");
@@ -82,7 +82,7 @@ public class IdentityRecord {
                 filename = "anonymous_coward";
             }
         }
-        return filename + ".html";
+        return filename;
     }
 
     public DatedCommitList getCommits() {
