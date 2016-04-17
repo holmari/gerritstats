@@ -152,7 +152,7 @@
         #if ( $patchSet.author != $identity )
             #foreach( $comment in $patchSet.comments )
                 #if ($comment.reviewer == $identity)
-                    <li><a href="$Gerrit.getUrlForComment($commit, $patchSet, $comment)" alt="$comment.file:$comment.line">$comment.message</a></li>
+                    <li><a href="$Gerrit.getUrlForComment($commit, $patchSet, $comment)" alt="$comment.file:$comment.line">$comment.escapedMessage</a></li>
                 #end
             #end
         #end

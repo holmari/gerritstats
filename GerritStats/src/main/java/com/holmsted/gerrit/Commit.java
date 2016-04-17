@@ -158,6 +158,7 @@ public class Commit {
         public int line;
         public Identity reviewer;
         public String message;
+        private String escapedMessage;
 
         public String getFile() {
             return file;
@@ -173,6 +174,22 @@ public class Commit {
 
         public String getMessage() {
             return message;
+        }
+
+        public String getEscapedMessage() {
+            if (message != null) {
+                if (escapedMessage == null) {
+                    escapedMessage = message
+                            .replaceAll("&", "&amp;")
+                            .replaceAll("<", "&lt;")
+                            .replaceAll(">", "&gt;")
+                            .replaceAll("\"", "&quot;")
+                            .replaceAll("'", "'&#39;")
+                            .replaceAll("/", "&#x2F;");
+                }
+                return escapedMessage;
+            }
+            return null;
         }
 
         public static List<PatchSetComment> fromJson(JSONArray comments) {
