@@ -3,6 +3,8 @@ package com.holmsted.gerrit;
 import com.holmsted.gerrit.processors.perperson.PerPersonDataProcessor;
 import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
+import java.io.File;
+import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,9 @@ public class GerritStatsMain {
         List<Commit> commits = new ArrayList<>();
         GerritStatParser commitDataParser = new GerritStatParser();
 
-        for (String filename : commandLine.getFilenames()) {
+        List<String> filenames = processFilenames(commandLine.getFilenames());
+
+        for (String filename : filenames) {
             String data = FileReader.readFile(filename);
             commits.addAll(commitDataParser.parseCommits(data));
         }
@@ -47,5 +51,31 @@ public class GerritStatsMain {
                 perPersonFormatter.invoke(queryData);
                 break;
         }
+    }
+
+    private static List<String> processFilenames(List<String> filenames) {
+        List<String> result = new ArrayList<>();
+        for (String filename : filenames) {
+            File file = new File(filename);
+            if (!file.exists()) {
+                System.err.println(String.format("Warning: file '%s' does not exist, skipping.", filename));
+                continue;
+            }
+            if (file.isFile()) {
+                result.add(filename);
+            } else {
+                File[] subdirFiles = file.listFiles(new FilenameFilter() {
+                    @Override
+                    public boolean accept(File dir, String name) {
+                        return name.endsWith(".json");
+                    }
+                });
+                for (File subdirFile : subdirFiles) {
+                    result.add(subdirFile.getAbsolutePath());
+                }
+            }
+        }
+
+        return result;
     }
 }

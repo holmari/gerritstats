@@ -113,6 +113,12 @@ comments and links back to the reviews.
 ./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
+However, you don't need all the arguments to generate output. Just pass the directory with downloaded json data to -f, and you're ready to go:
+
+```
+./gerrit_stats.sh --f gerrit_out/
+```
+
 The index page will provide you with a sortable overview table of some of the core statistics, similar to the plaintext CSV output.
 
 ![Overview table of all developers](doc/overview_table.png)

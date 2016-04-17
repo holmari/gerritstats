@@ -36,8 +36,8 @@ public class CommandLineParser {
     }
 
     @Parameter(names = {"-f", "--file", "--files"},
-            description = "Read output from comma-separated list of files. The files must be in json format, "
-                    + "created by GerritStatsDownloader.",
+            description = "Read output from comma-separated list of files or directories. "
+                    + "The files must be in json format, created by GerritStatsDownloader.",
             required = true)
     @Nonnull
     private List<String> filenames = new ArrayList<>();
