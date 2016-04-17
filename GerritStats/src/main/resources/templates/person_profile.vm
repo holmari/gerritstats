@@ -12,35 +12,35 @@
     <title>GerritStats: $identity.name ($identity.username)</title>
 </head>
 
-<h1>#printableName( $identity ) #wrapWithParenthesesIfNotEmpty( $identity.username )</h1>
-<div class="subtitleH1">$identity.email</div>
+<h1 id="pageTitle"></h1>
+<div class="subtitleH1" id="pageSubtitle"></div>
 
 <h3>Overall</h3>
 <p>
 <table>
-    <tr><th>Commits</th><td>$record.commits.size()</td></tr>
-    <tr><th>Comments written</th><td>$record.allCommentsWritten.size()</td></tr>
-    <tr><th>Comments received</th><td>$record.allCommentsReceived.size()</td></tr>
-    <tr><th>Comments / commit</th><td>$record.receivedCommentRatio</td></tr>
-    <tr><th>Added as reviewer</th><td>$record.addedAsReviewerTo.size()</td></tr>
+    <tr><th>Commits</th><td id="commitsSize"></td></tr>
+    <tr><th>Comments written</th><td id="commentsWritten"></td></tr>
+    <tr><th>Comments received</th><td id="commentsReceived"></td></tr>
+    <tr><th>Comments / commit</th><td id="receivedCommentRatio"></td></tr>
+    <tr><th>Added as reviewer</th><td id="addedAsReviewerTo"></td></tr>
     <tr><td>&nbsp;</td></tr>
-    <tr><th>Comments / review request</th><td>$record.reviewCommentRatio</td></tr>
-    <tr><th>Max patch set count</th><td>$record.maxPatchSetCount</td></tr>
+    <tr><th>Comments / review request</th><td id="reviewCommentRatio"></td></tr>
+    <tr><th>Max patch set count</th><td id="maxPatchSetCount"></td></tr>
 </table>
 
 <table>
-	<tr><th>+2 reviews given</th><td>$record.reviewCountPlus2</td></tr>
-	<tr><th>+1 reviews given</th><td>$record.reviewCountPlus1</td></tr>
-	<tr><th>-1 reviews given</th><td>$record.reviewCountMinus1</td></tr>
-	<tr><th>-2 reviews given</th><td>$record.reviewCountMinus2</td></tr>
-	<tr><th>+2 reviews received</th><td>$record.getReceivedReviewsForScore(2)</td></tr>
-	<tr><th>+1 reviews received</th><td>$record.getReceivedReviewsForScore(1)</td></tr>
-	<tr><th>-1 reviews received</th><td>$record.getReceivedReviewsForScore(-1)</td></tr>
-	<tr><th>-2 reviews received</th><td>$record.getReceivedReviewsForScore(-2)</td></tr>
+	<tr><th>+2 reviews given</th><td id="reviewCountGivenPlus2"></td></tr>
+	<tr><th>+1 reviews given</th><td id="reviewCountGivenPlus1"></td></tr>
+	<tr><th>-1 reviews given</th><td id="reviewCountGivenMinus1"></td></tr>
+	<tr><th>-2 reviews given</th><td id="reviewCountGivenMinus2"></td></tr>
+	<tr><th>+2 reviews received</th><td id="reviewCountReceivedPlus2"></td></tr>
+	<tr><th>+1 reviews received</th><td id="reviewCountReceivedPlus1"></td></tr>
+	<tr><th>-1 reviews received</th><td id="reviewCountReceivedMinus1"></td></tr>
+	<tr><th>-2 reviews received</th><td id="reviewCountReceivedMinus2"></td></tr>
 </table>
 
 <table>
-    <tr><th>Average time in code review</th><td>$record.printableAverageTimeInCodeReview</td></tr>
+    <tr><th>Average time in code review</th><td id="averageTimeInCodeReview">$record.printableAverageTimeInCodeReview</td></tr>
 </table>
 </p>
 
@@ -186,7 +186,31 @@
 #end
 	];
 </script>
+
 <script>
+
+function updateViewFromUserdata() {
+    var record = userdata['${record.filenameStem}']
+
+    $('#pageTitle').html(printableName(record))
+    $('#pageSubtitle').html(record.email)
+    $('#commitsSize').html(record.commits.length)
+    $('#commentsWritten').html(record.commentsWritten.length)
+    $('#commentsReceived').html(record.commentsReceived.length)
+    $('#receivedCommentRatio').html(getReceivedCommentRatio(record))
+    $('#addedAsReviewerTo').html(record.addedAsReviewerTo.length)
+    $('#reviewCommentRatio').html(record.commentsWritten.length / record.addedAsReviewerTo.length)
+    $('#maxPatchSetCount').html(getMaxPatchSetCount(record))
+    $('#reviewCountGivenPlus2').html(record.reviewCountPlus2)
+    $('#reviewCountGivenPlus1').html(record.reviewCountPlus1)
+    $('#reviewCountGivenMinus1').html(record.reviewCountMinus1)
+    $('#reviewCountGivenMinus2').html(record.reviewCountMinus2)
+    $('#reviewCountReceivedPlus2').html(getReceivedReviewsForScore(record, 2))
+    $('#reviewCountReceivedPlus1').html(getReceivedReviewsForScore(record, 1))
+    $('#reviewCountReceivedMinus1').html(getReceivedReviewsForScore(record, -1))
+    $('#reviewCountReceivedMinus2').html(getReceivedReviewsForScore(record, -2))
+    $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview))
+}
 
 /**
   * Processes the data into the following format:
@@ -277,13 +301,15 @@ function createFrequencyTable(svgId, x_domain, data) {
         .attr("height", function(d) { return height - y(d.count); })
        .append("svg:title")
         .text(function(d) { return d.date });
-};
+}
 
 var xDomain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"),
                new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
 createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(comments));
 
 createFrequencyTable("#badCommitsSvg", xDomain, badCommits);
+
+updateViewFromUserdata()
 
 </script>
 </body>
