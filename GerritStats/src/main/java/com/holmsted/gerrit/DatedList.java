@@ -56,10 +56,6 @@ public class DatedList<T> extends ArrayList<T> {
         return years;
     }
 
-    public YearlyItemList<T> getItemsForYear(int year) {
-        return itemsPerYear.get(year);
-    }
-
     public String getDisplayableMonthOnMonthChange(int year, int month) {
         if (!isDateWithinRange(year, month)) {
             return "";

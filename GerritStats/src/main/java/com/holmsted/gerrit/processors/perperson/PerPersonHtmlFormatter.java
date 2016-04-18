@@ -43,6 +43,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             "numeral.min.js",
             "bootstrap.css",
             "bootstrap.min.js",
+            "moment.min.js",
             "gerritstats.js"
     };
 
@@ -57,7 +58,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
         velocity.init();
 
-        baseContext.put("Gerrit", GerritUtils.class);
         baseContext.put("date", new ComparisonDateTool());
         baseContext.put("outputRules", outputRules);
 
@@ -113,6 +113,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(PatchSetCommentTable.class, new PatchSetCommentTableSerializer())
+                .registerTypeAdapter(ReviewerDataTable.class, new ReviewerDataTableSerializer())
                 .create();
 
         for (IdentityRecord record : orderedList) {
@@ -170,6 +171,22 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 JsonObject pair = new JsonObject();
                 pair.add("commit", context.serialize(key));
                 pair.add("commentsByUser", context.serialize(table.get(key)));
+                tableJson.add(pair);
+            }
+            return tableJson;
+        }
+    }
+
+    private static class ReviewerDataTableSerializer implements JsonSerializer<ReviewerDataTable> {
+        @Override
+        public JsonElement serialize(ReviewerDataTable table,
+                                     Type typeOfSrc,
+                                     JsonSerializationContext context) {
+            JsonArray tableJson = new JsonArray();
+            for (Commit.Identity key : table.keySet()) {
+                JsonObject pair = new JsonObject();
+                pair.add("identity", context.serialize(key));
+                pair.add("approvalData", context.serialize(table.get(key)));
                 tableJson.add(pair);
             }
             return tableJson;

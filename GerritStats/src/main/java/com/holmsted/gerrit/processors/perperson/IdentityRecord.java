@@ -39,11 +39,11 @@ public class IdentityRecord {
     final DatedCommitList commits = new DatedCommitList();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<>();
-    final Hashtable<Commit.Identity, ReviewerData> reviewRequestors = new Hashtable<>();
+    final ReviewerDataTable reviewRequestors = new ReviewerDataTable();
 
     final PatchSetCommentTable commentsWritten = new PatchSetCommentTable();
     final PatchSetCommentTable commentsReceived = new PatchSetCommentTable();
-    final Hashtable<Commit.Identity, ReviewerData> reviewersForOwnCommits = new Hashtable<>();
+    final ReviewerDataTable reviewersForOwnCommits = new ReviewerDataTable();
 
     private long averageTimeInCodeReview;
 

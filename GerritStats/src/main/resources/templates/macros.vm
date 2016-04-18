@@ -1,9 +1,3 @@
-#macro(listComma $index $listSize)
-#set( $lastone = $listSize - 1 )
-#if( $index <= $lastone ),
-#else #end
-#end
-
 #macro(printableName $identity)
     #set( $printableName = $identity.name )
     #if( "$!printableName" == "")
@@ -25,16 +19,4 @@
         #set( $extraInfo = $identity.username )
     #end
     #wrapWithParenthesesIfNotEmpty( $extraInfo )
-#end
-
-#macro(identityHref $identity)
-    #if( $identity.hasEmail() )
-        <a href="mailto:$identity.email">$identity.email</a>
-    #else
-        #if ( !$identity.hasUsername() )
-            Anonymous Coward
-        #else
-            $identity.username
-        #end
-    #end
 #end

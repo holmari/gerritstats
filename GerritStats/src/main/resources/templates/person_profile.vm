@@ -1,15 +1,16 @@
-#parse( "templates/macros.vm" )
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
 <script src="res/d3.min.js"></script>
-<script src="res/jquery.min.js"></script>
 <script src="res/gerritstats.js"></script>
+<script src="res/jquery.min.js"></script>
+<script src="res/moment.min.js"></script>
+<script src="res/numeral.min.js"></script>
 <script src="userdata/${record.filenameStem}.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
-    <title>GerritStats: $identity.name ($identity.username)</title>
+    <title id="pageTitleHead"></title>
 </head>
 
 <h1 id="pageTitle"></h1>
@@ -40,33 +41,21 @@
 </table>
 
 <table>
-    <tr><th>Average time in code review</th><td id="averageTimeInCodeReview">$record.printableAverageTimeInCodeReview</td></tr>
+    <tr><th>Average time in code review</th><td id="averageTimeInCodeReview"></td></tr>
 </table>
 </p>
 
-<h3>Adds them as reviewers ($record.reviewersForOwnCommits.size())</h3>
-<p>
-#foreach( $identity in $record.myReviewerList )
-#set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
-    #identityHref( $identity ) ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.myReviewerList.size() )
-#end
+<h3>Adds them as reviewers (<span id="addsThemAsReviewersCount"></span>)</h3>
+<p id="addsThemAsReviewers">
 </p>
 
-<h3 class="withSubtitle">They give +2..-2 approvals ($record.reviewersForOwnCommits.size())</h3>
+<h3 class="withSubtitle">They give +2..-2 approvals (<span id="approvalsPerReviewerCount"></span>)</h3>
 <div class="subtitleH3">sorted by number of times added as a reviewer</div>
-<p>
-#foreach( $identity in $record.myReviewerList )
-#set ( $reviewerData = $record.getReviewerDataForOwnCommitFor($identity) )
-    #identityHref( $identity ) ($reviewerData.approvalCount)#listComma( $velocityCount, $record.myReviewerList.size() )
-#end
+<p id="approvalsPerReviewer">
 </p>
 
-<h3>They add this person as reviewer</h3>
-<p>
-#foreach( $identity in $record.reviewRequestorList )
-#set ( $reviewerData = $record.getReviewRequestorDataFor($identity) )
-    #identityHref( $identity ) ($reviewerData.addedAsReviewerCount)#listComma( $velocityCount, $record.reviewRequestorList.size() )
-#end
+<h3>They add this person as reviewer (<span id="theyAddThisPersonAsReviewerCount"></span>)</h3>
+<p id="theyAddThisPersonAsReviewer">
 </p>
 
 <h3>Review comments per day</h3>
@@ -75,141 +64,205 @@
 
 <h3>Per-month stats</h3>
 
-<table class="perMonthStats">
-#foreach( $year in $record.commits.yearRange )
-
-	<tr><th colspan="13" class="monthlyCommitYearTitle">$year</th></tr>
-    <tr><th></th>
-        <th>Jan</th>
-        <th>Feb</th>
-        <th>Mar</th>
-        <th>Apr</th>
-        <th>May</th>
-        <th>Jun</th>
-        <th>Jul</th>
-        <th>Aug</th>
-        <th>Sep</th>
-        <th>Oct</th>
-        <th>Nov</th>
-        <th>Dec</th>
-    </tr>
-    <tr>
-        <th>Commits</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.commits.getPrintableMonthlyItemCount($year, $month)</td>
-#end
-    </tr>
-	<tr>
-	    <th>Comments</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.allCommentsWritten.getPrintableMonthlyItemCount($year, $month)</td>
-#end
-	</tr>
-	<tr>
-	    <th>Commits MoM %</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.commits.getDisplayableMonthOnMonthChange($year, $month)</td>
-#end
-	</tr>
-    <tr>
-	    <th>Commits QoQ %</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.commits.getDisplayableQuarterOnQuarterChange($year, $month)</td>
-#end
-	</tr>
-    <tr>
-        <th>Comments MoM %</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.allCommentsWritten.getDisplayableMonthOnMonthChange($year, $month)</td>
-#end
-	</tr>
-	<tr>
-	    <th>Comments QoQ %</th>
-#foreach( $month in $record.allCommentsWritten.monthsInYear )
-        <td>$record.allCommentsWritten.getDisplayableQuarterOnQuarterChange($year, $month)</td>
-#end
-	</tr>
-#end
+<table class="perMonthStats" id="perMonthStats">
 </table>
 
-#if ($outputRules.commitPatchSetCountThreshold != -1)
-<h3 class="withSubtitle">Commits exceeding $outputRules.commitPatchSetCountThreshold patches</h3>
-<div class="subtitleH3">only includes commits that were reworked over $outputRules.commitPatchSetCountThreshold times after the initial review, and then submitted.</div>
-<p>
-#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.commitPatchSetCountThreshold) )
-#foreach( $commit in $badCommitList )
-    <a href="$commit.url">$commit.url</a> ($commit.getPatchSetCountForKind("REWORK"))#listComma( $velocityCount, $badCommitList.size() )
-#end
+<h3 class="withSubtitle">Commits exceeding <span class="highPatchSetCountThreshold"></span> patches</h3>
+<div class="subtitleH3">only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</div>
+<p id="highPatchSetCountCommitList">
 </p>
 
-<div id="badCommitsSvg">
+<div id="highPatchSetCountCommitsSvg">
 </div>
 
-#end
-
 <h3>Review comments</h3>
-#foreach( $commit in $record.commitsWithWrittenComments )
-    <h4><a href="$commit.url">$commit.url</a> (Created: $date.format( "yyyy-MM-dd", $commit.createdOnDate ))</h4>
-    <ul>
-    #foreach( $patchSet in $commit.patchSets )
-        #if ( $patchSet.author != $identity )
-            #foreach( $comment in $patchSet.comments )
-                #if ($comment.reviewer == $identity)
-                    <li><a href="$Gerrit.getUrlForComment($commit, $patchSet, $comment)" alt="$comment.file:$comment.line">$comment.escapedMessage</a></li>
-                #end
-            #end
-        #end
-    #end
-    </ul>
-#end
+<p id="reviewComments">
 </p>
 
 <script>
-    var comments = [
-#foreach( $commit in $record.commitsWithWrittenComments )
-    #foreach( $patchSet in $commit.patchSets )
-        #if ( $patchSet.author != $identity )
-            #foreach( $comment in $patchSet.comments )
-                #if ($comment.reviewer == $identity)
-                    {date: "$date.format( "yyyy-MM-dd", $patchSet.createdOnDate )"},
-                #end
-            #end
-        #end
-    #end
-#end
-	];
 
-#set ( $badCommitList = $record.getCommitsWithNPatchSets($outputRules.commitPatchSetCountThreshold) )
-    var badCommits = [
-#foreach( $commit in $badCommitList )
-    {date: new Date("$date.format( "yyyy-MM-dd", $commit.createdOnDate )"), count: $commit.getPatchSetCountForKind("REWORK")},
-#end
-	];
-</script>
+function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
+    for (var i = 0; i < dataArray.length; ++i) {
+        var data = dataArray[i];
+        $(elementQuery).append(dataRenderer(data));
+        if (i < dataArray.length - 1) {
+            $(elementQuery).append(', ');
+        }
+    }
+}
 
-<script>
+/**
+ * Adds a list of reviewers to the element that matches the given element JQuery.
+ */
+function addReviewerDataToElement(reviewerData, elementJQuery, valueCallback) {
+    addCommaSeparatedDataToElement(reviewerData, elementJQuery, function(data) {
+        return '<a href="mailto:' + data.identity.email + '">'
+             + data.identity.email + '</a> (' + valueCallback(data) + ')'
+    });
+}
+
+/**
+ * Adds all review comments by user to the
+ */
+function addReviewCommentsByUser(record, elementQuery) {
+    var commits = record.getCommitsWithWrittenCommentsSortedByDate();
+
+    for (var i = 0; i < commits.length; ++i) {
+        var commitAndComments = commits[i];
+        var commit = commitAndComments.commit;
+
+        var commitCreatedDate = moment(commit.createdOnDate);
+        $(elementQuery).append('<h4><a href="' + commit.url + '">' + commit.url + '</a> (Created: '
+            +  commitCreatedDate.format("YYYY-MM-DD") + ')</h4><ul></ul>');
+
+        commit.patchSets.forEach(function(patchSet) {
+            // ignore self-reviews and replies
+            if (patchSet.author.email == record.identity.email) {
+                return;
+            }
+
+            var comments = patchSet.comments;
+            comments.forEach(function(comment) {
+                if (comment.reviewer.email != record.identity.email) {
+                    return;
+                }
+
+                var urlForComment = getGerritUrlForComment(commit, patchSet, comment)
+                var altText = comment.file + ':' + comment.line;
+                $(elementQuery + " ul").last().append('<li><a href="' + urlForComment + '" alt="' + altText + '">'
+                    + escapeHtml(comment.message) + '</a></li>');
+            });
+        });
+    }
+}
+
+function addHighPatchSetCommits(exceedingCommits) {
+    addCommaSeparatedDataToElement(exceedingCommits, '#highPatchSetCountCommitList', function(commit) {
+        return '<a href="' + commit.url + '">' + commit.url + '</a> ('
+            + userdataScope.getPatchSetCountForKind(commit, 'REWORK') + ')';
+    });
+}
+
+function addPerMonthStatsYearHeader(year) {
+    $('#perMonthStats').append('<tr><th colspan="13" class="monthlyCommitYearTitle">' + year + '</th></tr>\
+        <tr><th></th>\
+            <th>Jan</th>\
+            <th>Feb</th>\
+            <th>Mar</th>\
+            <th>Apr</th>\
+            <th>May</th>\
+            <th>Jun</th>\
+            <th>Jul</th>\
+            <th>Aug</th>\
+            <th>Sep</th>\
+            <th>Oct</th>\
+            <th>Nov</th>\
+            <th>Dec</th>\
+        </tr>\
+        <tr class="commitsSection">\
+            <th>Commits</th>\
+            <!-- content is added here -->\
+        </tr>\
+        <tr class="commentsSection">\
+            <th>Comments</th>\
+            <!-- content is added here -->\
+        </tr>\
+        <tr class="commitsMoMSection">\
+            <th>Commits MoM %</th>\
+            <!-- content is added here -->\
+        </tr>\
+        <tr class="commitsQoQSection">\
+            <th>Commits QoQ %</th>\
+            <!-- content is added here -->\
+        </tr>\
+        <tr class="commentsMoMSection">\
+            <th>Comments MoM %</th>\
+            <!-- content is added here -->\
+        </tr>\
+        <tr class="commentsQoQSection">\
+            <th>Comments QoQ %</th>\
+            <!-- content is added here -->\
+        </tr>\
+    ');
+}
+
+function addPerMonthStats(record) {
+    var commitTable = record.datedCommitTable;
+    var commentTable = record.datedCommentTable;
+
+    var years = record.datedCommitTable.getActiveYears();
+    years.forEach(function(year) {
+        addPerMonthStatsYearHeader(year);
+        for (var month = 1; month <= 12; ++month) {
+            var commitCount = commitTable.getPrintableMonthlyItemCount(year, month);
+            var commitsMoMChange = commitTable.getDisplayableMonthOnMonthChange(year, month);
+            var commitsQoQChange = commitTable.getDisplayableQuarterOnQuarterChange(year, month);
+
+            var commentCount = commentTable.getPrintableMonthlyItemCount(year, month);
+            var commentsMoMChange = commentTable.getDisplayableMonthOnMonthChange(year, month);
+            var commentsQoQChange = commentTable.getDisplayableQuarterOnQuarterChange(year, month);
+
+            $('#perMonthStats .commitsSection').last().append('<td>' + commitCount + '</td>');
+            $('#perMonthStats .commentsSection').last().append('<td>' + commentCount + '</td>');
+            $('#perMonthStats .commitsMoMSection').last().append('<td>' + commitsMoMChange + '</td>');
+            $('#perMonthStats .commitsQoQSection').last().append('<td>' + commitsQoQChange + '</td>');
+            $('#perMonthStats .commentsMoMSection').last().append('<td>' + commentsMoMChange + '</td>');
+            $('#perMonthStats .commentsQoQSection').last().append('<td>' + commentsQoQChange + '</td>');
+        }
+    });
+}
 
 function updateViewFromUserdata() {
-    var record = userdata['${record.filenameStem}']
+    var record = userdata['${record.filenameStem}'];
+    userdataScope.initializeRecord(record);
 
-    $('#pageTitle').html(printableName(record))
-    $('#pageSubtitle').html(record.email)
-    $('#commitsSize').html(record.commits.length)
-    $('#commentsWritten').html(record.commentsWritten.length)
-    $('#commentsReceived').html(record.commentsReceived.length)
-    $('#receivedCommentRatio').html(getReceivedCommentRatio(record))
-    $('#addedAsReviewerTo').html(record.addedAsReviewerTo.length)
-    $('#reviewCommentRatio').html(record.commentsWritten.length / record.addedAsReviewerTo.length)
-    $('#maxPatchSetCount').html(getMaxPatchSetCount(record))
-    $('#reviewCountGivenPlus2').html(record.reviewCountPlus2)
-    $('#reviewCountGivenPlus1').html(record.reviewCountPlus1)
-    $('#reviewCountGivenMinus1').html(record.reviewCountMinus1)
-    $('#reviewCountGivenMinus2').html(record.reviewCountMinus2)
-    $('#reviewCountReceivedPlus2').html(getReceivedReviewsForScore(record, 2))
-    $('#reviewCountReceivedPlus1').html(getReceivedReviewsForScore(record, 1))
-    $('#reviewCountReceivedMinus1').html(getReceivedReviewsForScore(record, -1))
-    $('#reviewCountReceivedMinus2').html(getReceivedReviewsForScore(record, -2))
-    $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview))
+    $('#pageTitleHead').html("GerritStats: " + record.printableName());
+    $('#pageTitle').html(record.printableName());
+    $('#pageSubtitle').html(record.identity.email);
+    $('#commitsSize').html(record.commits.length);
+    $('#commentsWritten').html(record.getAllCommentsByUser());
+    $('#commentsReceived').html(record.commentsReceived.length);
+    $('#receivedCommentRatio').html(record.getReceivedCommentRatio().toFixed(outputConfig.decimalPrecision));
+    $('#addedAsReviewerTo').html(record.addedAsReviewerTo.length);
+    $('#reviewCommentRatio').html((record.commentsWritten.length / record.addedAsReviewerTo.length)
+                                    .toFixed(outputConfig.decimalPrecision));
+    $('#maxPatchSetCount').html(record.getMaxPatchSetCount());
+    $('#reviewCountGivenPlus2').html(record.reviewCountPlus2);
+    $('#reviewCountGivenPlus1').html(record.reviewCountPlus1);
+    $('#reviewCountGivenMinus1').html(record.reviewCountMinus1);
+    $('#reviewCountGivenMinus2').html(record.reviewCountMinus2);
+    $('#reviewCountReceivedPlus2').html(record.getReceivedReviewsForScore(2));
+    $('#reviewCountReceivedPlus1').html(record.getReceivedReviewsForScore(1));
+    $('#reviewCountReceivedMinus1').html(record.getReceivedReviewsForScore(-1));
+    $('#reviewCountReceivedMinus2').html(record.getReceivedReviewsForScore(-2));
+    $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
+
+    addReviewerDataToElement(record.getReviewerDataForOwnCommits(), '#addsThemAsReviewers', function(data) {
+        return data.approvalData.addedAsReviewerCount;
+    });
+    // Note: could also use getReviewerApprovalDataForOwnCommits() for sorting.
+    addReviewerDataToElement(record.getReviewerDataForOwnCommits(), '#approvalsPerReviewer', function(data) {
+        return data.approvalData.approvalCount;
+    });
+    $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
+    $('#approvalsPerReviewerCount').html(record.reviewersForOwnCommits.length);
+
+    addReviewerDataToElement(record.getReviewRequestors(), '#theyAddThisPersonAsReviewer', function(data) {
+        return data.approvalData.addedAsReviewerCount;
+    });
+    $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
+
+    addReviewCommentsByUser(record, '#reviewComments')
+
+    $('.highPatchSetCountThreshold').html(outputConfig.highPatchSetCountThreshold.toString());
+
+    addHighPatchSetCommits(record.getCommitsWithHighPatchSetCount());
+    addPerMonthStats(record);
+
+    var xDomain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"),
+                   new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
+    createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(record.getReviewCommentDates()));
+    createFrequencyTable("#highPatchSetCountCommitsSvg", xDomain, record.getDatesForCommitsWithHighPatchSetCount());
 }
 
 /**
@@ -303,13 +356,7 @@ function createFrequencyTable(svgId, x_domain, data) {
         .text(function(d) { return d.date });
 }
 
-var xDomain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"),
-               new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
-createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(comments));
-
-createFrequencyTable("#badCommitsSvg", xDomain, badCommits);
-
-updateViewFromUserdata()
+updateViewFromUserdata();
 
 </script>
 </body>

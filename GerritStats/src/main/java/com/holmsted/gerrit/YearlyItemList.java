@@ -32,16 +32,6 @@ public class YearlyItemList<T> extends ArrayList<T> {
         return super.add(item);
     }
 
-    /**
-     * Returns a hashtable that maps against a month index,
-     * and a list of items within that month.
-     * Assumes that the given item range only contains items from within a single year.
-     * Call filterForYear() first if you need to filter for both year and month.
-     */
-    public Hashtable<Integer, List<T>> getMonthlyItems() {
-        return itemsPerMonth;
-    }
-
     public float getMonthOnMonthChange(int month) {
         if (month > 1) {
             int itemsInThisMonth = itemsPerMonth.get(month).size();
