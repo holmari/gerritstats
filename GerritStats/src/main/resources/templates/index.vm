@@ -53,7 +53,7 @@ Users in analysis: $identities.size() <br>
     <tbody>
 #foreach( $identity in $identities )
         <tr>
-            <td><a href="${identity.filenameStem}.html">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
+            <td><a href="profile.html?user=${identity.filenameStem}">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
             <td>$identity.reviewCountPlus2</td>
             <td>$identity.reviewCountPlus1</td>
             <td>$identity.reviewCountMinus1</td>

@@ -22,6 +22,33 @@ function escapeHtml(text) {
         .replace(/'/g, "&#039;");
 }
 
+function getUrlParameter(param) {
+    var pageURL = decodeURIComponent(window.location.search.substring(1));
+    var urlVariables = pageURL.split('&');
+
+    for (var i = 0; i < urlVariables.length; ++i) {
+        var parameterName = urlVariables[i].split('=');
+        if (parameterName[0] === param) {
+            return parameterName[1] === undefined ? true : parameterName[1];
+        }
+    }
+    return ''
+}
+
+function loadJavascriptFile(filename, onLoadCallback) {
+    var element = document.createElement("script");
+    element.src = filename;
+    element.onload = onLoadCallback;
+    document.body.appendChild(element);
+}
+
+/**
+ * Loads the userdata .js file for the given user's filename.
+ */
+function loadUserdataForFilenameStem(filenameStem, onLoadCallback) {
+    loadJavascriptFile('userdata/' + filenameStem + '.js', onLoadCallback);
+}
+
 function formatPrintableDuration(durationMsec) {
     var durationInSecs = parseInt(durationMsec / 1000);
     var days = parseInt(durationInSecs / (60 * 60 * 24));
@@ -49,14 +76,27 @@ function getGerritUrlForComment(commit, patchSet, comment) {
  */
 var userdataScope = {
 
+    _fromDate: null,
+    _toDate: null,
+
     initializeRecord: function(record) {
-        // attach all userdata-related methods to record, to make it behave like an object
+        // attach all userdata-related objects to record, to make it behave like an object
         for (objectName in userdataScope) {
             record[objectName] = userdataScope[objectName];
         }
 
         record['datedCommitTable'] = new DatedList(record.commits, function(item) {
             return item.createdOnDate;
+        });
+
+        record.commits.forEach(function(commit) {
+            var lastUpdatedDate = commit.lastUpdatedDate
+            if (!record._fromDate || lastUpdatedDate < record._fromDate) {
+                record._fromDate = lastUpdatedDate;
+            }
+            if (!record._toDate || lastUpdatedDate > record._toDate) {
+                record._toDate = lastUpdatedDate;
+            }
         });
 
         // reshuffle the comments so that they're all added separately;
@@ -74,6 +114,14 @@ var userdataScope = {
         record['datedCommentTable'] = new DatedList(allCommentsByUser, function(comment) {
             return comment.commit.createdOnDate;
         });
+    },
+
+    getFromDate: function() {
+        return new Date(moment(this._fromDate).format('YYYY-MM-DD'));
+    },
+
+    getToDate: function() {
+        return new Date(moment(this._toDate).format('YYYY-MM-DD'));
     },
 
     printableName: function() {

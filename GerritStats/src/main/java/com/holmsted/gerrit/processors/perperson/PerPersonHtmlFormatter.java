@@ -33,9 +33,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     private static final String INDEX_OUTPUT_NAME = "index.html";
 
     private static final String TEMPLATES_RES_PATH = "templates";
-    private static final String VM_PERSON_PROFILE = TEMPLATES_RES_PATH + File.separator + "person_profile.vm";
     private static final String VM_INDEX = TEMPLATES_RES_PATH + File.separator + "index.vm";
-    private static final String[] HTML_RESOURCES = {
+    private static final String[] JS_RESOURCES = {
             "d3.min.js",
             "style.css",
             "jquery.min.js",
@@ -45,6 +44,10 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             "bootstrap.min.js",
             "moment.min.js",
             "gerritstats.js"
+    };
+
+    private static final String[] HTML_RESOURCES = {
+            "profile.html"
     };
 
     private VelocityEngine velocity = new VelocityEngine();
@@ -77,20 +80,21 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         createIndex(orderedList);
         createPerPersonFiles(orderedList);
 
-        copyFilesToResources(HTML_RESOURCES);
+        copyFilesToTarget(resOutputDir, JS_RESOURCES);
+        copyFilesToTarget(outputDir, HTML_RESOURCES);
 
         System.out.println("Output written to " + outputDir.getAbsolutePath() + File.separator + INDEX_OUTPUT_NAME);
     }
 
-    private void copyFilesToResources(String... filenames) {
+    private void copyFilesToTarget(File outputDir, String... filenames) {
         for (String filename : filenames) {
-            copyFileToResources(filename);
+            copyFileToTarget(outputDir, filename);
         }
     }
 
-    private void copyFileToResources(String filename) {
+    private void copyFileToTarget(File outputDir, String filename) {
         InputStream stream = safeOpenFileResource(filename);
-        FileWriter.writeFile(resOutputDir.getAbsolutePath() + File.separator + filename, stream);
+        FileWriter.writeFile(outputDir.getAbsolutePath() + File.separator + filename, stream);
     }
 
     @Nonnull
@@ -117,13 +121,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 .create();
 
         for (IdentityRecord record : orderedList) {
-            Context context = new VelocityContext(baseContext);
-            context.put("identity", record.identity);
-            context.put("record", record);
-
-            String htmlOutputFilename = record.getFilenameStem() + ".html";
-            writeTemplate(context, VM_PERSON_PROFILE, htmlOutputFilename);
-
             writeJsonFile(record, gson);
         }
     }

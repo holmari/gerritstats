@@ -6,7 +6,9 @@
 <script src="res/jquery.min.js"></script>
 <script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
-<script src="userdata/${record.filenameStem}.js"></script>
+<script>
+    var filenameStem = getUrlParameter('user');
+</script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
@@ -80,7 +82,6 @@
 </p>
 
 <script>
-
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
         var data = dataArray[i];
@@ -213,7 +214,7 @@ function addPerMonthStats(record) {
 }
 
 function updateViewFromUserdata() {
-    var record = userdata['${record.filenameStem}'];
+    var record = userdata[filenameStem];
     userdataScope.initializeRecord(record);
 
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
@@ -259,8 +260,7 @@ function updateViewFromUserdata() {
     addHighPatchSetCommits(record.getCommitsWithHighPatchSetCount());
     addPerMonthStats(record);
 
-    var xDomain = [new Date("$date.format( "yyyy-MM-dd", $perPersonData.fromDate )"),
-                   new Date("$date.format( "yyyy-MM-dd", $perPersonData.toDate )")];
+    var xDomain = [record.getFromDate(), record.getToDate()];
     createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(record.getReviewCommentDates()));
     createFrequencyTable("#highPatchSetCountCommitsSvg", xDomain, record.getDatesForCommitsWithHighPatchSetCount());
 }
@@ -356,7 +356,9 @@ function createFrequencyTable(svgId, x_domain, data) {
         .text(function(d) { return d.date });
 }
 
-updateViewFromUserdata();
+loadUserdataForFilenameStem(filenameStem, function onLoad() {
+    updateViewFromUserdata();
+});
 
 </script>
 </body>
