@@ -99,22 +99,22 @@ th {
 }
 
 .commentChartBar {
-  fill: steelblue;
+    fill: steelblue;
 }
 
 .commentChartBar:hover {
-  fill: brown;
+    fill: brown;
 }
 
 .commentChartAxis {
-  font: 10px sans-serif;
+    font: 10px sans-serif;
 }
 
 .commentChartAxis path,
 .commentChartAxis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+    fill: none;
+    stroke: #000;
+    shape-rendering: crispEdges;
 }
 
 .x.commentChartAxis path {
