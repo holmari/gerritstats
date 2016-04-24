@@ -118,5 +118,16 @@ th {
 }
 
 .x.commentChartAxis path {
-  display: none;
+    display: none;
+}
+
+.reviewerApprovalChartAxis {
+    font: 10px sans-serif;
+}
+
+.reviewerApprovalChartAxis path,
+.reviewerApprovalChartAxis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
 }
