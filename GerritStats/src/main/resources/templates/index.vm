@@ -57,7 +57,7 @@ Users in analysis: $identities.size() <br>
         <tr>
             <td><input class='identityCheckbox' data-identifier='${identity.filenameStem}'
                        type='checkbox' checked='true' onclick='onIdentityCheckboxClicked(this)' /></td>
-            <td><a href="profile.html?user=${identity.filenameStem}">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
+            <td><a href="profile.html?user=${identity.filenameStem}&storageId">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
             <td>$identity.reviewCountPlus2</td>
             <td>$identity.reviewCountPlus1</td>
             <td>$identity.reviewCountMinus1</td>

@@ -53,6 +53,23 @@ function loadUserdataForFilenameStem(filenameStem, onLoadCallback) {
     loadJavascriptFile('userdata/' + filenameStem + '.js', onLoadCallback);
 }
 
+function hashCode(text) {
+    if (!text || text.length == 0) {
+        return 0;
+    }
+    var hash = 0;
+    for (var i = 0; i < text.length; ++i) {
+        char = text.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit
+    }
+    return hash;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// GerritStats-specific functions
+///////////////////////////////////////////////////////////////////////////////
+
 function formatPrintableDuration(durationMsec) {
     var durationInSecs = parseInt(durationMsec / 1000);
     var days = parseInt(durationInSecs / (60 * 60 * 24));
