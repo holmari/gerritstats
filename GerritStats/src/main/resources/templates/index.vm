@@ -5,8 +5,9 @@
 <script src="res/d3.min.js"></script>
 <script src="res/jquery.min.js"></script>
 <script src="res/jquery.tablesorter.min.js"></script>
-<script src="res/numeral.min.js"></script>
 <script src="res/bootstrap.min.js"></script>
+<script src="res/numeral.min.js"></script>
+
 <script src="res/gerritstats.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
@@ -37,6 +38,7 @@ Users in analysis: $identities.size() <br>
 
 <table id="identities" class="table table-striped">
     <thead>
+        <th><input name='selectAll' type='checkbox' checked='true' onclick='onSelectAllCheckboxClicked(this)' /></th>
         <th>Name</th>
         <th>+2<br>given</th>
         <th>+1<br>given</th>
@@ -53,6 +55,8 @@ Users in analysis: $identities.size() <br>
     <tbody>
 #foreach( $identity in $identities )
         <tr>
+            <td><input class='identityCheckbox' data-identifier='${identity.filenameStem}'
+                       type='checkbox' checked='true' onclick='onIdentityCheckboxClicked(this)' /></td>
             <td><a href="profile.html?user=${identity.filenameStem}">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
             <td>$identity.reviewCountPlus2</td>
             <td>$identity.reviewCountPlus1</td>
@@ -75,6 +79,32 @@ Users in analysis: $identities.size() <br>
 </div>
 
 <script>
+
+function onIdentityCheckboxClicked(checkbox) {
+    var userIdentifier = $(checkbox).attr('data-identifier');
+    if (checkbox.checked) {
+        selectedUsers[userIdentifier] = '1';
+    } else {
+        delete selectedUsers[userIdentifier];
+    }
+
+    proximityGraph.render();
+}
+
+function onSelectAllCheckboxClicked(checkbox) {
+    $('.identityCheckbox').each(function() {
+        $(this).prop('checked', checkbox.checked);
+        var userIdentifier = $(this).attr('data-identifier');
+        if (checkbox.checked) {
+            selectedUsers[userIdentifier] = '1';
+        } else {
+            delete selectedUsers[userIdentifier];
+        }
+    });
+
+    proximityGraph.render();
+}
+
 var identityGraph = {
     "nodes": [
 #foreach ($identity in $identities )
@@ -279,6 +309,11 @@ function ProximityGraph(identityGraph) {
     this.create(identityGraph);
 }
 
+var selectedUsers = {};
+identityGraph.nodes.forEach(function(node) {
+    selectedUsers[node.identifier] = '1'
+});
+
 var proximityGraph = new ProximityGraph(identityGraph);
 
 $(document).ready(function() {
@@ -295,7 +330,10 @@ $(document).ready(function() {
 
     $("#identities").tablesorter({
         headers: {
-            11: {
+            0: { // checkbox column
+                sorter: false
+            },
+            12: {
                 sorter:'timeInReview'
             }
         }
