@@ -310,8 +310,12 @@ function createReviewersAndApprovalsTable(reviewerData) {
     var tickCount = 0;
     var maxValue = 0;
     if (reviewerData.length > 0) {
-        tickCount = reviewerData[0].approvalData.addedAsReviewerCount;
-        maxValue = tickCount;
+        tickCount = maxValue = reviewerData.reduce(
+            function(previousValue, currentReviewerData, index, array) {
+                return Math.max(previousValue,
+                                Math.max(currentReviewerData.approvalData.addedAsReviewerCount,
+                                         currentReviewerData.approvalData.approvalCount));
+        }, 0);
     }
 
     // both axes share same domain
