@@ -170,7 +170,11 @@ public class IdentityRecord {
     }
 
     public float getReviewCommentRatio() {
-        return (float) commentsWritten.size() / addedAsReviewerTo.size();
+        if (addedAsReviewerTo.size() == 0) {
+            return 0;
+        } else {
+            return (float) commentsWritten.size() / addedAsReviewerTo.size();
+        }
     }
 
     public void addApproval(Commit.Approval approval) {
