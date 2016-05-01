@@ -79,6 +79,19 @@ function formatPrintableDuration(durationMsec) {
     return days + "d " + hours + "h " + minutes + "min";
 }
 
+function getPrintableName(identity) {
+    var name = identity.name;
+    if (name.length == 0) {
+        name = "Anonymous Coward";
+    }
+    if (identity.username.length > 0) {
+        name += " (" + identity.username + ")";
+    }
+    return name;
+}
+
+
+
 /**
  * Creates a code comment URL.
  *
@@ -146,14 +159,7 @@ var userdataScope = {
     },
 
     printableName: function() {
-        var name = this.identity.name;
-        if (name.length == 0) {
-            name = "Anonymous Coward";
-        }
-        if (this.identity.username.length > 0) {
-            name += " (" + this.identity.username + ")";
-        }
-        return name;
+        getPrintableName(this.identity)
     },
 
     getReceivedCommentRatio: function() {

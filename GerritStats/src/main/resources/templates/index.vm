@@ -1,4 +1,3 @@
-#parse( "templates/macros.vm" )
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
@@ -52,25 +51,7 @@ Users in analysis: $identities.size() <br>
         <th>Added as<br>reviewer</th>
         <th>Average time<br>in review</th>
     </thead>
-    <tbody>
-#foreach( $identity in $identities )
-        <tr>
-            <td><input class='identityCheckbox' data-identifier='${identity.filenameStem}'
-                       type='checkbox' checked='true' onclick='onIdentityCheckboxClicked(this)' /></td>
-            <td><a href="profile.html?user=${identity.filenameStem}&storageId">#printableName( $identity ) #printableExtraInfo( $identity )</a></td>
-            <td>$identity.reviewCountPlus2</td>
-            <td>$identity.reviewCountPlus1</td>
-            <td>$identity.reviewCountMinus1</td>
-            <td>$identity.reviewCountMinus2</td>
-            <td>$identity.allCommentsWritten.size()</td>
-            <td>$identity.allCommentsReceived.size()</td>
-            <td>$identity.commits.size()</td>
-            <td data-value="$identity.receivedCommentRatio"><script>document.write(numeral($identity.receivedCommentRatio).format('0.000'))</script></td>
-            <td data-value="$identity.reviewCommentRatio"><script>document.write(numeral($identity.reviewCommentRatio).format('0.000'))</script></td>
-            <td>$identity.addedAsReviewerTo.size()</td>
-            <td data-unixtime="$identity.averageTimeInCodeReview">$identity.printableAverageTimeInCodeReview</td>
-        </tr>
-#end
+    <tbody id="overviewTableBody">
     </tbody>
 </table>
 
@@ -105,6 +86,31 @@ function onSelectAllCheckboxClicked(checkbox) {
     proximityGraph.render();
 }
 
+// Overview data for each user; overview is generated based on this.
+var userData = [
+#foreach( $identity in $identities )
+{
+    identifier: '${identity.filenameStem}',
+    identity: {
+        email: '${identity.email}',
+        name: '${identity.name}',
+        username: '${identity.username}',
+    },
+    reviewCountPlus2: '${identity.reviewCountPlus2}',
+    reviewCountPlus1: '${identity.reviewCountPlus1}',
+    reviewCountMinus1: '${identity.reviewCountMinus1}',
+    reviewCountMinus2: '${identity.reviewCountMinus2}',
+    allCommentsWritten: ${identity.allCommentsWritten.size()},
+    allCommentsReceived: ${identity.allCommentsReceived.size()},
+    commitCount: '${identity.commits.size()}',
+    averageTimeInCodeReview: '$identity.averageTimeInCodeReview',
+    receivedCommentRatio: $identity.receivedCommentRatio,
+    reviewCommentRatio: $identity.reviewCommentRatio,
+    addedAsReviewerToCount: $identity.addedAsReviewerTo.size()
+},
+#end
+];
+
 var identityGraphNodes = [
 #foreach ($identity in $identities )
     {'name': '$identity.name', 'identifier': '$identity.filenameStem', 'commits': $identity.commits.size()},
@@ -131,6 +137,37 @@ var identityGraph = {
 </script>
 
 <script>
+
+function loadOverviewUserdata() {
+    var tbody = $('#overviewTableBody')
+    userData.forEach(function(item) {
+        var extraInfo = item.identity.email
+        if (extraInfo === undefined || extraInfo.length == 0) {
+            extraInfo = item.identity.username
+        }
+        if (extraInfo !== undefined && extraInfo.length > 0) {
+            extraInfo = '(' + extraInfo + ')'
+        }
+
+        tbody.append(
+        '<tr>\
+            <td><input class="identityCheckbox" data-identifier="' + item.identifier + '"\
+                       type="checkbox" checked="true" onclick="onIdentityCheckboxClicked(this)" /></td>\
+            <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + extraInfo + '</a></td>\
+            <td>' + item.reviewCountPlus2 + '</td>\
+            <td>' + item.reviewCountPlus1 + '</td>\
+            <td>' + item.reviewCountMinus1 + '</td>\
+            <td>' + item.reviewCountMinus2 + '</td>\
+            <td>' + item.allCommentsWritten + '</td>\
+            <td>' + item.allCommentsReceived + '</td>\
+            <td>' + item.commitCount + '</td>\
+            <td data-value="' + item.receivedCommentRatio + '">' + numeral(item.receivedCommentRatio).format("0.000") + '</td>\
+            <td data-value="' + item.reviewCommentRatio + '">' + numeral(item.reviewCommentRatio).format("0.000") + '</td>\
+            <td>' + item.addedAsReviewerToCount + '</td>\
+            <td data-unixtime="' + item.averageTimeInCodeReview + '">' + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
+        </tr>')
+    });
+}
 
 function ProximityGraph(identityGraph) {
     this.width = 1200;
@@ -372,6 +409,8 @@ identityGraph.nodes.forEach(function(node) {
 });
 
 var proximityGraph = new ProximityGraph(identityGraph);
+
+loadOverviewUserdata();
 
 $(document).ready(function() {
     $.tablesorter.addParser({
