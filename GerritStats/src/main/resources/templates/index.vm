@@ -86,12 +86,7 @@ function onSelectAllCheckboxClicked(checkbox) {
     proximityGraph.render();
 }
 
-var identityGraphNodes = [
-#foreach ($identity in $identities )
-    {'name': '$identity.name', 'identifier': '$identity.filenameStem', 'commits': $identity.commits.size()},
-#end
-];
-
+var identityGraphNodes = jQuery.extend(true, [], overviewUserdata);
 var identityGraph = {
     "nodes": identityGraphNodes,
     "links":[
@@ -220,7 +215,7 @@ function ProximityGraph(identityGraph) {
         var maxConnectionCount = this.getMaxValueFromArray(connectionCounts);
         var medianConnectionCount = this.getMedianValueFromArrayExcludingZeroes(connectionCounts);
 
-        var commitList = this.filterObjectArray(nodeData, 'commits').sort(this.numberComparator);
+        var commitList = this.filterObjectArray(nodeData, 'commitCount').sort(this.numberComparator);
         var medianCommitCount = this.getMedianValueFromArrayExcludingZeroes(commitList);
         var maxCommitCount = this.getMaxValueFromArray(commitList);
 
@@ -244,7 +239,7 @@ function ProximityGraph(identityGraph) {
         nodes.enter().append('circle')
             .attr('class', 'proximityGraphNode')
             .attr('r', function(d) {
-                return 3 + 2 * Math.sqrt(d.commits / medianCommitCount);
+                return 3 + 2 * Math.sqrt(d.commitCount / medianCommitCount);
             })
             .style('fill', function(d) {
                 var connectionCount = that.getConnectionCount(d.index, links);
@@ -259,7 +254,7 @@ function ProximityGraph(identityGraph) {
             .call(this.forceLayout.drag);
 
         nodes.append('title')
-            .text(function(d) { return d.name; });
+            .text(function(d) { return d.identity.name; });
 
         this.forceLayout.on('tick', function() {
                  link.attr('x1', function(d) { return d.source.x; })
