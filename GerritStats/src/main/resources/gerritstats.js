@@ -159,7 +159,7 @@ var userdataScope = {
     },
 
     printableName: function() {
-        getPrintableName(this.identity)
+        return getPrintableName(this.identity)
     },
 
     getReceivedCommentRatio: function() {

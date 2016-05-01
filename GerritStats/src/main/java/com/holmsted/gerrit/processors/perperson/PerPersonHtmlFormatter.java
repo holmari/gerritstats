@@ -14,13 +14,6 @@ import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 import com.holmsted.gerrit.processors.perperson.IdentityRecord.ReviewerData;
 
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.VelocityEngine;
-import org.apache.velocity.context.Context;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
-import org.apache.velocity.tools.generic.ComparisonDateTool;
-
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
@@ -34,10 +27,7 @@ import javax.annotation.Nonnull;
 
 class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
     private static final String RES_OUTPUT_DIR = "res";
-    private static final String INDEX_OUTPUT_NAME = "index.html";
 
-    private static final String TEMPLATES_RES_PATH = "templates";
-    private static final String VM_INDEX = TEMPLATES_RES_PATH + File.separator + "index.vm";
     private static final String[] JS_RESOURCES = {
             "d3.min.js",
             "style.css",
@@ -51,23 +41,14 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     };
 
     private static final String[] HTML_RESOURCES = {
+            "index.html",
             "profile.html"
     };
-
-    private VelocityEngine velocity = new VelocityEngine();
-    private Context baseContext = new VelocityContext();
 
     private File outputDir;
     private File resOutputDir;
 
     public PerPersonHtmlFormatter(@Nonnull OutputRules outputRules) {
-        velocity.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
-        velocity.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
-        velocity.init();
-
-        baseContext.put("date", new ComparisonDateTool());
-        baseContext.put("outputRules", outputRules);
-
         outputDir = new File(outputRules.getOutputDir());
         resOutputDir = new File(outputDir.getAbsolutePath() + File.separator + RES_OUTPUT_DIR);
     }
@@ -80,18 +61,16 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
 
         IdentityRecordList orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
 
-        baseContext.put("perPersonData", data);
-        createOverviewJs(orderedList);
-        createIndex(orderedList);
+        createOverviewJs(data, orderedList);
         createPerPersonFiles(orderedList);
 
         copyFilesToTarget(resOutputDir, JS_RESOURCES);
         copyFilesToTarget(outputDir, HTML_RESOURCES);
 
-        System.out.println("Output written to " + outputDir.getAbsolutePath() + File.separator + INDEX_OUTPUT_NAME);
+        System.out.println("Output written to " + outputDir.getAbsolutePath());
     }
 
-    private void createOverviewJs(IdentityRecordList identityRecords) {
+    private void createOverviewJs(PerPersonData perPersonData, IdentityRecordList identityRecords) {
         String outputFilename = "overview.js";
         System.out.println("Creating " + outputFilename);
 
@@ -103,6 +82,17 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         StringWriter writer = new StringWriter();
         writer.write(String.format("overviewUserdata = %s;",
                 gson.toJson(identityRecords)));
+
+        JsonObject datasetOverview = new JsonObject();
+        datasetOverview.add("projectName", gson.toJsonTree(perPersonData.getQueryData().getDisplayableProjectName()));
+        datasetOverview.add("filenames", gson.toJsonTree(perPersonData.getQueryData().getFilenames()));
+        datasetOverview.add("branchList", gson.toJsonTree(perPersonData.getQueryData().getDisplayableBranchList()));
+        datasetOverview.add("fromDate", gson.toJsonTree(perPersonData.getFromDate()));
+        datasetOverview.add("toDate", gson.toJsonTree(perPersonData.getToDate()));
+
+        writer.write('\n');
+        writer.write(String.format("datasetOverview = %s;",
+                gson.toJson(datasetOverview)));
 
         FileWriter.writeFile(outputDir.getPath()
                 + File.separator + "overview"
@@ -128,12 +118,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             throw new IOError(new IOException("File not found in jar: " + resourceName));
         }
         return stream;
-    }
-
-    private void createIndex(@Nonnull IdentityRecordList identities) {
-        Context context = new VelocityContext(baseContext);
-        context.put("identities", identities);
-        writeTemplate(context, VM_INDEX, INDEX_OUTPUT_NAME);
     }
 
     private void createPerPersonFiles(@Nonnull IdentityRecordList orderedList) {
@@ -170,14 +154,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         FileWriter.writeFile(outputDir.getPath()
                 + File.separator + "userdata"
                 + File.separator + outputFilename, writer.toString());
-    }
-
-    private void writeTemplate(@Nonnull Context context, String templateName, String outputFilename) {
-        System.out.println("Creating " + outputFilename);
-
-        StringWriter writer = new StringWriter();
-        velocity.mergeTemplate(templateName, "UTF-8", context, writer);
-        FileWriter.writeFile(outputDir.getPath() + File.separator + outputFilename, writer.toString());
     }
 
     private static class PatchSetCommentTableSerializer implements JsonSerializer<PatchSetCommentTable> {

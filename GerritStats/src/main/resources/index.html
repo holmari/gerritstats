@@ -5,34 +5,25 @@
 <script src="res/jquery.min.js"></script>
 <script src="res/jquery.tablesorter.min.js"></script>
 <script src="res/bootstrap.min.js"></script>
+<script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="overview/overview.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
-    <title>GerritStats for $perPersonData.queryData.displayableProjectName</title>
+    <title>GerritStats</title>
 </head>
 
 <h1>Gerrit Statistics</h1>
-#set( $dataSetName = $perPersonData.queryData.displayableProjectName )
-#set( $filenames = $perPersonData.queryData.filenames)
-#set( $fileCount = $filenames.size() )
-
-#if( $fileCount > 20 )
-#set( $firstFile = $filenames.get(0) )
-#set( $lastFileIndex = $fileCount - 1 )
-#set( $lastFile = $filenames.get($lastFileIndex) )
-    #set( $dataSetName = ${filenames.size()} + " files, from " + $firstFile + " to " + $lastFile )
-#end
-<div class="subtitleH1">for $dataSetName</div>
+<div class="subtitleH1">for <span id="subtitleDataSetName"></span></div>
 <br>
 <h2>Overview</h2>
 <div>
-Branches: $perPersonData.queryData.displayableBranchList <br>
-From: $date.format( "yyyy-MM-dd", $perPersonData.fromDate) <br>
-To: $date.format( "yyyy-MM-dd", $perPersonData.toDate) <br>
-Users in analysis: $identities.size() <br>
+Branches: <span id="datasetOverviewBranchList"></span><br>
+From: <span id="datasetOverviewFromDate"></span><br>
+To: <span id="datasetOverviewToDate"></span><br>
+Users in analysis: <span id="datasetOverviewIdentityCount"></span> <br>
 </div>
 
 <table id="identities" class="table table-striped">
@@ -124,19 +115,11 @@ var identityGraph = {
 function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody')
     overviewUserdata.forEach(function(item) {
-        var extraInfo = item.identity.email
-        if (extraInfo === undefined || extraInfo.length == 0) {
-            extraInfo = item.identity.username
-        }
-        if (extraInfo !== undefined && extraInfo.length > 0) {
-            extraInfo = '(' + extraInfo + ')'
-        }
-
         tbody.append(
         '<tr>\
             <td><input class="identityCheckbox" data-identifier="' + item.identifier + '"\
                        type="checkbox" checked="true" onclick="onIdentityCheckboxClicked(this)" /></td>\
-            <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + extraInfo + '</a></td>\
+            <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + '</a></td>\
             <td>' + item.reviewCountPlus2 + '</td>\
             <td>' + item.reviewCountPlus1 + '</td>\
             <td>' + item.reviewCountMinus1 + '</td>\
@@ -396,6 +379,21 @@ var proximityGraph = new ProximityGraph(identityGraph);
 loadOverviewUserdata();
 
 $(document).ready(function() {
+    document.title = "GerritStats for " + datasetOverview.projectName;
+    var dataSetName = datasetOverview.projectName;
+    if (datasetOverview.filenames.length > 20) {
+        var firstFilename = datasetOverview.filenames[0];
+        var lastFilename = datasetOverview.filenames[datasetOverview.filenames.length - 1];
+        dataSetName = datasetOverview.filenames.length + " files, from "
+                    + firstFilename + " to " + lastFilename
+    }
+    $('#subtitleDataSetName').html(dataSetName);
+
+    $('#datasetOverviewBranchList').html(datasetOverview.branchList);
+    $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
+    $('#datasetOverviewToDate').html(moment(datasetOverview.toDate).format("YYYY-MM-DD"));
+    $('#datasetOverviewIdentityCount').html(overviewUserdata.length);
+
     $.tablesorter.addParser({
         id: 'timeInReview',
         is: function(s) {

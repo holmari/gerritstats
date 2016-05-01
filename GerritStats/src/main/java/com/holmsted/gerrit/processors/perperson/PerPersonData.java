@@ -40,11 +40,11 @@ public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
         return queryData;
     }
 
-    public Date getFromDate() {
-        return new Date(fromDate);
+    public long getFromDate() {
+        return fromDate;
     }
 
-    public Date getToDate() {
-        return new Date(toDate);
+    public long getToDate() {
+        return toDate;
     }
 }

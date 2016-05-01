@@ -5,6 +5,7 @@ import com.holmsted.gerrit.QueryData;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.annotation.Nonnull;
@@ -59,8 +60,8 @@ class PerPersonPlaintextFormatter implements CommitDataProcessor.OutputFormatter
         QueryData queryData = records.getQueryData();
         System.out.println("Project: " + queryData.getDisplayableProjectName());
         System.out.println("Branches: " + queryData.getDisplayableBranchList());
-        System.out.println("From: " + dateFormat.format(records.getFromDate()));
-        System.out.println("To: " + dateFormat.format(records.getToDate()));
+        System.out.println("From: " + dateFormat.format(new Date(records.getFromDate())));
+        System.out.println("To: " + dateFormat.format(new Date(records.getToDate())));
         System.out.println("");
     }
 }
