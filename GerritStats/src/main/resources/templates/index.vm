@@ -86,24 +86,37 @@ function onSelectAllCheckboxClicked(checkbox) {
     proximityGraph.render();
 }
 
+function getIndexOfIdentity(identity) {
+    for (var i = 0; i < overviewUserdata.length; ++i) {
+        var user = overviewUserdata[i];
+        if ((user.identity.email !== undefined && user.identity.email == identity.email)
+         || (user.identity.username !== undefined && user.identity.username == identity.username)) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 var identityGraphNodes = jQuery.extend(true, [], overviewUserdata);
 var identityGraph = {
     "nodes": identityGraphNodes,
-    "links":[
-#foreach ($identity in $identities )
-     #set( $index = $velocityCount - 1 )
-         #foreach ( $reviewer in $identity.myReviewerList )
-             #set ( $reviewerData = $identity.getReviewerDataForOwnCommitFor($reviewer) )
-             #if ($reviewerData.approvalCount != 0 )
-                 {"source": identityGraphNodes[$index],
-                  "target": identityGraphNodes[$identities.getIndexOfIdentity($reviewer)],
-                  "value": $reviewerData.approvalCount
-                 },
-             #end
-         #end
-     #end
-         ]
+    "links":[]
     }
+
+    for (var i = 0; i < overviewUserdata.length; ++i) {
+        var item = overviewUserdata[i];
+        for (var j = 0; j < item.myReviewerList.length; ++j) {
+            var reviewerRecord = item.myReviewerList[j];
+            if (reviewerRecord.reviewData.approvalCount != 0) {
+                identityGraph.links.push({
+                    source: identityGraphNodes[i],
+                    target: identityGraphNodes[getIndexOfIdentity(reviewerRecord.identity)],
+                    value: reviewerRecord.reviewData.approvalCount
+                });
+            }
+        }
+    }
+
 </script>
 
 <script>

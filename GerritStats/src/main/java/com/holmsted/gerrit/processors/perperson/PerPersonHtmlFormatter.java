@@ -9,8 +9,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.holmsted.file.FileWriter;
 import com.holmsted.gerrit.Commit;
+import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
+import com.holmsted.gerrit.processors.perperson.IdentityRecord.ReviewerData;
 
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -25,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -229,6 +233,16 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             json.add("receivedCommentRatio", context.serialize(identityRecord.getReceivedCommentRatio()));
             json.add("reviewCommentRatio", context.serialize(identityRecord.getReviewCommentRatio()));
             json.add("addedAsReviewerToCount", context.serialize(identityRecord.addedAsReviewerTo.size()));
+
+            List<JsonObject> reviewerList = new ArrayList<>();
+            for (Identity reviewer : identityRecord.getMyReviewerList()) {
+                JsonObject reviewerRecord = new JsonObject();
+                ReviewerData reviewerData = identityRecord.getReviewerDataForOwnCommitFor(reviewer);
+                reviewerRecord.add("identity", context.serialize(reviewer));
+                reviewerRecord.add("reviewData", context.serialize(reviewerData));
+                reviewerList.add(reviewerRecord);
+            }
+            json.add("myReviewerList", context.serialize(reviewerList));
             return json;
         }
     }
