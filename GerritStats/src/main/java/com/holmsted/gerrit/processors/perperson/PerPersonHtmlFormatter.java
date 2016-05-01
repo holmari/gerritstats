@@ -77,6 +77,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         IdentityRecordList orderedList = data.toOrderedList(new AlphabeticalOrderComparator());
 
         baseContext.put("perPersonData", data);
+        createOverviewJs(orderedList);
         createIndex(orderedList);
         createPerPersonFiles(orderedList);
 
@@ -84,6 +85,24 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         copyFilesToTarget(outputDir, HTML_RESOURCES);
 
         System.out.println("Output written to " + outputDir.getAbsolutePath() + File.separator + INDEX_OUTPUT_NAME);
+    }
+
+    private void createOverviewJs(IdentityRecordList identityRecords) {
+        String outputFilename = "overview.js";
+        System.out.println("Creating " + outputFilename);
+
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(IdentityRecord.class, new IdentityRecordOverviewSerializer())
+                .create();
+
+        StringWriter writer = new StringWriter();
+        writer.write(String.format("overviewUserdata = %s;",
+                gson.toJson(identityRecords)));
+
+        FileWriter.writeFile(outputDir.getPath()
+                + File.separator + "overview"
+                + File.separator + outputFilename, writer.toString());
     }
 
     private void copyFilesToTarget(File outputDir, String... filenames) {
@@ -121,7 +140,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 .create();
 
         for (IdentityRecord record : orderedList) {
-            writeJsonFile(record, gson);
+            writeUserdataJsonFile(record, gson);
         }
     }
 
@@ -135,7 +154,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
      *
      * See e.g. http://stackoverflow.com/questions/7346563/loading-local-json-file
      */
-    private void writeJsonFile(@Nonnull IdentityRecord record, @Nonnull Gson gson) {
+    private void writeUserdataJsonFile(@Nonnull IdentityRecord record, @Nonnull Gson gson) {
         String outputFilename = record.getFilenameStem() + ".js";
         System.out.println("Creating " + outputFilename);
 
@@ -187,6 +206,30 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 tableJson.add(pair);
             }
             return tableJson;
+        }
+    }
+
+    private static class IdentityRecordOverviewSerializer implements JsonSerializer<IdentityRecord> {
+
+        @Override
+        public JsonElement serialize(IdentityRecord identityRecord,
+                                     Type typeOfSrc,
+                                     JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.add("identifier", context.serialize(identityRecord.getFilenameStem()));
+            json.add("identity", context.serialize(identityRecord.identity));
+            json.add("reviewCountPlus1", context.serialize(identityRecord.getReviewCountPlus2()));
+            json.add("reviewCountPlus2", context.serialize(identityRecord.getReviewCountPlus1()));
+            json.add("reviewCountMinus1", context.serialize(identityRecord.getReviewCountMinus1()));
+            json.add("reviewCountMinus2", context.serialize(identityRecord.getReviewCountMinus2()));
+            json.add("allCommentsWritten", context.serialize(identityRecord.getAllCommentsWritten().size()));
+            json.add("allCommentsReceived", context.serialize(identityRecord.getAllCommentsReceived().size()));
+            json.add("commitCount", context.serialize(identityRecord.getCommits().size()));
+            json.add("averageTimeInCodeReview", context.serialize(identityRecord.getAverageTimeInCodeReview()));
+            json.add("receivedCommentRatio", context.serialize(identityRecord.getReceivedCommentRatio()));
+            json.add("reviewCommentRatio", context.serialize(identityRecord.getReviewCommentRatio()));
+            json.add("addedAsReviewerToCount", context.serialize(identityRecord.addedAsReviewerTo.size()));
+            return json;
         }
     }
 }

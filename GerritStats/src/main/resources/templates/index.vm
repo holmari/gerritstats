@@ -6,8 +6,8 @@
 <script src="res/jquery.tablesorter.min.js"></script>
 <script src="res/bootstrap.min.js"></script>
 <script src="res/numeral.min.js"></script>
-
 <script src="res/gerritstats.js"></script>
+<script src="overview/overview.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
@@ -86,31 +86,6 @@ function onSelectAllCheckboxClicked(checkbox) {
     proximityGraph.render();
 }
 
-// Overview data for each user; overview is generated based on this.
-var userData = [
-#foreach( $identity in $identities )
-{
-    identifier: '${identity.filenameStem}',
-    identity: {
-        email: '${identity.email}',
-        name: '${identity.name}',
-        username: '${identity.username}',
-    },
-    reviewCountPlus2: '${identity.reviewCountPlus2}',
-    reviewCountPlus1: '${identity.reviewCountPlus1}',
-    reviewCountMinus1: '${identity.reviewCountMinus1}',
-    reviewCountMinus2: '${identity.reviewCountMinus2}',
-    allCommentsWritten: ${identity.allCommentsWritten.size()},
-    allCommentsReceived: ${identity.allCommentsReceived.size()},
-    commitCount: '${identity.commits.size()}',
-    averageTimeInCodeReview: '$identity.averageTimeInCodeReview',
-    receivedCommentRatio: $identity.receivedCommentRatio,
-    reviewCommentRatio: $identity.reviewCommentRatio,
-    addedAsReviewerToCount: $identity.addedAsReviewerTo.size()
-},
-#end
-];
-
 var identityGraphNodes = [
 #foreach ($identity in $identities )
     {'name': '$identity.name', 'identifier': '$identity.filenameStem', 'commits': $identity.commits.size()},
@@ -140,7 +115,7 @@ var identityGraph = {
 
 function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody')
-    userData.forEach(function(item) {
+    overviewUserdata.forEach(function(item) {
         var extraInfo = item.identity.email
         if (extraInfo === undefined || extraInfo.length == 0) {
             extraInfo = item.identity.username
