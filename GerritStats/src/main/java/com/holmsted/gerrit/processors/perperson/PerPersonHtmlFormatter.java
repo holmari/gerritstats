@@ -198,8 +198,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             JsonObject json = new JsonObject();
             json.add("identifier", context.serialize(identityRecord.getFilenameStem()));
             json.add("identity", context.serialize(identityRecord.identity));
-            json.add("reviewCountPlus1", context.serialize(identityRecord.getReviewCountPlus2()));
-            json.add("reviewCountPlus2", context.serialize(identityRecord.getReviewCountPlus1()));
+            json.add("reviewCountPlus2", context.serialize(identityRecord.getReviewCountPlus2()));
+            json.add("reviewCountPlus1", context.serialize(identityRecord.getReviewCountPlus1()));
             json.add("reviewCountMinus1", context.serialize(identityRecord.getReviewCountMinus1()));
             json.add("reviewCountMinus2", context.serialize(identityRecord.getReviewCountMinus2()));
             json.add("allCommentsWritten", context.serialize(identityRecord.getAllCommentsWritten().size()));
