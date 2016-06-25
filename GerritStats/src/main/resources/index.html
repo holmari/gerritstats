@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
+<script src="res/css-element-queries/ResizeSensor.js"></script>
+<script src="res/css-element-queries/ElementQueries.js"></script>
 <script src="res/d3.min.js"></script>
 <script src="res/jquery.min.js"></script>
 <script src="res/jquery.tablesorter.min.js"></script>
@@ -9,48 +11,110 @@
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="overview/overview.js"></script>
+
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title>GerritStats</title>
 </head>
+<header>
+    <table class="filterBox">
+        <tr>
+            <th><img src="res/ic_branches.png">Branches:</th>
+            <td class="filterBoxValue" id="datasetOverviewBranchList"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-calendar"></span>From:</th>
+            <td class="filterBoxValue" id="datasetOverviewFromDate"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-calendar"></span>To:</th>
+            <td class="filterBoxValue" id="datasetOverviewToDate"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-user"></span>Users in analysis:</th>
+            <td class="filterBoxValue" id="datasetOverviewIdentityCount"></td>
+        </tr>
+    </table>
 
-<h1>Gerrit Statistics</h1>
-<div class="subtitleH1">for <span id="subtitleDataSetName"></span></div>
-<br>
-<h2>Overview</h2>
-<div>
-Branches: <span id="datasetOverviewBranchList"></span><br>
-From: <span id="datasetOverviewFromDate"></span><br>
-To: <span id="datasetOverviewToDate"></span><br>
-Users in analysis: <span id="datasetOverviewIdentityCount"></span> <br>
-</div>
+    <h1>Gerrit Statistics</h1>
+    <div class="subtitleH1">for <span id="subtitleDataSetName"></span></div>
+</header>
+<nav>
+    <ul id="navBar" class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#" data-type='users'>Users</a></li>
+        <li role="presentation"><a href="#" data-type='connections'>Connections</a></li>
+    </ul>
+</nav>
 
+<content id="content">
 <table id="identities" class="table table-striped">
     <thead>
-        <th><input name='selectAll' type='checkbox' checked='true' onclick='onSelectAllCheckboxClicked(this)' /></th>
-        <th>Name</th>
-        <th>+2<br>given</th>
-        <th>+1<br>given</th>
-        <th>-1<br>given</th>
-        <th>-2<br>given</th>
-        <th>Comments<br>written</th>
-        <th>Comments<br>received</th>
-        <th>Commits</th>
-        <th>Comments<br>/ commit</th>
-        <th>Comments<br>/ review<br>requests</th>
-        <th>Added as<br>reviewer</th>
-        <th>Average time<br>in review</th>
+        <th id="checkboxColumn"><input name='selectAll' type='checkbox' checked='true' onclick='onSelectAllCheckboxClicked(this)' /></th>
+        <th id="nameColumn">Name</th>
+        <th class="dataField">+2<br>given</th>
+        <th class="dataField">+1<br>given</th>
+        <th class="dataField">-1<br>given</th>
+        <th class="dataField">-2<br>given</th>
+        <th class="dataField">Comments<br>written</th>
+        <th class="dataField">Comments<br>received</th>
+        <th class="dataField">Commits</th>
+        <th class="dataField">Comments<br>/ commit</th>
+        <th class="dataField">Comments<br>/ review<br>requests</th>
+        <th class="dataField">Added as<br>reviewer</th>
+        <th class="dataField">Average time<br>in review</th>
     </thead>
     <tbody id="overviewTableBody">
     </tbody>
 </table>
 
-<h3>Proximity graph</h3>
-<div id="proximityGraph">
+<!-- This element is positioned dynamically over the table -->
+<div id="proximityGraph" class="proximityGraph" style="display:none">
 </div>
 
 <script>
+$('nav a').click(function(event) {
+    event.preventDefault();
+    var navElement = $(this);
+
+    var navType = $(navElement).attr('data-type');
+    if (navType === undefined) {
+        throw new Error("navType is not defined!");
+    }
+    navElement.tab('show')
+
+    switch (navType) {
+    case 'users':
+        $('#proximityGraph').hide();
+        break;
+    case 'connections':
+        $('#proximityGraph').show();
+        updateTabBarPosition();
+        break;
+    }
+})
+
+function updateTabBarPosition() {
+    var navBar = $('#navBar');
+
+    var checkboxCol = $('#checkboxColumn');
+    var connectionsLeftMargin = nameColumn.clientLeft + nameColumn.clientWidth + 50;
+    navBar.css('margin-left', connectionsLeftMargin);
+
+    var content = $("#content");
+    var proximityGraphObject = $('#proximityGraph');
+
+    if (proximityGraphObject.is(':visible')) {
+        proximityGraphObject.css('left', connectionsLeftMargin);
+        proximityGraphObject.css('top', navBar.position().top + navBar.height());
+        proximityGraphObject.css('height', content.outerHeight());
+        proximityGraphObject.css('width', content.outerWidth() - nameColumn.clientWidth);
+        proximityGraph.updateSize();
+    }
+}
+
+var nameColumn = document.getElementById('nameColumn');
+new ResizeSensor(nameColumn, updateTabBarPosition);
 
 function onIdentityCheckboxClicked(checkbox) {
     var userIdentifier = $(checkbox).attr('data-identifier');
@@ -120,22 +184,22 @@ function loadOverviewUserdata() {
             <td><input class="identityCheckbox" data-identifier="' + item.identifier + '"\
                        type="checkbox" checked="true" onclick="onIdentityCheckboxClicked(this)" /></td>\
             <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + '</a></td>\
-            <td>' + item.reviewCountPlus2 + '</td>\
-            <td>' + item.reviewCountPlus1 + '</td>\
-            <td>' + item.reviewCountMinus1 + '</td>\
-            <td>' + item.reviewCountMinus2 + '</td>\
-            <td>' + item.allCommentsWritten + '</td>\
-            <td>' + item.allCommentsReceived + '</td>\
-            <td>' + item.commitCount + '</td>\
-            <td data-value="' + item.receivedCommentRatio + '">' + numeral(item.receivedCommentRatio).format("0.000") + '</td>\
-            <td data-value="' + item.reviewCommentRatio + '">' + numeral(item.reviewCommentRatio).format("0.000") + '</td>\
-            <td>' + item.addedAsReviewerToCount + '</td>\
-            <td data-unixtime="' + item.averageTimeInCodeReview + '">' + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
+            <td class="dataField">' + item.reviewCountPlus2 + '</td>\
+            <td class="dataField">' + item.reviewCountPlus1 + '</td>\
+            <td class="dataField">' + item.reviewCountMinus1 + '</td>\
+            <td class="dataField">' + item.reviewCountMinus2 + '</td>\
+            <td class="dataField">' + item.allCommentsWritten + '</td>\
+            <td class="dataField">' + item.allCommentsReceived + '</td>\
+            <td class="dataField">' + item.commitCount + '</td>\
+            <td class="dataField" data-value="' + item.receivedCommentRatio + '">' + numeral(item.receivedCommentRatio).format("0.000") + '</td>\
+            <td class="dataField" data-value="' + item.reviewCommentRatio + '">' + numeral(item.reviewCommentRatio).format("0.000") + '</td>\
+            <td class="dataField">' + item.addedAsReviewerToCount + '</td>\
+            <td class="dataField" data-unixtime="' + item.averageTimeInCodeReview + '">' + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
         </tr>')
     });
 }
 
-function ProximityGraph(identityGraph) {
+function ProximityGraph(identityGraph, objectSelector) {
     this.width = 1200;
     this.height = 800;
 
@@ -163,7 +227,7 @@ function ProximityGraph(identityGraph) {
     this.svg = null;
 
     this.create = function() {
-        this.svg = d3.select('#proximityGraph').append('svg')
+        this.svg = d3.select(objectSelector).append('svg')
             .attr('width', this.width)
             .attr('height', this.height);
 
@@ -173,6 +237,13 @@ function ProximityGraph(identityGraph) {
             .linkDistance(45);
 
         this.render();
+    }
+
+    this.updateSize = function() {
+        this.width = $(objectSelector).width();
+        this.height = $(objectSelector).height();
+        this.svg.attr("width", this.width).attr("height", this.height);
+        this.forceLayout.size([this.width, this.height]).resume();
     }
 
     this.render = function() {
@@ -374,7 +445,7 @@ identityGraph.nodes.forEach(function(node) {
     selectedUsers[node.identifier] = '1'
 });
 
-var proximityGraph = new ProximityGraph(identityGraph);
+var proximityGraph = new ProximityGraph(identityGraph, '#proximityGraph');
 
 loadOverviewUserdata();
 
@@ -434,4 +505,5 @@ $(document).ready(function() {
 });
 
 </script>
+</content>
 </body>

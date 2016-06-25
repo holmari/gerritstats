@@ -1,11 +1,19 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <body>
+
+<script src="res/css-element-queries/ResizeSensor.js"></script>
+<script src="res/css-element-queries/ElementQueries.js"></script>
 <script src="res/d3.min.js"></script>
-<script src="res/gerritstats.js"></script>
 <script src="res/jquery.min.js"></script>
+<script src="res/jquery.tablesorter.min.js"></script>
+<script src="res/bootstrap.min.js"></script>
 <script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
+<script src="res/gerritstats.js"></script>
+<script src="overview/overview.js"></script>
+
+
 <script>
     var filenameStem = getUrlParameter('user');
 </script>
@@ -14,12 +22,46 @@
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
     <title id="pageTitleHead"></title>
 </head>
+<header>
+    <table class="filterBox">
+        <tr>
+            <th><img src="res/ic_branches.png">Branches:</th>
+            <td class="filterBoxValue" id="datasetOverviewBranchList"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-calendar"></span>From:</th>
+            <td class="filterBoxValue" id="datasetOverviewFromDate"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-calendar"></span>To:</th>
+            <td class="filterBoxValue" id="datasetOverviewToDate"></td>
+        </tr>
+        <tr>
+            <th><span class="glyphicon glyphicon-user"></span>Users in analysis:</th>
+            <td class="filterBoxValue" id="datasetOverviewIdentityCount"></td>
+        </tr>
+    </table>
 
-<h1 id="pageTitle"></h1>
-<div class="subtitleH1" id="pageSubtitle"></div>
+    <h1 id="pageTitle"></h1>
+    <div class="subtitleH1"><span id="pageSubtitle"></span></div>
+</header>
+<nav>
+    <ul id="navBar" class="nav nav-tabs">
+        <li role="presentation" class="active"><a href="#" data-type='overall'>Overall</a></li>
+        <li role="presentation"><a href="#" data-type='reviewers'>Reviewers and approvals</a></li>
+        <li role="presentation"><a href="#" data-type='per_month'>Per-month</a></li>
+        <li role="presentation"><a href="#" data-type='iteration'>Iteration</a></li>
+        <li role="presentation"><a href="#" data-type='review_comments'>Review comments</a></li>
+    </ul>
+</nav>
 
+<content id="content">
+<a name="overall"></a>
 <h3>Overall</h3>
 <p>
+<table>
+    <tr><th>Username</th><td id="username"></td></tr>
+</table>
 <table>
     <tr><th>Commits</th><td id="commitsSize"></td></tr>
     <tr><th>Comments written</th><td id="commentsWritten"></td></tr>
@@ -47,6 +89,7 @@
 </table>
 </p>
 
+<a name="reviewers"></a>
 <h2>Reviewers and approvals</h2>
 <div id="reviewersAndApprovalsSvg">
 </div>
@@ -68,12 +111,14 @@
 <div id="commentsPerDaySvg">
 </div>
 
-<h3>Per-month stats</h3>
+<a name="per_month"></a>
+<h2>Per-month stats</h2>
 
 <table class="perMonthStats" id="perMonthStats">
 </table>
 
-<h3 class="withSubtitle">Commits exceeding <span class="highPatchSetCountThreshold"></span> patches</h3>
+<a name="iteration"></a>
+<h2 class="withSubtitle">Commits exceeding <span class="highPatchSetCountThreshold"></span> patches</h2>
 <div class="subtitleH3">only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</div>
 <p id="highPatchSetCountCommitList">
 </p>
@@ -81,11 +126,26 @@
 <div id="highPatchSetCountCommitsSvg">
 </div>
 
+<a name="review_comments"></a>
 <h3>Review comments</h3>
 <p id="reviewComments">
 </p>
 
+</content>
+
 <script>
+$('nav a').click(function(event) {
+    event.preventDefault();
+    var navElement = $(this);
+
+    var navType = $(navElement).attr('data-type');
+    if (navType === undefined) {
+        throw new Error("navType is not defined!");
+    }
+    navElement.tab('show');
+    window.location.href = '#' + navType;
+})
+
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
         var data = dataArray[i];
@@ -221,9 +281,16 @@ function updateViewFromUserdata() {
     var record = userdata[filenameStem];
     userdataScope.initializeRecord(record);
 
+    $('#datasetOverviewBranchList').html(datasetOverview.branchList);
+    $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
+    $('#datasetOverviewToDate').html(moment(datasetOverview.toDate).format("YYYY-MM-DD"));
+    $('#datasetOverviewIdentityCount').html(overviewUserdata.length);
+
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
-    $('#pageTitle').html(record.printableName());
+    $('#pageTitle').html(record.shortPrintableName());
     $('#pageSubtitle').html(record.identity.email);
+
+    $('#username').html(record.identity.username);
     $('#commitsSize').html(record.commits.length);
     $('#commentsWritten').html(record.getAllCommentsByUser());
     $('#commentsReceived').html(record.commentsReceived.length);
