@@ -11,8 +11,8 @@
 <script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
+<script src="res/selectedusers.js"></script>
 <script src="overview/overview.js"></script>
-
 
 <script>
     var filenameStem = getUrlParameter('user');
@@ -144,7 +144,9 @@ $('nav a').click(function(event) {
     }
     navElement.tab('show');
     window.location.href = '#' + navType;
-})
+});
+
+var usersInAnalysis = new SelectedUsers(overviewUserdata);
 
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
@@ -167,7 +169,7 @@ function addReviewerDataToElement(reviewerData, elementJQuery, valueCallback) {
 }
 
 /**
- * Adds all review comments by user to the
+ * Adds all review comments by user to the table at the bottom of the view.
  */
 function addReviewCommentsByUser(record, elementQuery) {
     var commits = record.getCommitsWithWrittenCommentsSortedByDate();
@@ -284,7 +286,7 @@ function updateViewFromUserdata() {
     $('#datasetOverviewBranchList').html(datasetOverview.branchList);
     $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
     $('#datasetOverviewToDate').html(moment(datasetOverview.toDate).format("YYYY-MM-DD"));
-    $('#datasetOverviewIdentityCount').html(overviewUserdata.length);
+    $('#datasetOverviewIdentityCount').html(usersInAnalysis.getPrintableUserCount());
 
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
     $('#pageTitle').html(record.shortPrintableName());

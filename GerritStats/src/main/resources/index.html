@@ -11,6 +11,7 @@
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="res/proximitygraph.js"></script>
+<script src="res/selectedusers.js"></script>
 <script src="res/tablecellhighlighter.js"></script>
 <script src="overview/overview.js"></script>
 
@@ -118,35 +119,31 @@ function updateTabBarPosition() {
 var nameColumn = document.getElementById('nameColumn');
 new ResizeSensor(nameColumn, updateTabBarPosition);
 
+function updateOnUserSelectionChange() {
+    usersInAnalysis.writeToStorage();
+
+    $('#datasetOverviewIdentityCount').html(usersInAnalysis.getPrintableUserCount());
+    proximityGraph.render();
+}
+
 function onIdentityCheckboxClicked(checkbox) {
     var userIdentifier = $(checkbox).attr('data-identifier');
 
-    if (checkbox.checked) {
-        selectedUsers[userIdentifier] = '1';
-    } else {
-        delete selectedUsers[userIdentifier];
-    }
-
-    $('#datasetOverviewIdentityCount').html(Object.keys(selectedUsers).length + ' / ' + overviewUserdata.length);
-
-    proximityGraph.render();
+    usersInAnalysis.setUserSelected(userIdentifier, checkbox.checked);
+    updateOnUserSelectionChange();
 }
 
 function onSelectAllCheckboxClicked(checkbox) {
     $('.identityCheckbox').each(function() {
         $(this).prop('checked', checkbox.checked);
         var userIdentifier = $(this).attr('data-identifier');
-        if (checkbox.checked) {
-            selectedUsers[userIdentifier] = '1';
-        } else {
-            delete selectedUsers[userIdentifier];
-        }
+        usersInAnalysis.setUserSelected(userIdentifier, checkbox.checked);
     });
 
-    $('#datasetOverviewIdentityCount').html(Object.keys(selectedUsers).length + ' / ' + overviewUserdata.length);
-
-    proximityGraph.render();
+    updateOnUserSelectionChange();
 }
+
+var usersInAnalysis = new SelectedUsers(overviewUserdata);
 
 function getIndexOfIdentity(identity) {
     for (var i = 0; i < overviewUserdata.length; ++i) {
@@ -201,8 +198,11 @@ function loadOverviewUserdata() {
     overviewUserdata.forEach(function(item) {
         tbody.append(
         '<tr>\
-            <td><input class="identityCheckbox" data-identifier="' + item.identifier + '"\
-                       type="checkbox" checked="true" onclick="onIdentityCheckboxClicked(this)" /></td>\
+            <td><input class="identityCheckbox" \
+                       data-identifier="' + item.identifier + '"\
+                       type="checkbox" '
+                    + (usersInAnalysis.isUserSelected(item) ? 'checked' : '') + '\
+                       onclick="onIdentityCheckboxClicked(this)" /></td>\
             <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + '</a></td>\
             <td class="dataField" ' + highlighters['reviewCountPlus2'].highlight(item) + '>' + item.reviewCountPlus2 + '</td>\
             <td class="dataField" ' + highlighters['reviewCountPlus1'].highlight(item) + '>' + item.reviewCountPlus1 + '</td>\
@@ -223,12 +223,7 @@ function loadOverviewUserdata() {
     });
 }
 
-var selectedUsers = {};
-identityGraph.nodes.forEach(function(node) {
-    selectedUsers[node.identifier] = '1'
-});
-
-var proximityGraph = new ProximityGraph(identityGraph, '#proximityGraph');
+var proximityGraph = new ProximityGraph(identityGraph, usersInAnalysis, '#proximityGraph');
 
 loadOverviewUserdata();
 
@@ -246,7 +241,7 @@ $(document).ready(function() {
     $('#datasetOverviewBranchList').html(datasetOverview.branchList);
     $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
     $('#datasetOverviewToDate').html(moment(datasetOverview.toDate).format("YYYY-MM-DD"));
-    $('#datasetOverviewIdentityCount').html(overviewUserdata.length + ' / ' + overviewUserdata.length);
+    $('#datasetOverviewIdentityCount').html(usersInAnalysis.getPrintableUserCount());
 
     $.tablesorter.addParser({
         id: 'timeInReview',

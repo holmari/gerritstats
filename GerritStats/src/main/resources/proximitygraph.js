@@ -1,4 +1,4 @@
-function ProximityGraph(identityGraph, objectSelector) {
+function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
     this.width = 1200;
     this.height = 800;
 
@@ -151,7 +151,7 @@ function ProximityGraph(identityGraph, objectSelector) {
     }
 
     this.isNodeSelected = function(identifier) {
-        return selectedUsers[identifier] === '1';
+        return selectedUsers.isUserSelected(identifier);
     }
 
     this.isLinkSelected = function(nodes, link) {
