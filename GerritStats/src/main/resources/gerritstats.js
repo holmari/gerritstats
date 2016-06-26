@@ -88,11 +88,15 @@ function getShortPrintableName(identity) {
 }
 
 function getPrintableName(identity) {
-    var name = getShortPrintableName(identity);
-    if (identity.username.length > 0) {
-        name += " (" + identity.username + ")";
+    if (identity.name.length == 0 && identity.username.length > 0) {
+        return identity.username;
+    } else {
+        var name = getShortPrintableName(identity);
+        if (identity.username.length > 0) {
+            name += " (" + identity.username + ")";
+        }
+        return name;
     }
-    return name;
 }
 
 /**
