@@ -37,7 +37,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             "bootstrap.css",
             "bootstrap.min.js",
             "moment.min.js",
-            "gerritstats.js"
+            "gerritstats.js",
+            "tablecellhighlighter.js"
     };
 
     private static final String[] HTML_RESOURCES = {

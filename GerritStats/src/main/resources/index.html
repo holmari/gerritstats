@@ -10,6 +10,7 @@
 <script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
+<script src="res/tablecellhighlighter.js"></script>
 <script src="overview/overview.js"></script>
 
 <head>
@@ -156,45 +157,62 @@ var identityGraphNodes = jQuery.extend(true, [], overviewUserdata);
 var identityGraph = {
     "nodes": identityGraphNodes,
     "links":[]
-    }
+}
 
-    for (var i = 0; i < overviewUserdata.length; ++i) {
-        var item = overviewUserdata[i];
-        for (var j = 0; j < item.myReviewerList.length; ++j) {
-            var reviewerRecord = item.myReviewerList[j];
-            if (reviewerRecord.reviewData.approvalCount != 0) {
-                identityGraph.links.push({
-                    source: identityGraphNodes[i],
-                    target: identityGraphNodes[getIndexOfIdentity(reviewerRecord.identity)],
-                    value: reviewerRecord.reviewData.approvalCount
-                });
-            }
+for (var i = 0; i < overviewUserdata.length; ++i) {
+    var item = overviewUserdata[i];
+    for (var j = 0; j < item.myReviewerList.length; ++j) {
+        var reviewerRecord = item.myReviewerList[j];
+        if (reviewerRecord.reviewData.approvalCount != 0) {
+            identityGraph.links.push({
+                source: identityGraphNodes[i],
+                target: identityGraphNodes[getIndexOfIdentity(reviewerRecord.identity)],
+                value: reviewerRecord.reviewData.approvalCount
+            });
         }
     }
-
-</script>
-
-<script>
+}
 
 function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody')
+
+    var highlighters = {
+        'reviewCountPlus2': new TableCellHighlighter(overviewUserdata, 'reviewCountPlus2'),
+        'reviewCountPlus1': new TableCellHighlighter(overviewUserdata, 'reviewCountPlus1'),
+        'reviewCountMinus1': new TableCellHighlighter(overviewUserdata, 'reviewCountMinus1'),
+        'reviewCountMinus2': new TableCellHighlighter(overviewUserdata, 'reviewCountMinus2'),
+        'allCommentsWritten': new TableCellHighlighter(overviewUserdata, 'allCommentsWritten'),
+        'allCommentsReceived': new TableCellHighlighter(overviewUserdata, 'allCommentsReceived'),
+        'commitCount': new TableCellHighlighter(overviewUserdata, 'commitCount'),
+        'receivedCommentRatio': new TableCellHighlighter(overviewUserdata, 'receivedCommentRatio')
+                                    .setIsAscending(true),
+        'reviewCommentRatio': new TableCellHighlighter(overviewUserdata, 'reviewCommentRatio'),
+        'addedAsReviewerToCount': new TableCellHighlighter(overviewUserdata, 'addedAsReviewerToCount'),
+        'averageTimeInCodeReview': new TableCellHighlighter(overviewUserdata, 'averageTimeInCodeReview')
+                                       .setIsAscending(true),
+    };
+
     overviewUserdata.forEach(function(item) {
         tbody.append(
         '<tr>\
             <td><input class="identityCheckbox" data-identifier="' + item.identifier + '"\
                        type="checkbox" checked="true" onclick="onIdentityCheckboxClicked(this)" /></td>\
             <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + '</a></td>\
-            <td class="dataField">' + item.reviewCountPlus2 + '</td>\
-            <td class="dataField">' + item.reviewCountPlus1 + '</td>\
-            <td class="dataField">' + item.reviewCountMinus1 + '</td>\
-            <td class="dataField">' + item.reviewCountMinus2 + '</td>\
-            <td class="dataField">' + item.allCommentsWritten + '</td>\
-            <td class="dataField">' + item.allCommentsReceived + '</td>\
-            <td class="dataField">' + item.commitCount + '</td>\
-            <td class="dataField" data-value="' + item.receivedCommentRatio + '">' + numeral(item.receivedCommentRatio).format("0.000") + '</td>\
-            <td class="dataField" data-value="' + item.reviewCommentRatio + '">' + numeral(item.reviewCommentRatio).format("0.000") + '</td>\
-            <td class="dataField">' + item.addedAsReviewerToCount + '</td>\
-            <td class="dataField" data-unixtime="' + item.averageTimeInCodeReview + '">' + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
+            <td class="dataField" ' + highlighters['reviewCountPlus2'].highlight(item) + '>' + item.reviewCountPlus2 + '</td>\
+            <td class="dataField" ' + highlighters['reviewCountPlus1'].highlight(item) + '>' + item.reviewCountPlus1 + '</td>\
+            <td class="dataField" ' + highlighters['reviewCountMinus1'].highlight(item) + '>' + item.reviewCountMinus1 + '</td>\
+            <td class="dataField" ' + highlighters['reviewCountMinus2'].highlight(item) + '>' + item.reviewCountMinus2 + '</td>\
+            <td class="dataField" ' + highlighters['allCommentsWritten'].highlight(item) + '>' + item.allCommentsWritten + '</td>\
+            <td class="dataField" ' + highlighters['allCommentsReceived'].highlight(item) + '>' + item.allCommentsReceived + '</td>\
+            <td class="dataField" ' + highlighters['commitCount'].highlight(item) + '>' + item.commitCount + '</td>\
+            <td class="dataField" data-value="' + item.receivedCommentRatio + '" '
+                + highlighters['receivedCommentRatio'].highlight(item) + '>' + numeral(item.receivedCommentRatio).format('0.000') + '</td>\
+            <td class="dataField" data-value="' + item.reviewCommentRatio + '" '
+                + highlighters['reviewCommentRatio'].highlight(item) + '>' + numeral(item.reviewCommentRatio).format('0.000') + '</td>\
+            <td class="dataField" ' + highlighters['addedAsReviewerToCount'].highlight(item) + '>' + item.addedAsReviewerToCount + '</td>\
+            <td class="dataField" data-unixtime="' + item.averageTimeInCodeReview + '" '
+                + highlighters['averageTimeInCodeReview'].highlight(item) + '>'
+                + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
         </tr>')
     });
 }
