@@ -290,14 +290,15 @@ function updateViewFromUserdata() {
     $('#pageTitle').html(record.shortPrintableName());
     $('#pageSubtitle').html(record.identity.email);
 
-    $('#username').html(record.identity.username);
+    $('#username').html(record.printableUsername());
     $('#commitsSize').html(record.commits.length);
     $('#commentsWritten').html(record.getAllCommentsByUser());
     $('#commentsReceived').html(record.commentsReceived.length);
     $('#receivedCommentRatio').html(record.getReceivedCommentRatio().toFixed(outputConfig.decimalPrecision));
     $('#addedAsReviewerTo').html(record.addedAsReviewerTo.length);
-    $('#reviewCommentRatio').html((record.commentsWritten.length / record.addedAsReviewerTo.length)
-                                    .toFixed(outputConfig.decimalPrecision));
+    $('#reviewCommentRatio').html(record.addedAsReviewerTo.length > 0
+        ? (record.commentsWritten.length / record.addedAsReviewerTo.length).toFixed(outputConfig.decimalPrecision)
+        : "&dash;");
     $('#maxPatchSetCount').html(record.getMaxPatchSetCount());
     $('#reviewCountGivenPlus2').html(record.reviewCountPlus2);
     $('#reviewCountGivenPlus1').html(record.reviewCountPlus1);

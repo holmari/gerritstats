@@ -173,6 +173,18 @@ var userdataScope = {
         return getShortPrintableName(this.identity);
     },
 
+    hasUsername: function() {
+        return this.identity.username && this.identity.username.length;
+    },
+
+    printableUsername: function() {
+        if (this.hasUsername()) {
+            return this.identity.username;
+        } else {
+            return "&dash;";
+        }
+    },
+
     getReceivedCommentRatio: function() {
          var receivedComments = this.commentsReceived.length;
          var commitCount = this.commits.length;
