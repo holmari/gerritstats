@@ -72,17 +72,7 @@ public class IdentityRecord {
     }
 
     public String getFilenameStem() {
-        String filename = identity.getUsername();
-        if (Strings.isNullOrEmpty(filename)) {
-            filename = Strings.nullToEmpty(identity.getEmail()).replace(".", "_");
-            int atMarkIndex = filename.indexOf('@');
-            if (atMarkIndex != -1) {
-                filename = filename.substring(0, atMarkIndex);
-            } else {
-                filename = "anonymous_coward";
-            }
-        }
-        return filename;
+        return identity.getIdentifier();
     }
 
     public DatedCommitList getCommits() {

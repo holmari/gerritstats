@@ -5,7 +5,6 @@ import com.holmsted.gerrit.QueryData;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.Hashtable;
 
 import javax.annotation.Nonnull;

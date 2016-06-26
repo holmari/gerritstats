@@ -56,17 +56,27 @@ public class Commit {
             return identity;
         }
 
+        public String getIdentifier() {
+            String identifier = username;
+            if (Strings.isNullOrEmpty(identifier)) {
+                identifier = Strings.nullToEmpty(email).replace(".", "_");
+                int atMarkIndex = identifier.indexOf('@');
+                if (atMarkIndex != -1) {
+                    identifier = identifier.substring(0, atMarkIndex);
+                } else {
+                    identifier = "anonymous_coward";
+                }
+            }
+            return identifier;
+        }
+
         @Override
         public boolean equals(Object other) {
             if (!(other instanceof Identity)) {
                 return false;
             }
             Identity otherIdentity = (Identity) other;
-            if (email != null) {
-                return email.equals(otherIdentity.email);
-            } else {
-                return super.equals(other);
-            }
+            return getIdentifier().equals(otherIdentity.getIdentifier());
         }
 
         public int compareTo(@Nonnull Identity other) {
@@ -81,11 +91,7 @@ public class Commit {
 
         @Override
         public int hashCode() {
-            if (email != null) {
-                return email.hashCode();
-            } else {
-                return super.hashCode();
-            }
+            return getIdentifier().hashCode();
         }
 
         @Override
