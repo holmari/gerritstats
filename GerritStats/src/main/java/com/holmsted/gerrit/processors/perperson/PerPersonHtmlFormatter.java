@@ -128,6 +128,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 .setPrettyPrinting()
                 .registerTypeAdapter(PatchSetCommentTable.class, new PatchSetCommentTableSerializer())
                 .registerTypeAdapter(ReviewerDataTable.class, new ReviewerDataTableSerializer())
+                .registerTypeAdapter(Identity.class, new IdentitySerializer())
                 .create();
 
         for (IdentityRecord record : orderedList) {
@@ -222,6 +223,18 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 reviewerList.add(reviewerRecord);
             }
             json.add("myReviewerList", context.serialize(reviewerList));
+            return json;
+        }
+    }
+
+    private static class IdentitySerializer implements JsonSerializer<Commit.Identity> {
+        @Override
+        public JsonElement serialize(Identity identity, Type typeOfSrc, JsonSerializationContext context) {
+            JsonObject json = new JsonObject();
+            json.add("identifier", context.serialize(identity.getIdentifier()));
+            json.add("name", context.serialize(identity.name));
+            json.add("email", context.serialize(identity.email));
+            json.add("username", context.serialize(identity.username));
             return json;
         }
     }

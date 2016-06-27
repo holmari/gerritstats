@@ -47,10 +47,10 @@ function loadJavascriptFile(filename, onLoadCallback) {
 }
 
 /**
- * Loads the userdata .js file for the given user's filename.
+ * Loads the userdata .js file for the given user's unique identifier.
  */
-function loadUserdataForFilenameStem(filenameStem, onLoadCallback) {
-    loadJavascriptFile('userdata/' + filenameStem + '.js', onLoadCallback);
+function loadUserdataForUserIdentifier(userIdentifier, onLoadCallback) {
+    loadJavascriptFile('userdata/' + userIdentifier + '.js', onLoadCallback);
 }
 
 function hashCode(text) {

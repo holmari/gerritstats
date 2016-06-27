@@ -15,7 +15,7 @@
 <script src="overview/overview.js"></script>
 
 <script>
-    var filenameStem = getUrlParameter('user');
+    var userIdentifier = getUrlParameter('user');
 </script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
@@ -151,9 +151,12 @@ var usersInAnalysis = new SelectedUsers(overviewUserdata);
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
         var data = dataArray[i];
-        $(elementQuery).append(dataRenderer(data));
-        if (i < dataArray.length - 1) {
-            $(elementQuery).append(', ');
+        var renderedData = dataRenderer(data);
+        if (renderedData) {
+            $(elementQuery).append(renderedData);
+            if (i < dataArray.length - 1) {
+                $(elementQuery).append(', ');
+            }
         }
     }
 }
@@ -163,8 +166,12 @@ function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
  */
 function addReviewerDataToElement(reviewerData, elementJQuery, valueCallback) {
     addCommaSeparatedDataToElement(reviewerData, elementJQuery, function(data) {
-        return '<a href="mailto:' + data.identity.email + '">'
-             + data.identity.email + '</a> (' + valueCallback(data) + ')'
+        if (usersInAnalysis.isUserSelected(data.identity.identifier)) {
+            return '<a href="mailto:' + data.identity.email + '">'
+                 + data.identity.email + '</a> (' + valueCallback(data) + ')'
+        } else {
+            return null;
+        }
     });
 }
 
@@ -177,14 +184,12 @@ function addReviewCommentsByUser(record, elementQuery) {
     for (var i = 0; i < commits.length; ++i) {
         var commitAndComments = commits[i];
         var commit = commitAndComments.commit;
-
-        var commitCreatedDate = moment(commit.createdOnDate);
-        $(elementQuery).append('<h4><a href="' + commit.url + '">' + commit.url + '</a> (Created: '
-            +  commitCreatedDate.format("YYYY-MM-DD") + ')</h4><ul></ul>');
+        var headerCreated = false;
 
         commit.patchSets.forEach(function(patchSet) {
             // ignore self-reviews and replies
-            if (patchSet.author.email == record.identity.email) {
+            if (patchSet.author.email == record.identity.email
+            || !usersInAnalysis.isUserSelected(patchSet.author.identifier)) {
                 return;
             }
 
@@ -192,6 +197,13 @@ function addReviewCommentsByUser(record, elementQuery) {
             comments.forEach(function(comment) {
                 if (comment.reviewer.email != record.identity.email) {
                     return;
+                }
+
+                if (!headerCreated) {
+                    headerCreated = true;
+                    var commitCreatedDate = moment(commit.createdOnDate);
+                    $(elementQuery).append('<h4><a href="' + commit.url + '">' + commit.url + '</a> (Created: '
+                        +  commitCreatedDate.format("YYYY-MM-DD") + ')</h4><ul></ul>');
                 }
 
                 var urlForComment = getGerritUrlForComment(commit, patchSet, comment)
@@ -279,8 +291,18 @@ function addPerMonthStats(record) {
     });
 }
 
+function filterForUsersInAnalysis(reviewerData) {
+    var result = [];
+    reviewerData.forEach(function(item) {
+        if (usersInAnalysis.isUserSelected(item.identity)) {
+            result.push(item);
+        }
+    });
+    return result;
+}
+
 function updateViewFromUserdata() {
-    var record = userdata[filenameStem];
+    var record = userdata[userIdentifier];
     userdataScope.initializeRecord(record);
 
     $('#datasetOverviewBranchList').html(datasetOverview.branchList);
@@ -313,6 +335,7 @@ function updateViewFromUserdata() {
     $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
 
     var reviewerData = record.getReviewerDataForOwnCommits();
+    reviewerData = filterForUsersInAnalysis(reviewerData);
     addReviewerDataToElement(reviewerData, '#addsThemAsReviewers', function(data) {
         return data.approvalData.addedAsReviewerCount;
     });
@@ -561,7 +584,7 @@ function createFrequencyTable(svgId, x_domain, data) {
         .text(function(d) { return d.date });
 }
 
-loadUserdataForFilenameStem(filenameStem, function onLoad() {
+loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
     updateViewFromUserdata();
 });
 
