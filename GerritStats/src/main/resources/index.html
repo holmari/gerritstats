@@ -27,15 +27,15 @@
             <td class="filterBoxValue" id="datasetOverviewBranchList"></td>
         </tr>
         <tr>
-            <th><span class="glyphicon glyphicon-calendar"></span>From:</th>
+            <th><span class="glyphicon glyphicon-calendar white"></span>From:</th>
             <td class="filterBoxValue" id="datasetOverviewFromDate"></td>
         </tr>
         <tr>
-            <th><span class="glyphicon glyphicon-calendar"></span>To:</th>
+            <th><span class="glyphicon glyphicon-calendar white"></span>To:</th>
             <td class="filterBoxValue" id="datasetOverviewToDate"></td>
         </tr>
         <tr>
-            <th><span class="glyphicon glyphicon-user"></span>Users in analysis:</th>
+            <th><span class="glyphicon glyphicon-user white"></span>Users in analysis:</th>
             <td class="filterBoxValue" id="datasetOverviewIdentityCount"></td>
         </tr>
     </table>
@@ -44,10 +44,12 @@
     <div class="subtitleH1">for <span id="subtitleDataSetName"></span></div>
 </header>
 <nav>
-    <ul id="navBar" class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#" data-type='users'>Users</a></li>
-        <li role="presentation"><a href="#" data-type='connections'>Connections</a></li>
-    </ul>
+    <div class="container-fluid">
+        <ul id="navBar" class="nav navbar-nav">
+            <li role="presentation" class="active" data-type='users'>Users</li>
+            <li role="presentation" data-type='connections'>Connections</li>
+        </ul>
+    </div>
 </nav>
 
 <content id="content">
@@ -76,7 +78,7 @@
 </div>
 
 <script>
-$('nav a').click(function(event) {
+$('nav li').click(function(event) {
     event.preventDefault();
     var navElement = $(this);
 
@@ -84,7 +86,7 @@ $('nav a').click(function(event) {
     if (navType === undefined) {
         throw new Error("navType is not defined!");
     }
-    navElement.tab('show')
+    navElement.tab('show');
 
     switch (navType) {
     case 'users':

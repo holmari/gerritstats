@@ -13,7 +13,6 @@
 <script src="res/gerritstats.js"></script>
 <script src="res/selectedusers.js"></script>
 <script src="overview/overview.js"></script>
-
 <script>
     var userIdentifier = getUrlParameter('user');
 </script>
@@ -43,24 +42,28 @@
     </table>
 
     <h1 id="pageTitle"></h1>
-    <div class="subtitleH1"><span id="pageSubtitle"></span></div>
+    <div class="subtitleH1"><span id="pageSubtitle">&nbsp;fff</span></div>
 </header>
 <nav>
-    <ul id="navBar" class="nav nav-tabs">
-        <li role="presentation" class="active"><a href="#" data-type='overall'>Overall</a></li>
-        <li role="presentation"><a href="#" data-type='reviewers'>Reviewers and approvals</a></li>
-        <li role="presentation"><a href="#" data-type='per_month'>Per-month</a></li>
-        <li role="presentation"><a href="#" data-type='iteration'>Iteration</a></li>
-        <li role="presentation"><a href="#" data-type='review_comments'>Review comments</a></li>
-    </ul>
+    <div class="container-fluid">
+        <ul id="navBar" class="nav navbar-nav">
+            <li role="presentation" class="active" data-type='overall'>Overall</li>
+            <li role="presentation" data-type='reviewers'>Reviewers and approvals</li>
+            <li role="presentation" data-type='per_month'>Per-month</li>
+            <li role="presentation" data-type='iteration'>Iteration</li>
+            <li role="presentation" data-type='review_comments'>Review comments</li>
+        </ul>
+    </div>
 </nav>
 
 <content id="content">
 <a name="overall"></a>
-<h3>Overall</h3>
+<h2>Profile</h2>
 <p>
-<table>
-    <tr><th>Username</th><td id="username"></td></tr>
+<table class="">
+    <tr><th>Username</th><td id="profileUsername"></td></tr>
+    <tr><th>Email</th><td id="profileEmail"></td></tr>
+    <tr><th>Aliases</th><td id="profileAliases">&dash;</td></tr>
 </table>
 <table>
     <tr><th>Commits</th><td id="commitsSize"></td></tr>
@@ -134,7 +137,7 @@
 </content>
 
 <script>
-$('nav a').click(function(event) {
+$('nav li').click(function(event) {
     event.preventDefault();
     var navElement = $(this);
 
@@ -143,6 +146,7 @@ $('nav a').click(function(event) {
         throw new Error("navType is not defined!");
     }
     navElement.tab('show');
+
     window.location.href = '#' + navType;
 });
 
@@ -312,9 +316,11 @@ function updateViewFromUserdata() {
 
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
     $('#pageTitle').html(record.shortPrintableName());
-    $('#pageSubtitle').html(record.identity.email);
+    $('#pageSubtitle').html(record.identity.email ? record.identity.email : "&nbsp;");
 
-    $('#username').html(record.printableUsername());
+    $('#profileUsername').html(record.printableUsername());
+    $('#profileEmail').html(record.printableEmail());
+
     $('#commitsSize').html(record.commits.length);
     $('#commentsWritten').html(record.getAllCommentsByUser());
     $('#commentsReceived').html(record.commentsReceived.length);

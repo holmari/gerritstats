@@ -185,6 +185,14 @@ var userdataScope = {
         }
     },
 
+    printableEmail: function() {
+        if (this.identity.email && this.identity.email.length) {
+            return this.identity.email;
+        } else {
+            return "&dash;"
+        }
+    },
+
     getReceivedCommentRatio: function() {
          var receivedComments = this.commentsReceived.length;
          var commitCount = this.commits.length;
