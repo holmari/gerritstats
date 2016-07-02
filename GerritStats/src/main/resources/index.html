@@ -123,7 +123,11 @@ function updateOnUserSelectionChange() {
     usersInAnalysis.writeToStorage();
 
     $('#datasetOverviewIdentityCount').html(usersInAnalysis.getPrintableUserCount());
-    proximityGraph.render();
+
+    var proximityGraphObject = $('#proximityGraph');
+    if (proximityGraphObject.is(':visible')) {
+        proximityGraph.render();
+    }
 }
 
 function onIdentityCheckboxClicked(checkbox) {
