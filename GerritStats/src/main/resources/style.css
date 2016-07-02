@@ -188,6 +188,110 @@ nav ul li:hover {
 }
 
 /******************************************************************************
+ *  Panels and panel items
+ *****************************************************************************/
+
+.panel {
+    display: block;
+    float: left;
+    padding-left: 0.75em;
+    padding-right: 0.75em;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    min-width: 320px;
+    min-height: 320px;
+}
+
+.panel table {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.panel h2 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 44px;
+    font-weight: 200;
+    margin-bottom: 0.5em;
+}
+
+.panel th {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-weight: 400;
+    font-size: 20px;
+    padding-bottom: 0.2em;
+    padding-right: 2em;
+}
+
+.panel td {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-weight: 200;
+    font-size: 20px;
+}
+
+.panel p {
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.numberPanel {
+    display: inline-block;
+    margin-left: 0.5em;
+    margin-right: 0.5e-resizem;
+    margin-bottom: 1em;
+    border-style: solid;
+    border-width: 1px 1px 1px 1px;
+    border-color: #f1f1f1;
+    min-width: 110px;
+    width: 150px;
+}
+
+.wide {
+    width: 220px;
+}
+
+.numberPanel .value {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 38px;
+    font-weight: 200;
+    text-align: center;
+}
+
+.numberPanel .title {
+    display: inline-block;
+    float: right;
+    background-color: #f8f8f8;
+    border-style: solid;
+    border-width: 1px 0px 0px 1px;
+    border-color: #ebebeb;
+    text-align: right;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 15px;
+    font-weight: 100;
+    color: #c4c4c4;
+}
+
+.numberPanel .xxx::after {
+    clear: both;
+}
+
+.clearFloat {
+    clear: both;
+}
+
+.panelContainer {
+    display: inline-block;
+    float: left;
+}
+
+/******************************************************************************
  * Profile: monthly commit table
  *****************************************************************************/
 

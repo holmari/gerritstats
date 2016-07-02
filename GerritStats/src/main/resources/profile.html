@@ -42,7 +42,7 @@
     </table>
 
     <h1 id="pageTitle"></h1>
-    <div class="subtitleH1"><span id="pageSubtitle">&nbsp;fff</span></div>
+    <div class="subtitleH1"><span id="pageSubtitle">&nbsp;</span></div>
 </header>
 <nav>
     <div class="container-fluid">
@@ -57,82 +57,199 @@
 </nav>
 
 <content id="content">
-<a name="overall"></a>
-<h2>Profile</h2>
-<p>
-<table class="">
-    <tr><th>Username</th><td id="profileUsername"></td></tr>
-    <tr><th>Email</th><td id="profileEmail"></td></tr>
-    <tr><th>Aliases</th><td id="profileAliases">&dash;</td></tr>
-</table>
-<table>
-    <tr><th>Commits</th><td id="commitsSize"></td></tr>
-    <tr><th>Comments written</th><td id="commentsWritten"></td></tr>
-    <tr><th>Comments received</th><td id="commentsReceived"></td></tr>
-    <tr><th>Comments / commit</th><td id="receivedCommentRatio"></td></tr>
-    <tr><th>Added as reviewer</th><td id="addedAsReviewerTo"></td></tr>
-    <tr><td>&nbsp;</td></tr>
-    <tr><th>Comments / review request</th><td id="reviewCommentRatio"></td></tr>
-    <tr><th>Max patch set count</th><td id="maxPatchSetCount"></td></tr>
-</table>
 
-<table>
-    <tr><th>+2 reviews given</th><td id="reviewCountGivenPlus2"></td></tr>
-    <tr><th>+1 reviews given</th><td id="reviewCountGivenPlus1"></td></tr>
-    <tr><th>-1 reviews given</th><td id="reviewCountGivenMinus1"></td></tr>
-    <tr><th>-2 reviews given</th><td id="reviewCountGivenMinus2"></td></tr>
-    <tr><th>+2 reviews received</th><td id="reviewCountReceivedPlus2"></td></tr>
-    <tr><th>+1 reviews received</th><td id="reviewCountReceivedPlus1"></td></tr>
-    <tr><th>-1 reviews received</th><td id="reviewCountReceivedMinus1"></td></tr>
-    <tr><th>-2 reviews received</th><td id="reviewCountReceivedMinus2"></td></tr>
-</table>
+    <!--
+        TODO: disabled for now. there's little additional value here.
+        What about just sticking username to top bar after email?
 
-<table>
-    <tr><th>Average time in code review</th><td id="averageTimeInCodeReview"></td></tr>
-</table>
-</p>
+    <div class="panel">
+        <h2>Profile</h2>
+        <table>
+            <tr><th>Username</th><td id="profileUsername"></td></tr>
+            <tr><th>Email</th><td id="profileEmail"></td></tr>
+            <tr><th>Aliases</th><td id="profileAliases">&dash;</td></tr>
+        </table>
+    </div>
+    -->
 
-<a name="reviewers"></a>
-<h2>Reviewers and approvals</h2>
-<div id="reviewersAndApprovalsSvg">
-</div>
+    <div class="panel">
+        <h2>Reviews given</h2>
+        <div class="numberPanel">
+            <div id="reviewCountGivenPlus2" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">+1</div></div>
+        </div>
 
-<h3>Adds them as reviewers (<span id="addsThemAsReviewersCount"></span>)</h3>
-<p id="addsThemAsReviewers">
-</p>
+        <div class="numberPanel">
+            <div id="reviewCountGivenPlus1" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">+2</div></div>
+        </div>
+        <div class="clearFloat"></div>
 
-<h3 class="withSubtitle">They give +2..-2 approvals (<span id="approvalsPerReviewerCount"></span>)</h3>
-<div class="subtitleH3">sorted by number of times added as a reviewer</div>
-<p id="approvalsPerReviewer">
-</p>
+        <div class="numberPanel">
+            <div id="reviewCountGivenMinus1" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">-1</div></div>
+        </div>
 
-<h3>They add this person as reviewer (<span id="theyAddThisPersonAsReviewerCount"></span>)</h3>
-<p id="theyAddThisPersonAsReviewer">
-</p>
+        <div class="numberPanel">
+            <div id="reviewCountGivenMinus2" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">-2</div></div>
+        </div>
+    </div>
+    <div class="panel">
+        <h2>Reviews received</h2>
+        <div class="numberPanel">
+            <div id="reviewCountReceivedPlus2" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">+1</div></div>
+        </div>
 
-<h3>Review comments per day</h3>
-<div id="commentsPerDaySvg">
-</div>
+        <div class="numberPanel">
+            <div id="reviewCountReceivedPlus1" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">+2</div></div>
+        </div>
+        <div class="clearFloat"></div>
 
-<a name="per_month"></a>
-<h2>Per-month stats</h2>
+        <div class="numberPanel">
+            <div id="reviewCountReceivedMinus1" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">-1</div></div>
+        </div>
 
-<table class="perMonthStats" id="perMonthStats">
-</table>
+        <div class="numberPanel">
+            <div id="reviewCountReceivedMinus2" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">-2</div></div>
+        </div>
+    </div>
 
-<a name="iteration"></a>
-<h2 class="withSubtitle">Commits exceeding <span class="highPatchSetCountThreshold"></span> patches</h2>
-<div class="subtitleH3">only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</div>
-<p id="highPatchSetCountCommitList">
-</p>
+    <div class="panel">
+        <h2>Commits</h2>
+        <div class="numberPanel">
+            <div id="commitsSize" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">total commits</div></div>
+        </div>
+        <div class="numberPanel">
+            <div id="addedAsReviewerTo" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">added as reviewer</div></div>
+        </div>
+        <div class="numberPanel">
+            <div id="maxPatchSetCount" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">max patch set count</div></div>
+        </div>
 
-<div id="highPatchSetCountCommitsSvg">
-</div>
+        <div class="clearFloat"></div>
 
-<a name="review_comments"></a>
-<h3>Review comments</h3>
-<p id="reviewComments">
-</p>
+        <div class="numberPanel">
+            <div id="commitsAbandoned" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">abandoned</div></div>
+        </div>
+        <div class="numberPanel">
+            <div id="commitsInReview" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">in review</div></div>
+        </div>
+        <div class="numberPanel">
+            <div id="gitRepoCount" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">git repos</div></div>
+        </div>
+    </div>
+    <div class="clearFloat"></div>
+
+    <div class="panelContainer">
+        <div class="panel">
+            <h2>Reviews by author</h2>
+            <div class="numberPanel wide">
+                <div id="commentsWritten" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments written</div></div>
+            </div>
+            <div class="numberPanel wide">
+                <div id="reviewCommentRatio" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments per review request</div></div>
+            </div>
+
+            <div class="clearFloat"></div>
+
+            <table>
+                <tr><th>Frequently used words</th></tr>
+                <tr><td id="frequentlyUsedWords">&dash;</td></tr>
+            </table>
+        </div>
+        <div class="clearFloat"></div>
+        <div class="panel">
+            <h2>Received reviews</h2>
+            <div class="numberPanel wide">
+                <div id="commentsReceived" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments received</div></div>
+            </div>
+            <div class="numberPanel wide">
+                <div id="receivedCommentRatio" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments per commit</div></div>
+            </div>
+
+            <div class="clearFloat"></div>
+
+            <table>
+                <tr><th>Average time in code review</th></tr>
+                <tr><td id="averageTimeInCodeReview">&dash;</td></tr>
+                <!-- TODO make a bar chart here showing user's time / avg time -->
+            </table>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Reviewers and approvals</h2>
+        <div id="reviewersAndApprovalsSvg">
+        </div>
+    </div>
+
+    <div class="clearFloat"></div>
+
+    <div class="panel">
+        <h2>Review comments per day</h2>
+        <div id="commentsPerDaySvg">
+        </div>
+    </div>
+
+    <div class="clearFloat"></div>
+
+    <div class="panel">
+        <h2>Commits exceeding <span class="highPatchSetCountThreshold">x</span> patches</h2>
+        <p>Only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</p>
+
+        <p id="highPatchSetCountCommitList">
+        </p>
+
+        <div id="highPatchSetCountCommitsSvg">
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Adds them as reviewers (<span id="addsThemAsReviewersCount"></span>)</h2>
+        <p id="addsThemAsReviewers">
+        </p>
+    </div>
+
+    <div class="panel">
+        <h2>They give +2..-2 approvals (<span id="approvalsPerReviewerCount"></span>)</h2>
+        <p>Sorted by number of times added as a reviewer</p>
+
+        <p id="approvalsPerReviewer">
+        </p>
+    </div>
+
+    <div class="panel">
+        <h2>They add this person as reviewer (<span id="theyAddThisPersonAsReviewerCount"></span>)</h2>
+        <p id="theyAddThisPersonAsReviewer">
+        </p>
+    </div>
+
+    <div class="panel">
+        <h2>Per-month stats</h2>
+        <table class="perMonthStats" id="perMonthStats">
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2>Review comments</h2>
+        <p id="reviewComments">
+        </p>
+    </div>
 
 </content>
 
@@ -402,7 +519,7 @@ function groupReviewCommentsByDate(comments) {
 
 function createReviewersAndApprovalsTable(reviewerData) {
     var margin = {top: 20, right: 20, bottom: 40, left: 40};
-    var width = 600 - margin.left - margin.right;
+    var width = 690 - margin.left - margin.right;
     var height = 600 - margin.top - margin.bottom;
 
     // axes size: max of added reviewer count.
