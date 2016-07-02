@@ -1,3 +1,7 @@
+/******************************************************************************
+ * Basic HTML styling
+ *****************************************************************************/
+
 body {
     font: 16px/1.5em "Helvetica Neue", Helvetica, sans-serif;
     margin: 0em 0em 0em 0em;
@@ -10,8 +14,89 @@ html {
     padding: 0em 0em 0em 0em;
 }
 
+content {
+    display: block;
+    margin: 1em 0em 1em 0em;
+    padding: 1em 1em 1em 1em;
+}
+
+pre {
+    display: inline;
+    font-family: monospace;
+    white-space: pre;
+}
+
+table {
+    margin-bottom: 1em;
+}
+
+th {
+    text-align: left;
+    padding-right: 1em;
+}
+
+/* *** Headers *** */
+
+h1 {
+    color: #f4f4f4;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 64px;
+    font-weight: 300;
+    margin: 0em;
+}
+
+h2 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 2em;
+    font-weight: 200;
+    margin-top: 20px;
+    margin-left: 0.1em;
+}
+
+h3 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 1.5em;
+    font-weight: 200;
+    margin-top: 20px;
+    margin-left: 0.1em;
+}
+
+h3.withSubtitle {
+    margin-bottom:0.2em;
+}
+
+h4 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 1.25em;
+    font-weight: 200;
+}
+
+h2 + div {
+    margin-left: 1em;
+}
+
+.subtitleH3 {
+    font-size: 1.0em;
+    font-weight: 200;
+    margin-top: 0em;
+    margin-bottom: 0em;
+    margin-left: 1.5em;
+}
+
+
+/* *** Links *** */
+
+a {
+    color: steelblue;
+}
+
+a:not(:hover) {
+    text-decoration: none;
+}
+
+
 /******************************************************************************
- *  Header elements
+ *  Top Header
  *****************************************************************************/
 
 header {
@@ -64,7 +149,7 @@ nav ul li:hover {
 }
 
 /******************************************************************************
- * Filter / data overview box on the top right corner
+ * Top Header: Filter / data overview box
  *****************************************************************************/
 
 .filterBox {
@@ -103,83 +188,8 @@ nav ul li:hover {
 }
 
 /******************************************************************************
- * Content
+ * Profile: monthly commit table
  *****************************************************************************/
-
-content {
-    display: block;
-    margin: 1em 0em 1em 0em;
-    padding: 1em 1em 1em 1em;
-}
-
-h1 {
-    color: #f4f4f4;
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 64px;
-    font-weight: 300;
-    margin: 0em;
-}
-
-h2 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 2em;
-    font-weight: 200;
-    margin-top: 20px;
-    margin-left: 0.1em;
-}
-
-h3 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 1.5em;
-    font-weight: 200;
-    margin-top: 20px;
-    margin-left: 0.1em;
-}
-
-h3.withSubtitle {
-    margin-bottom:0.2em;
-}
-
-h4 {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 1.25em;
-    font-weight: 200;
-}
-
-h2 + div {
-    margin-left: 1em;
-}
-
-pre {
-    display: inline;
-    font-family: monospace;
-    white-space: pre;
-}
-
-a {
-    color: steelblue;
-}
-
-a:not(:hover) {
-    text-decoration: none;
-}
-
-table {
-    margin-bottom: 1em;
-}
-
-th {
-    text-align: left;
-    padding-right: 1em;
-}
-
-.subtitleH3 {
-    font-size: 1.0em;
-    font-weight: 200;
-    margin-top: 0em;
-    margin-bottom: 0em;
-    margin-left: 1.5em;
-}
 
 .monthlyCommitYearTitle {
     font-size: 1.5em;
@@ -190,6 +200,10 @@ th {
 .perMonthStats tr th {
     min-width: 75px;
 }
+
+/******************************************************************************
+ * Graphs
+ *****************************************************************************/
 
 .commentChartBar {
     fill: steelblue;
@@ -226,7 +240,7 @@ th {
 }
 
 /******************************************************************************
- * Proximity graph
+ * Graphs: proximity graph
  *****************************************************************************/
 
 .proximityGraph {
