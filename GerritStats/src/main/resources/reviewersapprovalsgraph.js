@@ -2,8 +2,8 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
     this.margin = {
         top: 20,
         right: 20,
-        bottom: 40,
-        left: 40
+        bottom: 60,
+        left: 60
     };
     this.width = 480 - this.margin.left - this.margin.right;
     this.height = 480 - this.margin.top - this.margin.bottom;
@@ -66,19 +66,19 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
             .attr('transform', 'translate(0, ' + this.height + ')')
             .append('text')
                 .attr('transform', 'translate(' + (this.width / 2) + ', 0)')
-                .attr('class', 'gia-axisLabel')
+                .attr('class', 'reviewerApprovalAxisLabel')
                 .attr('x', 0)
-                .attr('y', this.margin.bottom)
+                .attr('y', this.margin.bottom - 6)
                 .style('text-anchor', 'middle')
                 .text('Number of times added as reviewer');
 
         this.svg.append('g')
             .attr('class', 'y reviewerApprovalChartAxis')
             .append('text')
-                .attr('class', 'gia-axisLabel')
+                .attr('class', 'reviewerApprovalAxisLabel')
                 .attr('transform', 'rotate(90) translate(' + (this.height / 2) + ' 0)')
                 .attr('x', 0)
-                .attr('y', this.margin.left)
+                .attr('y', this.margin.left - 6)
                 .style('text-anchor', 'middle')
                 .text('Number of approvals');
 
@@ -121,7 +121,7 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
                 .attr('fill', function(d) { return graph.colors(d.identity.email); })
                 .attr('stroke', 'rgba(0,0,0, .05)')
                 .on('mouseover', function(d) {
-                    graph.updateSelection(d);
+                    graph.updateSelection(d.identity.identifier);
                     graph.render();
                 })
                 .on('mouseout', function(d) {
