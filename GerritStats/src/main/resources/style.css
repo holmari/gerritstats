@@ -35,6 +35,11 @@ th {
     padding-right: 1em;
 }
 
+content.centered {
+    margin: auto;
+    width: 1200px;
+}
+
 /* *** Headers *** */
 
 h1 {
