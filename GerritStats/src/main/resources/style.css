@@ -3,7 +3,7 @@
  *****************************************************************************/
 
 body {
-    font: 16px/1.5em "Helvetica Neue", Helvetica, sans-serif;
+    font: 14px/1.25em "Helvetica Neue", Helvetica, sans-serif;
     margin: 0em 0em 0em 0em;
     padding: 0em 0em 0em 0em;
     background-color: #f4f4f4;
@@ -40,14 +40,14 @@ th {
 h1 {
     color: #f4f4f4;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 64px;
+    font-size: 48px;
     font-weight: 300;
     margin: 0em;
 }
 
 h2 {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 2em;
+    font-size: 1.5em;
     font-weight: 200;
     margin-top: 20px;
     margin-left: 0.1em;
@@ -55,7 +55,7 @@ h2 {
 
 h3 {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-weight: 200;
     margin-top: 20px;
     margin-left: 0.1em;
@@ -107,7 +107,7 @@ header {
 }
 
 .subtitleH1 {
-    font-size: 1.25em;
+    font-size: 1.125em;
     font-weight: 100;
     margin-top: 0.25em;
     margin-bottom: 0em;
@@ -133,12 +133,12 @@ nav .container-fluid {
 
 nav ul li {
     cursor: pointer;
-    padding-top: 0.25em;
-    padding-bottom: 0.25em;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
     padding-left: 1em;
     padding-right: 1em;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 100;
     color: #f4f4f4;
 }
@@ -211,7 +211,7 @@ nav ul li:hover {
 
 .panel h2 {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 44px;
+    font-size: 33px;
     font-weight: 200;
     margin-bottom: 0.5em;
 }
@@ -219,7 +219,7 @@ nav ul li:hover {
 .panel th {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
     font-weight: 400;
-    font-size: 20px;
+    font-size: 15px;
     padding-bottom: 0.2em;
     padding-right: 2em;
 }
@@ -227,7 +227,7 @@ nav ul li:hover {
 .panel td {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
     font-weight: 200;
-    font-size: 20px;
+    font-size: 15px;
 }
 
 .panel p {
@@ -257,7 +257,7 @@ nav ul li:hover {
     padding-top: 0.5em;
     padding-bottom: 0.5em;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 38px;
+    font-size: 34px;
     font-weight: 200;
     text-align: center;
 }
@@ -273,7 +273,7 @@ nav ul li:hover {
     padding-left: 0.5em;
     padding-right: 0.5em;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 15px;
+    font-size: 13px;
     font-weight: 100;
     color: #c4c4c4;
 }
@@ -296,7 +296,7 @@ nav ul li:hover {
  *****************************************************************************/
 
 .monthlyCommitYearTitle {
-    font-size: 1.5em;
+    font-size: 1.25em;
     font-weight: 300;
     padding-top: 20px;
 }
@@ -318,7 +318,7 @@ nav ul li:hover {
 }
 
 .commentChartAxis {
-    font: 10px sans-serif;
+    font: 12px sans-serif;
 }
 
 .commentChartAxis path,
@@ -333,7 +333,7 @@ nav ul li:hover {
 }
 
 .reviewerApprovalChartAxis {
-    font: 10px sans-serif;
+    font: 12px sans-serif;
 }
 
 .reviewerApprovalChartAxis path,
