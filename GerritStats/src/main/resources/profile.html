@@ -451,6 +451,7 @@ function updateViewFromUserdata() {
     $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
     $('#datasetOverviewToDate').html(moment(datasetOverview.toDate).format("YYYY-MM-DD"));
     $('#datasetOverviewIdentityCount').html(usersInAnalysis.getPrintableUserCount());
+    $('#generatedTimestamp').html(moment(datasetOverview.generatedDate).format('YYYY-MM-DD'))
 
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
     $('#pageTitle').html(record.shortPrintableName());
@@ -611,4 +612,15 @@ loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
 });
 
 </script>
+<footer>
+    <div class="footerContent">
+        <div class="footerLeft">
+            <a href="https://github.com/holmari/gerritstats">Github</a>
+        </div>
+        <div class="footerRight">
+            Generated on <span id="generatedTimestamp">&dash;</span>
+        </div>
+        <div class="clearFloat"></div>
+    </div>
+</footer>
 </body>

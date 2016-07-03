@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
@@ -92,6 +93,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         datasetOverview.add("branchList", gson.toJsonTree(perPersonData.getQueryData().getDisplayableBranchList()));
         datasetOverview.add("fromDate", gson.toJsonTree(perPersonData.getFromDate()));
         datasetOverview.add("toDate", gson.toJsonTree(perPersonData.getToDate()));
+        datasetOverview.add("generatedDate", gson.toJsonTree(new Date().getTime()));
 
         writer.write('\n');
         writer.write(String.format("datasetOverview = %s;",
