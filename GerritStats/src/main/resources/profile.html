@@ -152,6 +152,34 @@
     </div>
     <div class="clearFloat"></div>
 
+    <div class="panel">
+        <h2>Adds them as reviewers</h2>
+        <table id="addedAsReviewersTable" class="table table-striped">
+            <thead>
+                <th>Name</th>
+                <th class="dataField">times<br>added</th>
+                <th class="dataField">reviews<br>given</th>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr><td colspan="3"></td></tr>
+                <tr>
+                    <th>Total reviewers added</th>
+                    <td colspan="2" id="addsThemAsReviewersCount"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="panel">
+        <h2>Reviewers and approvals</h2>
+        <div id="reviewersAndApprovalsSvg">
+        </div>
+    </div>
+
+    <div class="clearFloat"></div>
+
     <div class="panelContainer">
         <div class="panel">
             <h2>Reviews by author</h2>
@@ -194,12 +222,25 @@
     </div>
 
     <div class="panel">
-        <h2>Reviewers and approvals</h2>
-        <div id="reviewersAndApprovalsSvg">
-        </div>
+        <h2>They request reviews</h2>
+        <table id="reviewRequestorTable" class="table table-striped">
+            <thead>
+                <th>Name</th>
+                <th class="dataField">times<br>added</th>
+                <th class="dataField">reviews<br>given</th>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr><td colspan="3"></td></tr>
+                <tr>
+                    <th>Total review requestors</th>
+                    <td colspan="2" id="theyAddThisPersonAsReviewerCount"></td>
+                </tr>
+            </tfoot>
+        </table>
     </div>
 
-    <div class="clearFloat"></div>
 
     <div class="panel">
         <h2>Review comments per day</h2>
@@ -218,26 +259,6 @@
 
         <div id="highPatchSetCountCommitsSvg">
         </div>
-    </div>
-
-    <div class="panel">
-        <h2>Adds them as reviewers (<span id="addsThemAsReviewersCount"></span>)</h2>
-        <p id="addsThemAsReviewers">
-        </p>
-    </div>
-
-    <div class="panel">
-        <h2>They give +2..-2 approvals (<span id="approvalsPerReviewerCount"></span>)</h2>
-        <p>Sorted by number of times added as a reviewer</p>
-
-        <p id="approvalsPerReviewer">
-        </p>
-    </div>
-
-    <div class="panel">
-        <h2>They add this person as reviewer (<span id="theyAddThisPersonAsReviewerCount"></span>)</h2>
-        <p id="theyAddThisPersonAsReviewer">
-        </p>
     </div>
 
     <div class="panel">
@@ -294,6 +315,18 @@ function addReviewerDataToElement(reviewerData, elementJQuery, valueCallback) {
         } else {
             return null;
         }
+    });
+}
+
+function addReviewerDataToTable(reviewerData, tableJQuery) {
+    var tableBody = $(tableJQuery).find('tbody');
+
+    reviewerData.forEach(function(item) {
+        tableBody.append('<tr>\
+            <td><a href="profile.html?user=' + item.identity.identifier + '">' + getShortPrintableName(item.identity) + '</a></td>\
+            <td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>\
+            <td class="dataField">' + item.approvalData.approvalCount + '</td>\
+        </tr>');
     });
 }
 
@@ -460,20 +493,14 @@ function updateViewFromUserdata() {
 
     var reviewerData = record.getReviewerDataForOwnCommits();
     reviewerData = filterForUsersInAnalysis(reviewerData);
-    addReviewerDataToElement(reviewerData, '#addsThemAsReviewers', function(data) {
-        return data.approvalData.addedAsReviewerCount;
-    });
-    // Note: could also use record.getReviewerApprovalDataForOwnCommits() for sorting.
-    addReviewerDataToElement(reviewerData, '#approvalsPerReviewer', function(data) {
-        return data.approvalData.approvalCount;
-    });
-    $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
-    $('#approvalsPerReviewerCount').html(record.reviewersForOwnCommits.length);
 
-    addReviewerDataToElement(record.getReviewRequestors(), '#theyAddThisPersonAsReviewer', function(data) {
-        return data.approvalData.addedAsReviewerCount;
-    });
+    addReviewerDataToTable(reviewerData, '#addedAsReviewersTable');
+    $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
+    $('#addedAsReviewersTable').tablesorter();
+
+    addReviewerDataToTable(record.getReviewRequestors(), '#reviewRequestorTable');
     $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
+    $('#reviewRequestorTable').tablesorter();
 
     addReviewCommentsByUser(record, '#reviewComments')
 
