@@ -11,6 +11,9 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
     this.selectedReviewer = null;
     this.colors = d3.scale.category10();
 
+    // Allows listening to highlight changes caused by user interaction.
+    this.selectionChangedListener = null;
+
     this.initialize = function() {
         // axes size: max of added reviewer count.
         var tickCount = 0;
@@ -48,6 +51,16 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
             .append("g")
             .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
+        // diagonal
+        this.svg.append("line")
+             .attr('x1', 0)
+             .attr('y1', this.height)
+             .attr('x2', this.width)
+             .attr('y2', 0)
+             .attr('stroke-width', 0.5)
+             .attr('stroke', '#dddddd')
+             .attr('fill-opacity', 0.5);
+
         this.svg.append('g')
             .attr('class', 'x reviewerApprovalChartAxis')
             .attr('transform', 'translate(0, ' + this.height + ')')
@@ -78,15 +91,19 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
 
         this.svg.append('g')
             .attr('class', 'reviewerApprovals')
+    };
 
-        var diagonal = this.svg.append("line")
-                             .attr('x1', 0)
-                             .attr('y1', this.height)
-                             .attr('x2', this.width)
-                             .attr('y2', 0)
-                             .attr('stroke-width', 0.5)
-                             .attr('stroke', '#dddddd')
-                             .attr('fill-opacity', 0.5);
+    this.setSelectedItemByIdentifier = function(userIdentifier) {
+        this.selectedReviewer = userIdentifier;
+        this.render();
+    };
+
+    this.updateSelection = function(newSelection) {
+        var previousSelection = this.selectedReviewer;
+        this.selectedReviewer = newSelection;
+        if (this.selectionChangedListener) {
+            this.selectionChangedListener(this.selectedReviewer, previousSelection);
+        }
     };
 
     this.renderPoints = function() {
@@ -103,16 +120,24 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
                 .attr('r', function(d) { return 5 + (d.approvalData.addedAsReviewerCount / graph.maxValue) * 30; })
                 .attr('fill', function(d) { return graph.colors(d.identity.email); })
                 .attr('stroke', 'rgba(0,0,0, .05)')
-                .on('mouseover', function(d) { graph.selectedReviewer = d; graph.render(); })
-                .on('mouseout', function(d) { graph.selectedReviewer = null; graph.render(); })
+                .on('mouseover', function(d) {
+                    graph.updateSelection(d);
+                    graph.render();
+                })
+                .on('mouseout', function(d) {
+                    graph.updateSelection(null);
+                    graph.render();
+                })
             .append('svg:title')
                 .text(function(d) { return d.identity.name; });
 
         points
-            .classed('selected', function(d) { return graph.selectedReviewer && d === graph.selectedReviewer; })
+            .classed('selected', function(d) {
+                return graph.selectedReviewer && d.identity.identifier === graph.selectedReviewer;
+            })
             .attr('fill-opacity', function(d) {
                 if (graph.selectedReviewer) {
-                    return d === graph.selectedReviewer ? 1 : 0.1;
+                    return d.identity.identifier === graph.selectedReviewer ? 1 : 0.3;
                 } else {
                     return 0.3;
                 }

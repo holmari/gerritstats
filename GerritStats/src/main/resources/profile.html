@@ -271,6 +271,7 @@ $('nav li').click(function(event) {
 });
 
 var usersInAnalysis = new SelectedUsers(overviewUserdata);
+var reviewerApprovalGraph = null;
 
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
@@ -285,29 +286,22 @@ function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     }
 }
 
-/**
- * Adds a list of reviewers to the element that matches the given element JQuery.
- */
-function addReviewerDataToElement(reviewerData, elementJQuery, valueCallback) {
-    addCommaSeparatedDataToElement(reviewerData, elementJQuery, function(data) {
-        if (usersInAnalysis.isUserSelected(data.identity.identifier)) {
-            return '<a href="mailto:' + data.identity.email + '">'
-                 + data.identity.email + '</a> (' + valueCallback(data) + ')'
-        } else {
-            return null;
-        }
-    });
-}
-
 function addReviewerDataToTable(reviewerData, tableJQuery) {
     var tableBody = $(tableJQuery).find('tbody');
 
     reviewerData.forEach(function(item) {
-        tableBody.append('<tr>\
+        tableBody.append('<tr data-identifier="' + item.identity.identifier + '">\
             <td><a href="profile.html?user=' + item.identity.identifier + '">' + getShortPrintableName(item.identity) + '</a></td>\
             <td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>\
             <td class="dataField">' + item.approvalData.approvalCount + '</td>\
         </tr>');
+    });
+    tableBody.find('tr').mouseover(function(event) {
+        var identifier = event.currentTarget.attributes['data-identifier'].value;
+        reviewerApprovalGraph.setSelectedItemByIdentifier(identifier);
+    });
+    tableBody.find('tr').mouseout(function() {
+        reviewerApprovalGraph.setSelectedItemByIdentifier(null);
     });
 }
 
@@ -486,6 +480,7 @@ function updateViewFromUserdata() {
 
     var reviewerData = record.getReviewerDataForOwnCommits();
     reviewerData = filterForUsersInAnalysis(reviewerData);
+    reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
 
     addReviewerDataToTable(reviewerData, '#addedAsReviewersTable');
     $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
@@ -506,7 +501,17 @@ function updateViewFromUserdata() {
     createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(record.getReviewCommentDates()));
     createFrequencyTable("#highPatchSetCountCommitsSvg", xDomain, record.getDatesForCommitsWithHighPatchSetCount());
 
-    var reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
+    reviewerApprovalGraph.selectionChangedListener = function(currentSelection, previousSelection) {
+        var body = $('#addedAsReviewersTable').find('tbody');
+        if (currentSelection) {
+            var identifier = currentSelection;
+            body.find("tr[data-identifier='" + identifier + "']").addClass('highlightedRow');
+        }
+        if (previousSelection) {
+            var prevIdentifier = previousSelection;
+            body.find("tr[data-identifier='" + prevIdentifier + "']").removeClass('highlightedRow');
+        }
+    };
     reviewerApprovalGraph.render();
 }
 

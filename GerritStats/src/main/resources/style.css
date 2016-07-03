@@ -26,10 +26,6 @@ pre {
     white-space: pre;
 }
 
-table {
-    margin-bottom: 1em;
-}
-
 th {
     text-align: left;
     padding-right: 1em;
@@ -38,6 +34,16 @@ th {
 content.centered {
     margin: auto;
     width: 1200px;
+}
+
+/* *** Tables & highlights *** */
+
+table {
+    margin-bottom: 1em;
+}
+
+.highlightedRow {
+    background-color: #dcdeeb !important;
 }
 
 /* *** Headers *** */
