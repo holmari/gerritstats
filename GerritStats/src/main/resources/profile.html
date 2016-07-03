@@ -12,6 +12,7 @@
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="res/selectedusers.js"></script>
+<script src="res/reviewersapprovalsgraph.js"></script>
 <script src="overview/overview.js"></script>
 <script>
     var userIdentifier = getUrlParameter('user');
@@ -485,7 +486,8 @@ function updateViewFromUserdata() {
     createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(record.getReviewCommentDates()));
     createFrequencyTable("#highPatchSetCountCommitsSvg", xDomain, record.getDatesForCommitsWithHighPatchSetCount());
 
-    createReviewersAndApprovalsTable(reviewerData);
+    var reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
+    reviewerApprovalGraph.render();
 }
 
 /**
@@ -515,134 +517,6 @@ function groupReviewCommentsByDate(comments) {
         return (left.date <  right.date) ? -1 : 1;
     });
     return data;
-}
-
-function createReviewersAndApprovalsTable(reviewerData) {
-    var margin = {top: 20, right: 20, bottom: 40, left: 40};
-    var width = 690 - margin.left - margin.right;
-    var height = 600 - margin.top - margin.bottom;
-
-    // axes size: max of added reviewer count.
-    var tickCount = 0;
-    var maxValue = 0;
-    if (reviewerData.length > 0) {
-        tickCount = maxValue = reviewerData.reduce(
-            function(previousValue, currentReviewerData, index, array) {
-                return Math.max(previousValue,
-                                Math.max(currentReviewerData.approvalData.addedAsReviewerCount,
-                                         currentReviewerData.approvalData.approvalCount));
-        }, 0);
-    }
-
-    // both axes share same domain
-    var domain = [0, tickCount];
-    var xScale = d3.scale.linear()
-        .domain(domain)
-        .range([0, width]);
-
-    var yScale = d3.scale.linear()
-        .domain(domain)
-        .range([height, 0]);
-
-    var xAxis = d3.svg.axis()
-        .scale(xScale)
-        .orient('bottom');
-
-    var yAxis = d3.svg.axis()
-        .scale(yScale)
-        .orient('left');
-
-    var svgId = '#reviewersAndApprovalsSvg';
-    var svg = d3.select(svgId).append('svg')
-        .attr('width', width + margin.left + margin.right)
-        .attr('height', height + margin.top + margin.bottom)
-        .append("g")
-        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
-    svg.append('g')
-        .attr('class', 'x reviewerApprovalChartAxis')
-        .attr('transform', 'translate(0, ' + height + ')')
-        .append('text')
-            .attr('transform', 'translate(' + (width / 2) + ', 0)')
-            .attr('class', 'gia-axisLabel')
-            .attr('x', 0)
-            .attr('y', margin.bottom)
-            .style('text-anchor', 'middle')
-            .text('Number of times added as reviewer');
-
-    svg.append('g')
-        .attr('class', 'y reviewerApprovalChartAxis')
-        .append('text')
-            .attr('class', 'gia-axisLabel')
-            .attr('transform', 'rotate(90) translate(' + (height / 2) + ' 0)')
-            .attr('x', 0)
-            .attr('y', margin.left)
-            .style('text-anchor', 'middle')
-            .text('Number of approvals');
-
-    svg.append('g')
-        .attr('class', 'x reviewerApprovalChartAxis')
-        .attr('transform', 'translate(0,' + height + ')');
-
-    svg.append('g')
-        .attr('class', 'y reviewerApprovalChartAxis');
-
-    svg.append('g')
-        .attr('class', 'reviewerApprovals')
-
-    var diagonal = svg.append("line")
-                         .attr('x1', 0)
-                         .attr('y1', height)
-                         .attr('x2', width)
-                         .attr('y2', 0)
-                         .attr('stroke-width', 0.5)
-                         .attr('stroke', '#dddddd')
-                         .attr('fill-opacity', 0.5);
-
-    var selectedReviewer = null;
-    var colors = d3.scale.category10();
-
-    function renderPoints() {
-        var g = svg.select('g.reviewerApprovals');
-
-        points = g.selectAll('circle.reviewerApproval')
-                    .data(reviewerData);
-
-        points.enter()
-            .append('circle')
-                .attr('class', 'reviewerApproval')
-                .attr('cx', function(d) { return xScale(d.approvalData.addedAsReviewerCount); })
-                .attr('cy', function(d) { return yScale(d.approvalData.approvalCount); })
-                .attr('r', function(d) { return 5 + (d.approvalData.addedAsReviewerCount / maxValue) * 30; })
-                .attr('fill', function(d) { return colors(d.identity.email); })
-                .attr('stroke', 'rgba(0,0,0, .05)')
-                .on('mouseover', function(d) { selectedReviewer = d; render(); })
-                .on('mouseout', function(d) { selectedReviewer = null; render(); })
-            .append('svg:title')
-                .text(function(d) { return d.identity.name; });
-
-        points
-            .classed('selected', function(d) { return selectedReviewer && d === selectedReviewer; })
-            .attr('fill-opacity', function(d) {
-                if (selectedReviewer) {
-                    return d === selectedReviewer ? 1 : 0.1;
-                } else {
-                    return 0.3;
-                }
-            });
-    }
-
-    function render() {
-        svg.select('g.x.reviewerApprovalChartAxis')
-            .call(xAxis);
-
-        svg.select('g.y.reviewerApprovalChartAxis')
-            .call(yAxis);
-
-        renderPoints();
-    }
-
-    render();
 }
 
 function createFrequencyTable(svgId, x_domain, data) {
