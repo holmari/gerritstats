@@ -5,8 +5,8 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
         bottom: 40,
         left: 40
     };
-    this.width = 690 - this.margin.left - this.margin.right;
-    this.height = 600 - this.margin.top - this.margin.bottom;
+    this.width = 480 - this.margin.left - this.margin.right;
+    this.height = 480 - this.margin.top - this.margin.bottom;
 
     this.selectedReviewer = null;
     this.colors = d3.scale.category10();

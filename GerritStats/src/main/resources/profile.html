@@ -73,7 +73,7 @@
     </div>
     -->
 
-    <div class="panel">
+    <div class="panel thirdWidth">
         <h2>Reviews given</h2>
         <div class="numberPanel">
             <div id="reviewCountGivenPlus2" class="value">&dash;</div>
@@ -96,7 +96,7 @@
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
     </div>
-    <div class="panel">
+    <div class="panel thirdWidth">
         <h2>Reviews received</h2>
         <div class="numberPanel">
             <div id="reviewCountReceivedPlus2" class="value">&dash;</div>
@@ -120,7 +120,7 @@
         </div>
     </div>
 
-    <div class="panel">
+    <div class="panel thirdWidth">
         <h2>Commits</h2>
         <div class="numberPanel">
             <div id="commitsSize" class="value">&dash;</div>
@@ -130,17 +130,16 @@
             <div id="addedAsReviewerTo" class="value">&dash;</div>
             <div>&nbsp;<div class="title">added as reviewer</div></div>
         </div>
+        <div class="clearFloat"></div>
         <div class="numberPanel">
             <div id="maxPatchSetCount" class="value">&dash;</div>
             <div>&nbsp;<div class="title">max patch set count</div></div>
         </div>
-
-        <div class="clearFloat"></div>
-
         <div class="numberPanel">
             <div id="commitsAbandoned" class="value">&dash;</div>
             <div>&nbsp;<div class="title">abandoned</div></div>
         </div>
+        <!--
         <div class="numberPanel">
             <div id="commitsInReview" class="value">&dash;</div>
             <div>&nbsp;<div class="title">in review</div></div>
@@ -149,10 +148,11 @@
             <div id="gitRepoCount" class="value">&dash;</div>
             <div>&nbsp;<div class="title">git repos</div></div>
         </div>
+        -->
     </div>
     <div class="clearFloat"></div>
 
-    <div class="panel">
+    <div class="panel halfWidth">
         <h2>Adds them as reviewers</h2>
         <table id="addedAsReviewersTable" class="table table-striped">
             <thead>
@@ -172,7 +172,7 @@
         </table>
     </div>
 
-    <div class="panel">
+    <div class="panel halfWidth">
         <h2>Reviewers and approvals</h2>
         <div id="reviewersAndApprovalsSvg">
         </div>
@@ -180,8 +180,27 @@
 
     <div class="clearFloat"></div>
 
+    <div class="panel halfWidth">
+        <h2>They request reviews</h2>
+        <table id="reviewRequestorTable" class="table table-striped">
+            <thead>
+                <th>Name</th>
+                <th class="dataField">times<br>added</th>
+            </thead>
+            <tbody>
+            </tbody>
+            <tfoot>
+                <tr><td colspan="2"></td></tr>
+                <tr>
+                    <th>Total review requestors</th>
+                    <td id="theyAddThisPersonAsReviewerCount"></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
     <div class="panelContainer">
-        <div class="panel">
+        <div class="panel halfWidth">
             <h2>Reviews by author</h2>
             <div class="numberPanel wide">
                 <div id="commentsWritten" class="value">&dash;</div>
@@ -200,7 +219,7 @@
             </table>
         </div>
         <div class="clearFloat"></div>
-        <div class="panel">
+        <div class="panel halfWidth">
             <h2>Received reviews</h2>
             <div class="numberPanel wide">
                 <div id="commentsReceived" class="value">&dash;</div>
@@ -210,39 +229,15 @@
                 <div id="receivedCommentRatio" class="value">&dash;</div>
                 <div>&nbsp;<div class="title">comments per commit</div></div>
             </div>
-
             <div class="clearFloat"></div>
-
-            <table>
-                <tr><th>Average time in code review</th></tr>
-                <tr><td id="averageTimeInCodeReview">&dash;</td></tr>
-                <!-- TODO make a bar chart here showing user's time / avg time -->
-            </table>
+            <div class="numberPanel wide">
+                <div id="averageTimeInCodeReview" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">avg time in code review</div></div>
+            </div>
         </div>
     </div>
 
-    <div class="panel">
-        <h2>They request reviews</h2>
-        <table id="reviewRequestorTable" class="table table-striped">
-            <thead>
-                <th>Name</th>
-                <th class="dataField">times<br>added</th>
-                <th class="dataField">reviews<br>given</th>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-                <tr><td colspan="3"></td></tr>
-                <tr>
-                    <th>Total review requestors</th>
-                    <td colspan="2" id="theyAddThisPersonAsReviewerCount"></td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-
-    <div class="panel">
+    <div class="panel fullWidth">
         <h2>Review comments per day</h2>
         <div id="commentsPerDaySvg">
         </div>
@@ -250,7 +245,7 @@
 
     <div class="clearFloat"></div>
 
-    <div class="panel">
+    <div class="panel fullWidth">
         <h2>Commits exceeding <span class="highPatchSetCountThreshold">x</span> patches</h2>
         <p>Only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</p>
 
@@ -261,18 +256,17 @@
         </div>
     </div>
 
-    <div class="panel">
+    <div class="panel fullWidth">
         <h2>Per-month stats</h2>
         <table class="perMonthStats" id="perMonthStats">
         </table>
     </div>
 
-    <div class="panel">
+    <div class="panel fullWidth">
         <h2>Review comments</h2>
         <p id="reviewComments">
         </p>
     </div>
-
 </content>
 
 <script>
@@ -329,6 +323,18 @@ function addReviewerDataToTable(reviewerData, tableJQuery) {
         </tr>');
     });
 }
+
+function addReviewerDataToRequestorTable(reviewerData, tableJQuery) {
+    var tableBody = $(tableJQuery).find('tbody');
+
+    reviewerData.forEach(function(item) {
+        tableBody.append('<tr>\
+            <td><a href="profile.html?user=' + item.identity.identifier + '">' + getShortPrintableName(item.identity) + '</a></td>\
+            <td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>\
+        </tr>');
+    });
+}
+
 
 /**
  * Adds all review comments by user to the table at the bottom of the view.
@@ -498,7 +504,7 @@ function updateViewFromUserdata() {
     $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
     $('#addedAsReviewersTable').tablesorter();
 
-    addReviewerDataToTable(record.getReviewRequestors(), '#reviewRequestorTable');
+    addReviewerDataToRequestorTable(record.getReviewRequestors(), '#reviewRequestorTable');
     $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
     $('#reviewRequestorTable').tablesorter();
 
@@ -548,7 +554,7 @@ function groupReviewCommentsByDate(comments) {
 
 function createFrequencyTable(svgId, x_domain, data) {
     var margin = {top: 20, right: 20, bottom: 30, left: 40};
-    var width = 800 - margin.left - margin.right;
+    var width = 1050 - margin.left - margin.right;
     var height = 400 - margin.top - margin.bottom;
 
     var x = d3.time.scale()
