@@ -58,21 +58,6 @@
 </nav>
 
 <content id="content" class="centered">
-
-    <!--
-        TODO: disabled for now. there's little additional value here.
-        What about just sticking username to top bar after email?
-
-    <div class="panel">
-        <h2>Profile</h2>
-        <table>
-            <tr><th>Username</th><td id="profileUsername"></td></tr>
-            <tr><th>Email</th><td id="profileEmail"></td></tr>
-            <tr><th>Aliases</th><td id="profileAliases">&dash;</td></tr>
-        </table>
-    </div>
-    -->
-
     <div class="panel thirdWidth">
         <a name="#overall"></a>
         <h2>Reviews given</h2>
@@ -475,7 +460,7 @@ function updateViewFromUserdata() {
 
     $('#pageTitleHead').html("GerritStats: " + record.printableName());
     $('#pageTitle').html(record.shortPrintableName());
-    $('#pageSubtitle').html(record.identity.email ? record.identity.email : "&nbsp;");
+    $('#pageSubtitle').html(record.printableEmailAndIdentity());
 
     $('#profileUsername').html(record.printableUsername());
     $('#profileEmail').html(record.printableEmail());

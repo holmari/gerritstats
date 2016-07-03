@@ -184,6 +184,17 @@ var userdataScope = {
         return getShortPrintableName(this.identity);
     },
 
+    printableEmailAndIdentity: function() {
+        var email = this.identity.email;
+        var mailAndIdentity = email ? email : '';
+        if (mailAndIdentity.length && this.hasUsername()) {
+            mailAndIdentity += ' (' + this.identity.username + ')'
+        } else if (!mailAndIdentity.length) {
+            mailAndIdentity = this.identity.username;
+        }
+        return mailAndIdentity;
+    },
+
     hasUsername: function() {
         return this.identity.username && this.identity.username.length;
     },
