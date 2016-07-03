@@ -249,6 +249,11 @@ nav ul li:hover {
     width: 1090px;
 }
 
+.panel .horizontalCenterGroup {
+    margin-left: 0px;
+    text-align: center;
+}
+
 .numberPanel {
     display: inline-block;
     margin-left: 7px;
