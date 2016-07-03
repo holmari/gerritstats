@@ -50,9 +50,9 @@
         <ul id="navBar" class="nav navbar-nav">
             <li role="presentation" class="active" data-type='overall'>Overall</li>
             <li role="presentation" data-type='reviewers'>Reviewers and approvals</li>
-            <li role="presentation" data-type='per_month'>Per-month</li>
             <li role="presentation" data-type='iteration'>Iteration</li>
-            <li role="presentation" data-type='review_comments'>Review comments</li>
+            <li role="presentation" data-type='perMonth'>Per-month</li>
+            <li role="presentation" data-type='comments'>Review comments</li>
         </ul>
     </div>
 </nav>
@@ -74,6 +74,7 @@
     -->
 
     <div class="panel thirdWidth">
+        <a name="#overall"></a>
         <h2>Reviews given</h2>
         <div class="numberPanel">
             <div id="reviewCountGivenPlus2" class="value">&dash;</div>
@@ -153,6 +154,7 @@
     <div class="clearFloat"></div>
 
     <div class="panel halfWidth">
+        <a name="reviewers"></a>
         <h2>Adds them as reviewers</h2>
         <table id="addedAsReviewersTable" class="table table-striped">
             <thead>
@@ -243,6 +245,7 @@
     <div class="clearFloat"></div>
 
     <div class="panel fullWidth">
+        <a name="iteration"></a>
         <h2>Commits exceeding <span class="highPatchSetCountThreshold">x</span> patches</h2>
         <p>Only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</p>
 
@@ -254,12 +257,14 @@
     </div>
 
     <div class="panel fullWidth">
+        <a name="perMonth"></a>
         <h2>Per-month stats</h2>
         <table class="perMonthStats" id="perMonthStats">
         </table>
     </div>
 
     <div class="panel fullWidth">
+        <a name="comments"></a>
         <h2>Review comments</h2>
         <p id="reviewComments">
         </p>
