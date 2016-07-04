@@ -151,37 +151,6 @@ function onSelectAllCheckboxClicked(checkbox) {
 
 var usersInAnalysis = new SelectedUsers(overviewUserdata);
 
-function getIndexOfIdentity(identity) {
-    for (var i = 0; i < overviewUserdata.length; ++i) {
-        var user = overviewUserdata[i];
-        if ((user.identity.email !== undefined && user.identity.email == identity.email)
-         || (user.identity.username !== undefined && user.identity.username == identity.username)) {
-            return i;
-        }
-    }
-    return -1;
-}
-
-var identityGraphNodes = jQuery.extend(true, [], overviewUserdata);
-var identityGraph = {
-    "nodes": identityGraphNodes,
-    "links":[]
-}
-
-for (var i = 0; i < overviewUserdata.length; ++i) {
-    var item = overviewUserdata[i];
-    for (var j = 0; j < item.myReviewerList.length; ++j) {
-        var reviewerRecord = item.myReviewerList[j];
-        if (reviewerRecord.reviewData.approvalCount != 0) {
-            identityGraph.links.push({
-                source: identityGraphNodes[i],
-                target: identityGraphNodes[getIndexOfIdentity(reviewerRecord.identity)],
-                value: reviewerRecord.reviewData.approvalCount
-            });
-        }
-    }
-}
-
 function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody')
 
@@ -229,7 +198,9 @@ function loadOverviewUserdata() {
     });
 }
 
+var identityGraph = createIdentityGraph(overviewUserdata);
 var proximityGraph = new ProximityGraph(identityGraph, usersInAnalysis, '#proximityGraph');
+proximityGraph.create();
 
 loadOverviewUserdata();
 

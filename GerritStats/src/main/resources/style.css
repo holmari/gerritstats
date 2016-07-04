@@ -50,6 +50,10 @@ tr[data-identifier]:hover {
     background-color: #dcdeeb !important;
 }
 
+.tableCaption {
+    padding: 8px 8px 8px 8px;
+}
+
 /* *** Headers *** */
 
 h1 {
@@ -406,13 +410,17 @@ header a img {
 }
 
 .proximityGraphNode {
-    stroke: #fff;
     stroke-width: 1.5px;
 }
 
 .proximityGraphLink {
     stroke: #999;
     stroke-opacity: .6;
+}
+
+.teamGraph {
+    min-width: 538px;
+    width: 538px;
 }
 
 /******************************************************************************

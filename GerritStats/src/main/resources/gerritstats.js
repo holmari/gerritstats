@@ -122,6 +122,16 @@ function getGerritUrlForComment(commit, patchSet, comment) {
     return baseUrl + "/#/c/" + commit.commitNumber + "/" + patchSet.number + "/" + comment.file;
 }
 
+function filterReviewerData(reviewerData, usersInAnalysis) {
+    var result = [];
+    reviewerData.forEach(function(item) {
+        if (usersInAnalysis.isUserSelected(item.identity.identifier)) {
+            result.push(item);
+        }
+    });
+    return result;
+}
+
 /**
  * The methods here are bound to the scope of each userdata['..'] object,
  * to allow for easy access to the per-person data.
@@ -270,13 +280,34 @@ var userdataScope = {
 
     getFilteredReviewerDataForOwnCommits: function(usersInAnalysis) {
         var reviewerData = this.getReviewerDataForOwnCommits();
-        var result = [];
+        return filterReviewerData(reviewerData, usersInAnalysis);
+    },
+
+    /**
+     * Returns a Set of all users that the user had interaction with.
+     * The result will be filtered so that only users in analysis are included.
+     */
+    getTeamIdentities: function(usersInAnalysis) {
+        var identities = new Set();
+        var reviewerData = this.getReviewerDataForOwnCommits();
         reviewerData.forEach(function(item) {
-            if (usersInAnalysis.isUserSelected(item.identity)) {
-                result.push(item);
+            identities.add(item.identity.identifier);
+        });
+        reviewerData = this.getReviewRequestors();
+        reviewerData.forEach(function(item) {
+            identities.add(item.identity.identifier);
+        });
+
+        var filteredResult = new Set();
+        identities.forEach(function(identifier) {
+            if (usersInAnalysis.isUserSelected(identifier)) {
+                filteredResult.add(identifier);
             }
         });
-        return result;
+        // add the user themselves to the team, too
+        filteredResult.add(this.identity.identifier);
+
+        return filteredResult;
     },
 
     getReviewRequestors: function() {

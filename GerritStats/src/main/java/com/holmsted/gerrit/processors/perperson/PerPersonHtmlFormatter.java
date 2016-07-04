@@ -80,6 +80,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
 
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
+                .registerTypeAdapter(Identity.class, new IdentitySerializer())
                 .registerTypeAdapter(IdentityRecord.class, new IdentityRecordOverviewSerializer())
                 .create();
 

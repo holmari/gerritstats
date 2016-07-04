@@ -8,11 +8,12 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
     this.width = 480 - this.margin.left - this.margin.right;
     this.height = 480 - this.margin.top - this.margin.bottom;
 
-    this.selectedReviewer = null;
     this.colors = d3.scale.category10();
 
-    // Allows listening to highlight changes caused by user interaction.
+    /** Allows listening to highlight changes caused by user interaction. */
     this.selectionChangedListener = null;
+    /** The selected (hovered or otherwise) item, or null if nothing is selected. */
+    this.selectedReviewer = null;
 
     this.initialize = function() {
         // axes size: max of added reviewer count.

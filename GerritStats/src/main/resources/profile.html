@@ -13,6 +13,7 @@
 <script src="res/gerritstats.js"></script>
 <script src="res/frequencytable.js"></script>
 <script src="res/permonthstats.js"></script>
+<script src="res/proximitygraph.js"></script>
 <script src="res/selectedusers.js"></script>
 <script src="res/reviewersapprovalsgraph.js"></script>
 <script src="overview/overview.js"></script>
@@ -185,6 +186,20 @@
                 </tr>
             </tfoot>
         </table>
+
+        <h4 class="tableCaption">These users never responded to review requests:</h4>
+        <table id="leftoverUsersTable" class="table table-striped">
+            <thead>
+                <th>Name</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel halfWidth">
+        <h2>Team graph</h2>
+        <div id="teamGraphSvg" class="teamGraph"></div>
     </div>
 
     <div class="panelContainer">
@@ -285,6 +300,7 @@ $('nav li').click(function(event) {
 var userIdentifier = getUrlParameter('user');
 var usersInAnalysis = new SelectedUsers(overviewUserdata);
 var reviewerApprovalGraph = null;
+var teamGraph = null;
 
 function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     for (var i = 0; i < dataArray.length; ++i) {
@@ -299,7 +315,7 @@ function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
     }
 }
 
-function addReviewerDataToTable(reviewerData, tableJQuery) {
+function addReviewerDataToTable(tableJQuery, reviewerData) {
     var tableBody = $(tableJQuery).find('tbody');
 
     reviewerData.forEach(function(item) {
@@ -318,17 +334,42 @@ function addReviewerDataToTable(reviewerData, tableJQuery) {
     });
 }
 
-function addReviewerDataToRequestorTable(reviewerData, tableJQuery) {
+function addTableCaptionRow(tableJQuery, separatorText) {
+    var tableBody = $(tableJQuery).find('tbody');
+    tableBody.append('<tr><th colspan="2" class="captionRow">' + (separatorText ? separatorText : '') + '</th></tr>');
+}
+
+function addReviewerRequestorDataToTable(tableJQuery, reviewerData) {
     var tableBody = $(tableJQuery).find('tbody');
 
     reviewerData.forEach(function(item) {
-        tableBody.append('<tr>\
+        tableBody.append('<tr data-identifier="' + item.identity.identifier + '">\
             <td><a href="profile.html?user=' + item.identity.identifier + '">' + getShortPrintableName(item.identity) + '</a></td>\
-            <td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>\
+            <td class="dataField">'
+                + (item.approvalData.addedAsReviewerCount >= 0 ? item.approvalData.addedAsReviewerCount : '&dash;')
+         + '</td>\
         </tr>');
+    });
+    tableBody.find('tr').mouseover(function(event) {
+        var identifier = event.currentTarget.attributes['data-identifier'].value;
+        teamGraph.setSelectedIdentifier(identifier);
+    });
+    tableBody.find('tr').mouseout(function() {
+        teamGraph.setSelectedIdentifier(null);
     });
 }
 
+function highlightTableRow(tableQuery, currentSelection, previousSelection) {
+    var body = $(tableQuery).find('tbody');
+    if (currentSelection) {
+        var identifier = currentSelection;
+        body.find("tr[data-identifier='" + identifier + "']").addClass('highlightedRow');
+    }
+    if (previousSelection) {
+        var prevIdentifier = previousSelection;
+        body.find("tr[data-identifier='" + prevIdentifier + "']").removeClass('highlightedRow');
+    }
+}
 
 /**
  * Adds all review comments by user to the table at the bottom of the view.
@@ -377,9 +418,19 @@ function addHighPatchSetCommits(exceedingCommits) {
     });
 }
 
+function hasIdentifier(reviewerData, identifierToSearch) {
+    for (var i = 0; i < reviewerData.length; ++i) {
+        if (reviewerData[i].identity.identifier == identifierToSearch) {
+            return true;
+        }
+    }
+    return false;
+}
+
 function updateViewFromUserdata() {
     var record = userdata[userIdentifier];
     userdataScope.initializeRecord(record);
+    var teamIdentities = record.getTeamIdentities(usersInAnalysis);
 
     $('#datasetOverviewBranchList').html(datasetOverview.branchList);
     $('#datasetOverviewFromDate').html(moment(datasetOverview.fromDate).format("YYYY-MM-DD"));
@@ -416,15 +467,33 @@ function updateViewFromUserdata() {
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
 
-    addReviewerDataToTable(reviewerData, '#addedAsReviewersTable');
+    addReviewerDataToTable('#addedAsReviewersTable', reviewerData);
     $('#addsThemAsReviewersCount').html(record.reviewersForOwnCommits.length);
     $('#addedAsReviewersTable').tablesorter();
 
-    addReviewerDataToRequestorTable(record.getReviewRequestors(), '#reviewRequestorTable');
+    var reviewRequestorData = record.getReviewRequestors();
+    var leftoverTeamData = [];
+
+    // append all users in 'team' who did not request reviews
+    for (var i = 0; i < reviewerData.length; ++i) {
+        var reviewerItem = reviewerData[i];
+        var identifier = reviewerItem.identity.identifier;
+        if (!hasIdentifier(reviewRequestorData, identifier)) {
+            leftoverTeamData.push({
+                'approvalData': {
+                    'addedAsReviewerCount': -1,
+                    'approvalCount': -1
+                },
+                'identity': reviewerItem.identity
+            });
+        }
+    }
+    addReviewerRequestorDataToTable('#reviewRequestorTable', reviewRequestorData);
+    addReviewerRequestorDataToTable('#leftoverUsersTable', leftoverTeamData);
     $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
     $('#reviewRequestorTable').tablesorter();
 
-    addReviewCommentsByUser(record, '#reviewComments')
+    addReviewCommentsByUser(record, '#reviewComments');
 
     $('.highPatchSetCountThreshold').html(outputConfig.highPatchSetCountThreshold.toString());
 
@@ -435,17 +504,26 @@ function updateViewFromUserdata() {
     new FrequencyTable("#highPatchSetCountCommitsSvg", record, record.getDatesForCommitsWithHighPatchSetCount());
 
     reviewerApprovalGraph.selectionChangedListener = function(currentSelection, previousSelection) {
-        var body = $('#addedAsReviewersTable').find('tbody');
-        if (currentSelection) {
-            var identifier = currentSelection;
-            body.find("tr[data-identifier='" + identifier + "']").addClass('highlightedRow');
-        }
-        if (previousSelection) {
-            var prevIdentifier = previousSelection;
-            body.find("tr[data-identifier='" + prevIdentifier + "']").removeClass('highlightedRow');
-        }
+        highlightTableRow('#addedAsReviewersTable', currentSelection, previousSelection);
     };
     reviewerApprovalGraph.render();
+
+    var identityGraph = createIdentityGraph(overviewUserdata, teamIdentities);
+    teamGraph = new ProximityGraph(identityGraph, usersInAnalysis, '#teamGraphSvg');
+    teamGraph.width = 490;
+    teamGraph.height = 490;
+    teamGraph.relativeLinkValueThreshold = 0.025;
+    teamGraph.charge = -200;
+    teamGraph.linkDistance = 25;
+    teamGraph.drawCrosshair = true;
+    teamGraph.highlightSelection = true;
+    teamGraph.defaultItemOpacity = 0.6;
+    teamGraph.centeredIdentifier = userIdentifier;
+    teamGraph.selectionChangedListener = function(currentSelection, previousSelection) {
+        highlightTableRow('#reviewRequestorTable', currentSelection, previousSelection);
+        highlightTableRow('#leftoverUsersTable', currentSelection, previousSelection);
+    };
+    teamGraph.create();
 }
 
 /**
