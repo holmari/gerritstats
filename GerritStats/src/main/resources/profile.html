@@ -11,6 +11,7 @@
 <script src="res/moment.min.js"></script>
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
+<script src="res/frequencytable.js"></script>
 <script src="res/selectedusers.js"></script>
 <script src="res/reviewersapprovalsgraph.js"></script>
 <script src="overview/overview.js"></script>
@@ -500,9 +501,8 @@ function updateViewFromUserdata() {
     addHighPatchSetCommits(record.getCommitsWithHighPatchSetCount());
     addPerMonthStats(record);
 
-    var xDomain = [record.getFromDate(), record.getToDate()];
-    createFrequencyTable("#commentsPerDaySvg", xDomain, groupReviewCommentsByDate(record.getReviewCommentDates()));
-    createFrequencyTable("#highPatchSetCountCommitsSvg", xDomain, record.getDatesForCommitsWithHighPatchSetCount());
+    new FrequencyTable("#commentsPerDaySvg", record, groupReviewCommentsByDate(record.getReviewCommentDates()));
+    new FrequencyTable("#highPatchSetCountCommitsSvg", record, record.getDatesForCommitsWithHighPatchSetCount());
 
     reviewerApprovalGraph.selectionChangedListener = function(currentSelection, previousSelection) {
         var body = $('#addedAsReviewersTable').find('tbody');
@@ -545,68 +545,6 @@ function groupReviewCommentsByDate(comments) {
         return (left.date <  right.date) ? -1 : 1;
     });
     return data;
-}
-
-function createFrequencyTable(svgId, x_domain, data) {
-    var margin = {top: 20, right: 20, bottom: 30, left: 40};
-    var width = 1050 - margin.left - margin.right;
-    var height = 400 - margin.top - margin.bottom;
-
-    var x = d3.time.scale()
-        .domain(x_domain)
-        .range([0, width]);
-
-    var y = d3.scale.linear()
-        .range([height, 0]);
-
-    var xAxis = d3.svg.axis()
-        .scale(x)
-        .orient("bottom")
-        .ticks(d3.time.weeks(x_domain[0], x_domain[1]).length)
-        .tickFormat(d3.time.format("%W"))
-
-    var yAxis = d3.svg.axis()
-        .scale(y)
-        .orient("left")
-        .ticks(10)
-        .tickFormat(d3.format("d"))
-
-    var svg = d3.select(svgId).append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    x.domain(x_domain);
-    y.domain([0, d3.max(data, function(d) { return d.count; })]);
-
-    svg.append("g")
-      .attr("class", "x commentChartAxis")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
-
-    svg.append("g")
-      .attr("class", "y commentChartAxis")
-      .call(yAxis)
-    .append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 6)
-      .attr("dy", ".71em")
-      .style("text-anchor", "end")
-      .text("Value");
-
-    var totalDaysInDomain = d3.time.days(x_domain[0], x_domain[1]);
-    var barWidth = width / totalDaysInDomain.length;
-    svg.selectAll(".bar")
-        .data(data)
-      .enter().append("rect")
-        .attr("class", "commentChartBar")
-        .attr("x", function(d) { return x(d.date); })
-        .attr("width", barWidth)
-        .attr("y", function(d) { return y(d.count); })
-        .attr("height", function(d) { return height - y(d.count); })
-       .append("svg:title")
-        .text(function(d) { return d.date });
 }
 
 loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
