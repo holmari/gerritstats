@@ -289,6 +289,10 @@ header a img {
     width: 220px;
 }
 
+.numberPanel.xWide {
+    width: 300px;
+}
+
 .numberPanel .value {
     padding-left: 0.5em;
     padding-right: 0.5em;
