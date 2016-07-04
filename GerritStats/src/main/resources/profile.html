@@ -16,9 +16,6 @@
 <script src="res/selectedusers.js"></script>
 <script src="res/reviewersapprovalsgraph.js"></script>
 <script src="overview/overview.js"></script>
-<script>
-    var userIdentifier = getUrlParameter('user');
-</script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
     <link type="text/css" rel="stylesheet" media="screen" href="res/style.css" />
@@ -259,6 +256,17 @@
         </p>
     </div>
 </content>
+<footer>
+    <div class="footerContent">
+        <div class="footerLeft">
+            <a href="https://github.com/holmari/gerritstats">Github</a>
+        </div>
+        <div class="footerRight">
+            Generated on <span id="generatedTimestamp">&dash;</span>
+        </div>
+        <div class="clearFloat"></div>
+    </div>
+</footer>
 
 <script>
 $('nav li').click(function(event) {
@@ -274,6 +282,7 @@ $('nav li').click(function(event) {
     window.location.href = '#' + navType;
 });
 
+var userIdentifier = getUrlParameter('user');
 var usersInAnalysis = new SelectedUsers(overviewUserdata);
 var reviewerApprovalGraph = null;
 
@@ -484,15 +493,4 @@ loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
 });
 
 </script>
-<footer>
-    <div class="footerContent">
-        <div class="footerLeft">
-            <a href="https://github.com/holmari/gerritstats">Github</a>
-        </div>
-        <div class="footerRight">
-            Generated on <span id="generatedTimestamp">&dash;</span>
-        </div>
-        <div class="clearFloat"></div>
-    </div>
-</footer>
 </body>
