@@ -12,6 +12,7 @@
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="res/frequencytable.js"></script>
+<script src="res/permonthstats.js"></script>
 <script src="res/selectedusers.js"></script>
 <script src="res/reviewersapprovalsgraph.js"></script>
 <script src="overview/overview.js"></script>
@@ -367,75 +368,6 @@ function addHighPatchSetCommits(exceedingCommits) {
     });
 }
 
-function addPerMonthStatsYearHeader(year) {
-    $('#perMonthStats').append('<tr><th colspan="13" class="monthlyCommitYearTitle">' + year + '</th></tr>\
-        <tr><th></th>\
-            <th>Jan</th>\
-            <th>Feb</th>\
-            <th>Mar</th>\
-            <th>Apr</th>\
-            <th>May</th>\
-            <th>Jun</th>\
-            <th>Jul</th>\
-            <th>Aug</th>\
-            <th>Sep</th>\
-            <th>Oct</th>\
-            <th>Nov</th>\
-            <th>Dec</th>\
-        </tr>\
-        <tr class="commitsSection">\
-            <th>Commits</th>\
-            <!-- content is added here -->\
-        </tr>\
-        <tr class="commentsSection">\
-            <th>Comments</th>\
-            <!-- content is added here -->\
-        </tr>\
-        <tr class="commitsMoMSection">\
-            <th>Commits MoM %</th>\
-            <!-- content is added here -->\
-        </tr>\
-        <tr class="commitsQoQSection">\
-            <th>Commits QoQ %</th>\
-            <!-- content is added here -->\
-        </tr>\
-        <tr class="commentsMoMSection">\
-            <th>Comments MoM %</th>\
-            <!-- content is added here -->\
-        </tr>\
-        <tr class="commentsQoQSection">\
-            <th>Comments QoQ %</th>\
-            <!-- content is added here -->\
-        </tr>\
-    ');
-}
-
-function addPerMonthStats(record) {
-    var commitTable = record.datedCommitTable;
-    var commentTable = record.datedCommentTable;
-
-    var years = record.datedCommitTable.getActiveYears();
-    years.forEach(function(year) {
-        addPerMonthStatsYearHeader(year);
-        for (var month = 1; month <= 12; ++month) {
-            var commitCount = commitTable.getPrintableMonthlyItemCount(year, month);
-            var commitsMoMChange = commitTable.getDisplayableMonthOnMonthChange(year, month);
-            var commitsQoQChange = commitTable.getDisplayableQuarterOnQuarterChange(year, month);
-
-            var commentCount = commentTable.getPrintableMonthlyItemCount(year, month);
-            var commentsMoMChange = commentTable.getDisplayableMonthOnMonthChange(year, month);
-            var commentsQoQChange = commentTable.getDisplayableQuarterOnQuarterChange(year, month);
-
-            $('#perMonthStats .commitsSection').last().append('<td>' + commitCount + '</td>');
-            $('#perMonthStats .commentsSection').last().append('<td>' + commentCount + '</td>');
-            $('#perMonthStats .commitsMoMSection').last().append('<td>' + commitsMoMChange + '</td>');
-            $('#perMonthStats .commitsQoQSection').last().append('<td>' + commitsQoQChange + '</td>');
-            $('#perMonthStats .commentsMoMSection').last().append('<td>' + commentsMoMChange + '</td>');
-            $('#perMonthStats .commentsQoQSection').last().append('<td>' + commentsQoQChange + '</td>');
-        }
-    });
-}
-
 function filterForUsersInAnalysis(reviewerData) {
     var result = [];
     reviewerData.forEach(function(item) {
@@ -499,8 +431,8 @@ function updateViewFromUserdata() {
     $('.highPatchSetCountThreshold').html(outputConfig.highPatchSetCountThreshold.toString());
 
     addHighPatchSetCommits(record.getCommitsWithHighPatchSetCount());
-    addPerMonthStats(record);
 
+    new PerMonthStats('#perMonthStats', record);
     new FrequencyTable("#commentsPerDaySvg", record, groupReviewCommentsByDate(record.getReviewCommentDates()));
     new FrequencyTable("#highPatchSetCountCommitsSvg", record, record.getDatesForCommitsWithHighPatchSetCount());
 
