@@ -377,16 +377,6 @@ function addHighPatchSetCommits(exceedingCommits) {
     });
 }
 
-function filterForUsersInAnalysis(reviewerData) {
-    var result = [];
-    reviewerData.forEach(function(item) {
-        if (usersInAnalysis.isUserSelected(item.identity)) {
-            result.push(item);
-        }
-    });
-    return result;
-}
-
 function updateViewFromUserdata() {
     var record = userdata[userIdentifier];
     userdataScope.initializeRecord(record);
@@ -423,8 +413,7 @@ function updateViewFromUserdata() {
     $('#reviewCountReceivedMinus2').html(record.getReceivedReviewsForScore(-2));
     $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
 
-    var reviewerData = record.getReviewerDataForOwnCommits();
-    reviewerData = filterForUsersInAnalysis(reviewerData);
+    var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
 
     addReviewerDataToTable(reviewerData, '#addedAsReviewersTable');

@@ -268,6 +268,17 @@ var userdataScope = {
         return reviewerData;
     },
 
+    getFilteredReviewerDataForOwnCommits: function(usersInAnalysis) {
+        var reviewerData = this.getReviewerDataForOwnCommits();
+        var result = [];
+        reviewerData.forEach(function(item) {
+            if (usersInAnalysis.isUserSelected(item.identity)) {
+                result.push(item);
+            }
+        });
+        return result;
+    },
+
     getReviewRequestors: function() {
         return userdataScope.sortReviewDataByAddedAsReviewerCount(this.reviewRequestors);
     },
