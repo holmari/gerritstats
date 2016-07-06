@@ -20,6 +20,13 @@ content {
     padding: 1em 1em 1em 1em;
 }
 
+p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 16px;
+    font-weight: 200;
+    line-height: 1.4;
+}
+
 pre {
     display: inline;
     font-family: monospace;
@@ -262,6 +269,11 @@ header a img {
     width: 354px;
 }
 
+.panel.twoThirdsWidth {
+    min-width: 722px;
+    width: 722px;
+}
+
 .panel.halfWidth {
     min-width: 538px;
     width: 538px;
@@ -359,6 +371,10 @@ header a img {
     line-height: 1.5;
 }
 
+.highPatchSetCountThreshold {
+    font-weight: bolder;
+}
+
 /******************************************************************************
  * Review comments
  *****************************************************************************/
@@ -409,6 +425,45 @@ header a img {
     fill: none;
     stroke: #cccccc;
     shape-rendering: crispEdges;
+}
+
+
+/******************************************************************************
+ * Graphs: iterative commits
+ *****************************************************************************/
+
+.iterativeCommitChartAxis {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 12px;
+    fill: #303138;
+}
+
+.iterativeCommitChartAxis path,
+.iterativeCommitChartAxis line {
+    fill: none;
+    stroke: #cccccc;
+    shape-rendering: crispEdges;
+}
+
+.iterativeCommitBubble {
+    fill-opacity: 0.3;
+}
+
+.selected {
+    fill-opacity: 1.0;
+}
+
+.verticalGuideline {
+    stroke: red; /* replaced at runtime */
+    stroke-width: 0.75;
+    fill-opacity: 1.0;
+    stroke-dasharray: ("10, 10");
+}
+
+.verticalGuidelineText {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    fill: #303138;
 }
 
 /******************************************************************************

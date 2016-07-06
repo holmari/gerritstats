@@ -369,16 +369,17 @@ var userdataScope = {
         return exceedingCommits;
     },
 
-    getDatesForCommitsWithHighPatchSetCount: function() {
-        var exceedingCommits = this.getCommitsWithHighPatchSetCount()
-        var commitDates = []
+    getDatedCommitsWithHighPatchSetCount: function() {
+        var exceedingCommits = this.getCommitsWithHighPatchSetCount();
+        var datedCommits = [];
         exceedingCommits.forEach(function(commit) {
-            commitDates.push({
-                'date': new Date(moment(commit.createdOnDate).format('YYYY-MM-DD')),
+            datedCommits.push({
+                'date': commit.createdOnDate,
                 'count': userdataScope.getPatchSetCountForKind(commit, 'REWORK'),
+                'commit': commit
             });
         });
-        return commitDates;
+        return datedCommits;
     },
 
     ///////////////////////////////////////////////////////////////////////////

@@ -12,6 +12,7 @@
 <script src="res/numeral.min.js"></script>
 <script src="res/gerritstats.js"></script>
 <script src="res/frequencytable.js"></script>
+<script src="res/iterationtimelinegraph.js"></script>
 <script src="res/permonthstats.js"></script>
 <script src="res/proximitygraph.js"></script>
 <script src="res/selectedusers.js"></script>
@@ -245,16 +246,23 @@
 
     <div class="clearFloat"></div>
 
-    <div class="panel fullWidth">
+    <div class="panel thirdWidth">
         <a name="iteration"></a>
-        <h2>Commits exceeding <span class="highPatchSetCountThreshold">x</span> patches</h2>
-        <p>Only includes commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted.</p>
+        <h2>Iteration</h2>
+        <p>Commits that were reworked over <span class="highPatchSetCountThreshold"></span> times after the initial review, and then submitted:</p>
+        <table id="iterationTable" class="table table-striped">
+            <thead>
+                <th>Title</th>
+                <th>Iterations</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
 
-        <p id="highPatchSetCountCommitList">
-        </p>
-
-        <div id="highPatchSetCountCommitsSvg">
-        </div>
+    <div class="panel twoThirdsWidth">
+        <h2>Iteration timeline</h2>
+        <div id="highPatchSetCountCommitsSvg"></div>
     </div>
 
     <div class="panel fullWidth">
@@ -301,19 +309,7 @@ var userIdentifier = getUrlParameter('user');
 var usersInAnalysis = new SelectedUsers(overviewUserdata);
 var reviewerApprovalGraph = null;
 var teamGraph = null;
-
-function addCommaSeparatedDataToElement(dataArray, elementQuery, dataRenderer) {
-    for (var i = 0; i < dataArray.length; ++i) {
-        var data = dataArray[i];
-        var renderedData = dataRenderer(data);
-        if (renderedData) {
-            $(elementQuery).append(renderedData);
-            if (i < dataArray.length - 1) {
-                $(elementQuery).append(', ');
-            }
-        }
-    }
-}
+var iterationTimelineGraph = null;
 
 function addReviewerDataToTable(tableJQuery, reviewerData) {
     var tableBody = $(tableJQuery).find('tbody');
@@ -343,12 +339,14 @@ function addReviewerRequestorDataToTable(tableJQuery, reviewerData) {
     var tableBody = $(tableJQuery).find('tbody');
 
     reviewerData.forEach(function(item) {
-        tableBody.append('<tr data-identifier="' + item.identity.identifier + '">\
-            <td><a href="profile.html?user=' + item.identity.identifier + '">' + getShortPrintableName(item.identity) + '</a></td>\
-            <td class="dataField">'
-                + (item.approvalData.addedAsReviewerCount >= 0 ? item.approvalData.addedAsReviewerCount : '&dash;')
-         + '</td>\
-        </tr>');
+        var html = '<tr data-identifier="' + item.identity.identifier + '">\
+                      <td><a href="profile.html?user=' + item.identity.identifier + '">'
+                          + getShortPrintableName(item.identity) + '</a></td>';
+         if (item.approvalData.addedAsReviewerCount >= 0) {
+             html += '<td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>';
+         }
+         html += '</tr>';
+        tableBody.append(html);
     });
     tableBody.find('tr').mouseover(function(event) {
         var identifier = event.currentTarget.attributes['data-identifier'].value;
@@ -412,9 +410,20 @@ function addReviewCommentsByUser(record, elementQuery) {
 }
 
 function addHighPatchSetCommits(exceedingCommits) {
-    addCommaSeparatedDataToElement(exceedingCommits, '#highPatchSetCountCommitList', function(commit) {
-        return '<a href="' + commit.url + '">' + commit.url + '</a> ('
-            + userdataScope.getPatchSetCountForKind(commit, 'REWORK') + ')';
+    var tableBody = $('#iterationTable').find('tbody');
+
+    exceedingCommits.forEach(function(commit) {
+        tableBody.append('<tr data-identifier="' + commit.url + '">\
+            <td><a href="' + commit.url + '">' + commit.subject + '</a></td>\
+            <td class="dataField">' + userdataScope.getPatchSetCountForKind(commit, 'REWORK') + '</td>\
+        </tr>');
+    });
+    tableBody.find('tr').mouseover(function(event) {
+        var commitUrl = event.currentTarget.attributes['data-identifier'].value;
+        iterationGraph.setSelectedCommitUrl(commitUrl);
+    });
+    tableBody.find('tr').mouseout(function() {
+        iterationGraph.setSelectedCommitUrl(null);
     });
 }
 
@@ -501,7 +510,12 @@ function updateViewFromUserdata() {
 
     new PerMonthStats('#perMonthStats', record);
     new FrequencyTable("#commentsPerDaySvg", record, groupReviewCommentsByDate(record.getReviewCommentDates()));
-    new FrequencyTable("#highPatchSetCountCommitsSvg", record, record.getDatesForCommitsWithHighPatchSetCount());
+    iterationGraph = new IterationTimelineGraph("#highPatchSetCountCommitsSvg", record);
+    iterationGraph.highPatchSetCountThreshold = outputConfig.highPatchSetCountThreshold;
+    iterationGraph.selectionChangedListener = function(currentSelection, previousSelection) {
+        highlightTableRow('#iterationTable', currentSelection, previousSelection);
+    };
+    iterationGraph.render();
 
     reviewerApprovalGraph.selectionChangedListener = function(currentSelection, previousSelection) {
         highlightTableRow('#addedAsReviewersTable', currentSelection, previousSelection);

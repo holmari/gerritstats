@@ -246,24 +246,29 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
                         return that.mapConnectionsToColor(relativeConnectionCount, that.lowConnectionColors);
                     }
                 })
-                .attr('fill-opacity', function(d) {
+                .on('mouseover', function(d) {
+                    that.updateSelection(d.identity.identifier);
                     if (that.highlightSelection) {
-                        return d.identity.identifier === that.selectedIdentifier ? 1 : that.defaultItemOpacity;
-                    } else {
-                        return that.defaultItemOpacity;
+                        d3.select(this).classed('selected', true);
                     }
                 })
                 .on('mouseout', function(d) {
                     that.updateSelection(null);
-                    d3.select(this).style('fill-opacity', that.defaultItemOpacity);
-                })
-                .on('mouseover', function(d) {
-                    that.updateSelection(d.identity.identifier);
-                    if (that.highlightSelection) {
-                        d3.select(this).style('fill-opacity', 1);
-                    }
+                    d3.select(this).classed('selected', false);
                 })
                 .call(this.forceLayout.drag);
+
+        nodes
+            .classed('selected', function(d) {
+                return d.identity.identifier === that.selectedIdentifier;
+            })
+            .attr('fill-opacity', function(d) {
+                if (that.highlightSelection) {
+                    return d.identity.identifier === that.selectedIdentifier ? 1 : that.defaultItemOpacity;
+                } else {
+                    return that.defaultItemOpacity;
+                }
+            });
 
         nodes.append('title')
             .attr("pointer-events", 'none')
