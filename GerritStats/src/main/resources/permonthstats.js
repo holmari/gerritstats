@@ -1,5 +1,5 @@
 /**
- * Renders a simple 2d bar chart.
+ * Renders a table of monthly statistics.
  */
 function PerMonthStats(parentId, userData) {
 

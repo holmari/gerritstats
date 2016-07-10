@@ -46,14 +46,15 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
             .scale(this.yScale)
             .orient('left');
 
-        this.svg = d3.select(svgId).append('svg')
-            .attr('width', this.width + this.margin.left + this.margin.right)
-            .attr('height', this.height + this.margin.top + this.margin.bottom)
-            .append("g")
-            .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
+        this.svg = d3.select(svgId)
+            .append('svg')
+              .attr('width', this.width + this.margin.left + this.margin.right)
+              .attr('height', this.height + this.margin.top + this.margin.bottom)
+            .append('g')
+              .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
 
         // diagonal
-        this.svg.append("line")
+        this.svg.append('line')
              .attr('x1', 0)
              .attr('y1', this.height)
              .attr('x2', this.width)
@@ -63,32 +64,25 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
              .attr('fill-opacity', 0.5);
 
         this.svg.append('g')
-            .attr('class', 'x reviewerApprovalChartAxis')
+            .attr('class', 'x chartAxis')
             .attr('transform', 'translate(0, ' + this.height + ')')
             .append('text')
                 .attr('transform', 'translate(' + (this.width / 2) + ', 0)')
-                .attr('class', 'reviewerApprovalAxisLabel')
+                .attr('class', 'chartAxisLabel')
                 .attr('x', 0)
                 .attr('y', this.margin.bottom - 6)
                 .style('text-anchor', 'middle')
                 .text('Number of times added as reviewer');
 
         this.svg.append('g')
-            .attr('class', 'y reviewerApprovalChartAxis')
+            .attr('class', 'y chartAxis')
             .append('text')
-                .attr('class', 'reviewerApprovalAxisLabel')
-                .attr('transform', 'rotate(90) translate(' + (this.height / 2) + ' 0)')
+                .attr('class', 'chartAxisLabel')
+                .attr('transform', 'rotate(90) translate(' + (this.height / 2) + ', 0)')
                 .attr('x', 0)
                 .attr('y', this.margin.left - 6)
                 .style('text-anchor', 'middle')
                 .text('Number of approvals');
-
-        this.svg.append('g')
-            .attr('class', 'x reviewerApprovalChartAxis')
-            .attr('transform', 'translate(0,' + this.height + ')');
-
-        this.svg.append('g')
-            .attr('class', 'y reviewerApprovalChartAxis');
 
         this.svg.append('g')
             .attr('class', 'reviewerApprovals')
@@ -146,10 +140,10 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
     };
 
     this.render = function() {
-        this.svg.select('g.x.reviewerApprovalChartAxis')
+        this.svg.select('g.x.chartAxis')
             .call(this.xAxis);
 
-        this.svg.select('g.y.reviewerApprovalChartAxis')
+        this.svg.select('g.y.chartAxis')
             .call(this.yAxis);
 
         this.renderPoints();

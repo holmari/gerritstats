@@ -384,49 +384,38 @@ header a img {
 }
 
 /******************************************************************************
- * Graphs
+ * Graphs: axes and labels
  *****************************************************************************/
 
-.commentChartBar {
-    fill: steelblue;
-}
-
-.commentChartBar:hover {
-    fill: brown;
-}
-
-.commentChartAxis {
-    font: 12px sans-serif;
-}
-
-.commentChartAxis path,
-.commentChartAxis line {
-    fill: none;
-    stroke: #000;
-    shape-rendering: crispEdges;
-}
-
-.x.commentChartAxis path {
-    display: none;
-}
-
-.reviewerApprovalChartAxis {
+.chartAxis {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
     font-size: 12px;
     fill: #303138;
 }
 
-.reviewerApprovalAxisLabel {
+.chartAxisLabel {
     font-size: 13px;
 }
 
-.reviewerApprovalChartAxis path,
-.reviewerApprovalChartAxis line {
+.chartAxis path,
+.chartAxis line {
     fill: none;
     stroke: #cccccc;
     shape-rendering: crispEdges;
 }
 
+.chartGuideline {
+    stroke: red; /* replaced at runtime */
+    stroke-width: 0.75;
+    fill-opacity: 1.0;
+    stroke-dasharray: ("10, 10");
+}
+
+.chartGuidelineText {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    fill: #303138;
+}
 
 /******************************************************************************
  * Graphs: iterative commits
@@ -453,17 +442,17 @@ header a img {
     fill-opacity: 1.0;
 }
 
-.verticalGuideline {
-    stroke: red; /* replaced at runtime */
-    stroke-width: 0.75;
-    fill-opacity: 1.0;
-    stroke-dasharray: ("10, 10");
+/******************************************************************************
+ * Graphs: review comments per day
+ *****************************************************************************/
+
+.commentChartBar {
+    fill-opacity: 0.5;
 }
 
-.verticalGuidelineText {
-    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
-    font-size: 14px;
-    fill: #303138;
+.commentChartBar:hover {
+    fill-opacity: 1;
+    stroke: #308138;
 }
 
 /******************************************************************************

@@ -63,7 +63,7 @@ function IterationTimelineGraph(svgId, userData) {
              .attr('fill-opacity', 0.5);
 
         this.verticalGuide = this.svg.append('line')
-             .attr('class', 'verticalGuideline')
+             .attr('class', 'chartGuideline')
              .attr('x1', 100)
              .attr('y1', this.height / 2)
              .attr('x2', 100)
@@ -72,7 +72,7 @@ function IterationTimelineGraph(svgId, userData) {
              .style('visibility', 'hidden');
 
         this.helpTextLabel = this.svg.append('text')
-             .attr('class', 'verticalGuidelineText')
+             .attr('class', 'chartGuidelineText')
              .attr('x', 100)
              .attr('y', this.height / 2)
              .style('visibility', 'hidden');
