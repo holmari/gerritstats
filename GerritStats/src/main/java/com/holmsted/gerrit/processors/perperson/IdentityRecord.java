@@ -1,13 +1,20 @@
 package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
+import com.holmsted.gerrit.Commit.PatchSet;
+import com.holmsted.gerrit.Commit.PatchSetComment;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -23,6 +30,37 @@ public class IdentityRecord {
 
         public int getApprovalCount() {
             return approvalCount;
+        }
+    }
+
+    public static class Repository {
+        String name;
+        String url;
+
+        int commitCountForUser;
+
+        @Override
+        public int hashCode() {
+            return name.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof Repository) {
+                Repository otherRepo = (Repository) other;
+                return name.equals(otherRepo.name);
+            } else {
+                return false;
+            }
+        }
+
+        public static Repository fromCommit(Commit commit) {
+            Repository repo = new Repository();
+            repo.name = commit.project;
+            repo.url = String.format("%s/#/q/project:%s",
+                    commit.url.substring(0, commit.url.lastIndexOf('/')),
+                    commit.project);
+            return repo;
         }
     }
 
@@ -120,6 +158,22 @@ public class IdentityRecord {
 
     public int getReviewCountPlus2() {
         return reviewCountPlus2;
+    }
+
+    public List<Repository> getRepositories() {
+        Map<String, Repository> repositories = new HashMap<>();
+
+        for (Commit commit : commits) {
+            Repository repository = repositories.get(commit.project);
+            if (repository == null) {
+                repository = Repository.fromCommit(commit);
+                repositories.put(commit.project, repository);
+            }
+            repository.commitCountForUser++;
+        }
+
+        List<Repository> result = new ArrayList<>(repositories.values());
+        return result;
     }
 
     public float getReceivedCommentRatio() {

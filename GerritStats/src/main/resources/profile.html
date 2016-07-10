@@ -278,6 +278,20 @@
     </div>
 
     <div class="panel fullWidth">
+        <a name="perMonth"></a>
+        <h2>Repositories contributed to</h2>
+        <table class="table table-striped" id="repositoriesTable">
+            <thead>
+                <th>Repository</th>
+                <th># of commits</th>
+                <th># of comments<br>written</th>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="panel fullWidth">
         <a name="comments"></a>
         <h2>Review comments</h2>
         <p id="reviewComments">
@@ -432,6 +446,29 @@ function addHighPatchSetCommits(exceedingCommits) {
     });
 }
 
+function addRepositories(identityRecord) {
+    var table = $('#repositoriesTable');
+    var tableBody = table.find('tbody');
+
+    var repositories = identityRecord.repositories;
+    var reviewCountsPerRepo = identityRecord.getUserReviewCountsPerRepository(usersInAnalysis);
+
+    var getCommentCount = function(repository) {
+        var statsObject = reviewCountsPerRepo[repository.name];
+        return statsObject ? statsObject.commentsWrittenByUser : 0;
+    }
+
+    repositories.forEach(function(repository) {
+        tableBody.append('<tr data-identifier="' + repository.name + '">\
+            <td><a href="' + repository.url + '">' + repository.name + '</a></td>\
+            <td class="dataField">' + repository.commitCountForUser + '</td>\
+            <td class="dataField">' + getCommentCount(repository) + '</td>\
+        </tr>');
+    });
+
+    table.tablesorter();
+}
+
 function hasIdentifier(reviewerData, identifierToSearch) {
     for (var i = 0; i < reviewerData.length; ++i) {
         if (reviewerData[i].identity.identifier == identifierToSearch) {
@@ -516,6 +553,7 @@ function updateViewFromUserdata() {
     $('.highPatchSetCountThreshold').html(outputConfig.highPatchSetCountThreshold.toString());
 
     addHighPatchSetCommits(record.getCommitsWithHighPatchSetCount());
+    addRepositories(record);
 
     new PerMonthStats('#perMonthStats', record);
     new FrequencyTable("#commentsPerDaySvg", record, groupReviewCommentsByDate(record.getReviewCommentDates()));

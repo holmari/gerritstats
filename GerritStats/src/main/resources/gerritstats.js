@@ -382,6 +382,44 @@ var userdataScope = {
         return datedCommits;
     },
 
+
+    getAddedAsReviewedToWithFilter: function(usersInAnalysis) {
+        var filteredCommits = [];
+        this.addedAsReviewerTo.forEach(function(commit) {
+            if (usersInAnalysis.isUserSelected(commit.owner.identifier)) {
+                filteredCommits.push(commit);
+            }
+        });
+        return filteredCommits;
+    },
+
+    getUserReviewCountsPerRepository: function(usersInAnalysis) {
+        var userIdentifier = this.identity.identifier;
+        var filteredCommits = this.getAddedAsReviewedToWithFilter(usersInAnalysis);
+
+        var results = {};
+        filteredCommits.forEach(function(commit) {
+            commit.patchSets.forEach(function(patchSet) {
+                patchSet.comments.forEach(function(comment) {
+                    if (comment.reviewer.identifier != userIdentifier) {
+                        return;
+                    }
+
+                    var result = results[commit.project];
+                    if (!result) {
+                        result = {
+                            'commentsWrittenByUser': 0
+                        };
+                    }
+
+                    result['commentsWrittenByUser'] += 1;
+                    results[commit.project] = result;
+                });
+            });
+        });
+        return results;
+    },
+
     ///////////////////////////////////////////////////////////////////////////
     // Private methods
     ///////////////////////////////////////////////////////////////////////////
