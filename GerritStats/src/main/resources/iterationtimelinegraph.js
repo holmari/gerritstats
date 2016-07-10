@@ -44,7 +44,8 @@ function IterationTimelineGraph(svgId, userData) {
 
         this.xAxis = d3.svg.axis()
             .scale(this.xScale)
-            .orient('bottom');
+            .orient('bottom')
+            .tickFormat(getDefaultXAxisTimeFormat());
 
         this.svg = d3.select(svgId).append('svg')
             .attr('width', this.width + this.margin.left + this.margin.right)

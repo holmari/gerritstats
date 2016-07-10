@@ -26,7 +26,8 @@ function FrequencyTable(svgId, record, data) {
 
         this.xAxis = d3.svg.axis()
                         .scale(this.x)
-                        .orient('bottom'),
+                        .orient('bottom')
+                        .tickFormat(getDefaultXAxisTimeFormat());
         this.yAxis = d3.svg.axis()
                         .scale(this.y)
                         .orient('left');
