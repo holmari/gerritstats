@@ -438,7 +438,7 @@ header a img {
     fill-opacity: 0.3;
 }
 
-.selected {
+.iterativeCommitBubble.selected {
     fill-opacity: 1.0;
 }
 
@@ -481,6 +481,15 @@ header a img {
 .teamGraph {
     min-width: 538px;
     width: 538px;
+}
+
+.proximityGraphNode {
+    stroke: #ffffff;
+}
+
+.proximityGraphNode.selected {
+    fill-opacity: 1.0;
+    stroke: #303138;
 }
 
 /******************************************************************************

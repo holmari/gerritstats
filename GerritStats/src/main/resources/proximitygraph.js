@@ -117,7 +117,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
     this.updateSize = function() {
         this.width = $(objectSelector).width();
         this.height = $(objectSelector).height();
-        this.svg.attr("width", this.width).attr("height", this.height);
+        this.svg.attr('width', this.width).attr('height', this.height);
         this.forceLayout.size([this.width, this.height]).resume();
     }
 
@@ -228,13 +228,6 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
                 .attr('class', 'proximityGraphNode')
                 .attr('r', function(d) {
                     return that.getNodeRadius(d, medianCommitCount);
-                })
-                .style('stroke', function(d) {
-                    if (that.highlightSelection && d.identity.identifier == that.selectedIdentifier) {
-                        return '#303138';
-                    } else {
-                        return '#ffffff';
-                    }
                 })
                 .style('fill', function(d) {
                     var connectionCount = that.getConnectionCount(d.index, links);
