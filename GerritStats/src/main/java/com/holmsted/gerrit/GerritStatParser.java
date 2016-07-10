@@ -18,8 +18,8 @@ public class GerritStatParser {
                 JSONObject lineJson = JsonUtils.readJsonString(line);
                 if (Commit.isCommit(lineJson)) {
                     commits.add(Commit.fromJson(lineJson));
-                } else {
-                    // TODO ignore for now
+                // ignore the stats, log the rest in case the format changes
+                } else if (!lineJson.get("type").equals("stats")) {
                     System.err.println("Ignored line " + line);
                 }
             } catch (JSONException ex) {
