@@ -85,6 +85,16 @@
             <div id="reviewCountGivenMinus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
+
+        <div class="numberPanel">
+            <div id="commentsWritten" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">comments written</div></div>
+        </div>
+
+        <div class="numberPanel">
+            <div id="reviewCommentRatio" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">comments / review req.</div></div>
+        </div>
     </div>
     <div class="panel thirdWidth">
         <h2>Reviews received</h2>
@@ -108,6 +118,13 @@
             <div id="reviewCountReceivedMinus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
+
+        <div class="horizontalCenterGroup">
+            <div class="numberPanel wide">
+                <div id="selfReviews" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">self-reviews</div></div>
+            </div>
+        </div>
     </div>
 
     <div class="panel thirdWidth">
@@ -129,16 +146,13 @@
             <div id="commitsAbandoned" class="value">&dash;</div>
             <div>&nbsp;<div class="title">abandoned</div></div>
         </div>
-        <!--
-        <div class="numberPanel">
-            <div id="commitsInReview" class="value">&dash;</div>
-            <div>&nbsp;<div class="title">in review</div></div>
+
+        <div class="horizontalCenterGroup">
+            <div class="numberPanel wide">
+                <div id="commitsInReview" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">in review</div></div>
+            </div>
         </div>
-        <div class="numberPanel">
-            <div id="gitRepoCount" class="value">&dash;</div>
-            <div>&nbsp;<div class="title">git repos</div></div>
-        </div>
-        -->
     </div>
     <div class="clearFloat"></div>
 
@@ -213,37 +227,21 @@
         <div id="teamGraphSvg" class="teamGraph"></div>
     </div>
 
-    <div class="panelContainer">
-        <div class="panel halfWidth">
-            <h2>Reviews by author</h2>
-            <div class="horizontalCenterGroup">
-                <div class="numberPanel wide">
-                    <div id="commentsWritten" class="value">&dash;</div>
-                    <div>&nbsp;<div class="title">comments written</div></div>
-                </div>
-                <div class="numberPanel wide">
-                    <div id="reviewCommentRatio" class="value">&dash;</div>
-                    <div>&nbsp;<div class="title">comments per review request</div></div>
-                </div>
+    <div class="panel halfWidth">
+        <h2>Received reviews</h2>
+        <div class="horizontalCenterGroup">
+            <div class="numberPanel wide">
+                <div id="commentsReceived" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments received</div></div>
             </div>
-        </div>
-        <div class="clearFloat"></div>
-        <div class="panel halfWidth">
-            <h2>Received reviews</h2>
-            <div class="horizontalCenterGroup">
-                <div class="numberPanel wide">
-                    <div id="commentsReceived" class="value">&dash;</div>
-                    <div>&nbsp;<div class="title">comments received</div></div>
-                </div>
-                <div class="numberPanel wide">
-                    <div id="receivedCommentRatio" class="value">&dash;</div>
-                    <div>&nbsp;<div class="title">comments per commit</div></div>
-                </div>
-                <div class="clearFloat"></div>
-                <div class="numberPanel xWide">
-                    <div id="averageTimeInCodeReview" class="value">&dash;</div>
-                    <div>&nbsp;<div class="title">avg time in code review</div></div>
-                </div>
+            <div class="numberPanel wide">
+                <div id="receivedCommentRatio" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">comments per commit</div></div>
+            </div>
+            <div class="clearFloat"></div>
+            <div class="numberPanel xWide">
+                <div id="averageTimeInCodeReview" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">avg time in code review</div></div>
             </div>
         </div>
     </div>
@@ -561,12 +559,14 @@ function updateViewFromUserdata() {
     $('#reviewCountGivenPlus1').html(record.reviewCountPlus1);
     $('#reviewCountGivenMinus1').html(record.reviewCountMinus1);
     $('#reviewCountGivenMinus2').html(record.reviewCountMinus2);
+    $('#selfReviews').html(record.selfReviewedCommitCount);
     $('#reviewCountReceivedPlus2').html(record.getReceivedReviewsForScore(2));
     $('#reviewCountReceivedPlus1').html(record.getReceivedReviewsForScore(1));
     $('#reviewCountReceivedMinus1').html(record.getReceivedReviewsForScore(-1));
     $('#reviewCountReceivedMinus2').html(record.getReceivedReviewsForScore(-2));
     $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
     $('#commitsAbandoned').html(record.abandonedCommitCount);
+    $('#commitsInReview').html(record.inReviewCommitCount);
 
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);

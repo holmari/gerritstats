@@ -223,6 +223,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             json.add("receivedCommentRatio", context.serialize(identityRecord.getReceivedCommentRatio()));
             json.add("reviewCommentRatio", context.serialize(identityRecord.getReviewCommentRatio()));
             json.add("addedAsReviewerToCount", context.serialize(identityRecord.addedAsReviewerTo.size()));
+            json.add("selfReviewedCommitCount", context.serialize(identityRecord.getSelfReviewedCommits().size()));
             json.add("abandonedCommitCount", context.serialize(identityRecord.getAbandonedCommitCount()));
 
             List<JsonObject> reviewerList = new ArrayList<>();
@@ -269,6 +270,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                     JsonObject object = (JsonObject) tree;
                     object.add("abandonedCommitCount", new JsonPrimitive(record.getAbandonedCommitCount()));
                     object.add("repositories", gson.toJsonTree(record.getRepositories()));
+                    object.add("selfReviewedCommitCount", gson.toJsonTree(record.getSelfReviewedCommits().size()));
+                    object.add("inReviewCommitCount", new JsonPrimitive(record.getInReviewCommitCount()));
 
                     elementAdapter.write(out, tree);
                 }

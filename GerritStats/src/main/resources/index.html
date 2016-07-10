@@ -67,6 +67,7 @@
         <th class="dataField">Comments<br>/ commit</th>
         <th class="dataField">Comments<br>/ review<br>requests</th>
         <th class="dataField">Added as<br>reviewer</th>
+        <th class="dataField">Self-reviews</th>
         <th class="dataField">Average time<br>in review</th>
     </thead>
     <tbody id="overviewTableBody">
@@ -166,6 +167,8 @@ function loadOverviewUserdata() {
                                     .setIsAscending(true),
         'reviewCommentRatio': new TableCellHighlighter(overviewUserdata, 'reviewCommentRatio'),
         'addedAsReviewerToCount': new TableCellHighlighter(overviewUserdata, 'addedAsReviewerToCount'),
+        'selfReviewedCommitCount': new TableCellHighlighter(overviewUserdata, 'selfReviewedCommitCount')
+                                    .setIsAscending(true),
         'averageTimeInCodeReview': new TableCellHighlighter(overviewUserdata, 'averageTimeInCodeReview')
                                        .setIsAscending(true),
     };
@@ -191,6 +194,7 @@ function loadOverviewUserdata() {
             <td class="dataField" data-value="' + item.reviewCommentRatio + '" '
                 + highlighters['reviewCommentRatio'].highlight(item) + '>' + numeral(item.reviewCommentRatio).format('0.000') + '</td>\
             <td class="dataField" ' + highlighters['addedAsReviewerToCount'].highlight(item) + '>' + item.addedAsReviewerToCount + '</td>\
+            <td class="dataField" ' + highlighters['selfReviewedCommitCount'].highlight(item) + '>' + item.selfReviewedCommitCount + '</td>\
             <td class="dataField" data-unixtime="' + item.averageTimeInCodeReview + '" '
                 + highlighters['averageTimeInCodeReview'].highlight(item) + '>'
                 + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
@@ -253,7 +257,7 @@ $(document).ready(function() {
             10: {
                 sorter: 'decimal'
             },
-            12: {
+            13: {
                 sorter:'timeInReview'
             }
         }

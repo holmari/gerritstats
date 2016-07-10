@@ -1,20 +1,18 @@
 package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
+import com.holmsted.gerrit.Commit.Approval;
 import com.holmsted.gerrit.Commit.PatchSet;
-import com.holmsted.gerrit.Commit.PatchSetComment;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
 
+import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -212,6 +210,16 @@ public class IdentityRecord {
         }
     }
 
+    public int getInReviewCommitCount() {
+        int newCommitCount = 0;
+        for (Commit commit : commits) {
+            if (commit.status.equals("NEW")) {
+                ++newCommitCount;
+            }
+        }
+        return newCommitCount;
+    }
+
     public int getAbandonedCommitCount() {
         int abandonedCommitCount = 0;
         for (Commit commit : commits) {
@@ -240,6 +248,49 @@ public class IdentityRecord {
         } else if (approval.value == -2) {
             ++reviewCountMinus2;
         }
+    }
+
+    public List<Commit> getSelfReviewedCommits() {
+        List<Commit> result = new ArrayList<>();
+
+        for (Commit commit : commits) {
+            if (!commit.status.equals("MERGED")) {
+                continue;
+            }
+
+            // merge always comes from the last patch set, so check that first
+            boolean selfReviewedLastCommit = true;
+            PatchSet lastPatchSet = commit.patchSets.get(commit.patchSets.size() - 1);
+            for (Approval approval : lastPatchSet.approvals) {
+                if (approval.value == 2) {
+                    selfReviewedLastCommit &= approval.grantedBy.equals(identity);
+                }
+            }
+            if (!selfReviewedLastCommit) {
+                continue;
+            }
+
+            boolean foundEarlierNonAuthorApproval = false;
+            for (PatchSet patchSet : commit.patchSets) {
+                for (Approval approval : patchSet.approvals) {
+                    if (approval.value == 2 && !approval.grantedBy.equals(identity)) {
+                        foundEarlierNonAuthorApproval = true;
+                        break;
+                    }
+                }
+                if (foundEarlierNonAuthorApproval) {
+                    break;
+                }
+            }
+            if (foundEarlierNonAuthorApproval) {
+                continue;
+            }
+
+            result.add(commit);
+        }
+
+
+        return result;
     }
 
     public List<Commit.Identity> getMyReviewerList() {
