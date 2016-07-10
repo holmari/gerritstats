@@ -382,7 +382,6 @@ var userdataScope = {
         return datedCommits;
     },
 
-
     getAddedAsReviewedToWithFilter: function(usersInAnalysis) {
         var filteredCommits = [];
         this.addedAsReviewerTo.forEach(function(commit) {

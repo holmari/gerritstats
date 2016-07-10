@@ -178,18 +178,19 @@
                 <thead>
                     <th>Name</th>
                     <th class="dataField">times<br>added</th>
+                    <th class="dataField">reviews<br>written</th>
                 </thead>
                 <tbody>
                 </tbody>
                 <tfoot>
-                    <tr><td colspan="2"></td></tr>
+                    <tr><td colspan="3"></td></tr>
                     <tr>
                         <th>Total review requestors</th>
-                        <td id="theyAddThisPersonAsReviewerCount"></td>
+                        <td colspan="2" id="theyAddThisPersonAsReviewerCount"></td>
                     </tr>
                     <tr>
                         <th>Total review requests</th>
-                        <td id="reviewRequestCount"></td>
+                        <td colspan="2" id="reviewRequestCount"></td>
                     </tr>
                 </tfoot>
             </table>
@@ -197,7 +198,7 @@
         <div class="clearFloat"></div>
         <div class="panel halfWidth">
             <h2>They never responded to review requests</h2>
-            <table id="leftoverUsersTable" class="table table-striped">
+            <table id="nonRespondingUsersTable" class="table table-striped">
                 <thead>
                     <th>Name</th>
                 </thead>
@@ -359,17 +360,39 @@ function addTableCaptionRow(tableJQuery, separatorText) {
     tableBody.append('<tr><th colspan="2" class="captionRow">' + (separatorText ? separatorText : '') + '</th></tr>');
 }
 
-function addReviewerRequestorDataToTable(tableJQuery, reviewerData) {
-    var tableBody = $(tableJQuery).find('tbody');
+
+function addReviewRequestorData(identityRecord, reviewerData) {
+    var table = $('#reviewRequestorTable');
+    var tableBody = table.find('tbody');
+
+    var reviewsWrittenForUser = {};
+    identityRecord.commentsWritten.forEach(function(commentSet) {
+        var commitOwner = commentSet.commit.owner.identifier;
+        if (!usersInAnalysis.isUserSelected(commitOwner)) {
+            return;
+        }
+
+        var userRecord = reviewsWrittenForUser[commitOwner];
+        if (!userRecord) {
+            userRecord = 0;
+        }
+
+        userRecord += commentSet.commentsByUser.length;
+        reviewsWrittenForUser[commitOwner] = userRecord;
+    });
+
+    var getReviewsWrittenToUser = function(identifier) {
+        var reviewCount = reviewsWrittenForUser[identifier];
+        return reviewCount ? reviewCount : 0;
+    }
 
     reviewerData.forEach(function(item) {
         var html = '<tr data-identifier="' + item.identity.identifier + '">\
-                      <td><a href="profile.html?user=' + item.identity.identifier + '">'
-                          + getShortPrintableName(item.identity) + '</a></td>';
-         if (item.approvalData.addedAsReviewerCount >= 0) {
-             html += '<td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>';
-         }
-         html += '</tr>';
+                        <td><a href="profile.html?user=' + item.identity.identifier + '">'
+                        + getShortPrintableName(item.identity) + '</a></td>'
+                     + '<td class="dataField">' + item.approvalData.addedAsReviewerCount + '</td>'
+                     + '<td class="dataField">' + getReviewsWrittenToUser(item.identity.identifier) + '</td>'
+                 + '</tr>'
         tableBody.append(html);
     });
     tableBody.find('tr').mouseover(function(event) {
@@ -379,6 +402,30 @@ function addReviewerRequestorDataToTable(tableJQuery, reviewerData) {
     tableBody.find('tr').mouseout(function() {
         teamGraph.setSelectedIdentifier(null);
     });
+
+    table.tablesorter();
+}
+
+function addNonRespondingUserData(identityRecord, reviewerData) {
+    var table = $('#nonRespondingUsersTable');
+    var tableBody = $(table).find('tbody');
+
+    reviewerData.forEach(function(item) {
+        var html = '<tr data-identifier="' + item.identity.identifier + '">\
+                        <td><a href="profile.html?user=' + item.identity.identifier + '">'
+                         + getShortPrintableName(item.identity) + '</a></td>';
+        html += '</tr>';
+        tableBody.append(html);
+    });
+    tableBody.find('tr').mouseover(function(event) {
+        var identifier = event.currentTarget.attributes['data-identifier'].value;
+        teamGraph.setSelectedIdentifier(identifier);
+    });
+    tableBody.find('tr').mouseout(function() {
+        teamGraph.setSelectedIdentifier(null);
+    });
+
+    table.tablesorter();
 }
 
 function highlightTableRow(tableQuery, currentSelection, previousSelection) {
@@ -529,14 +576,14 @@ function updateViewFromUserdata() {
     $('#addedAsReviewersTable').tablesorter();
 
     var reviewRequestorData = record.getReviewRequestors();
-    var leftoverTeamData = [];
+    var nonRespondingUserData = [];
 
     // append all users in 'team' who did not request reviews
     for (var i = 0; i < reviewerData.length; ++i) {
         var reviewerItem = reviewerData[i];
         var identifier = reviewerItem.identity.identifier;
         if (!hasIdentifier(reviewRequestorData, identifier)) {
-            leftoverTeamData.push({
+            nonRespondingUserData.push({
                 'approvalData': {
                     'addedAsReviewerCount': -1,
                     'approvalCount': -1
@@ -545,13 +592,13 @@ function updateViewFromUserdata() {
             });
         }
     }
-    addReviewerRequestorDataToTable('#reviewRequestorTable', reviewRequestorData);
-    addReviewerRequestorDataToTable('#leftoverUsersTable', leftoverTeamData);
+
+    addReviewRequestorData(record, reviewRequestorData);
+    addNonRespondingUserData(record, nonRespondingUserData);
     $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
     $('#reviewRequestCount').html(record.reviewRequestors.reduce(function(prevValue, currentValue) {
         return prevValue += currentValue.approvalData.addedAsReviewerCount;
     }, 0));
-    $('#reviewRequestorTable').tablesorter();
 
     addReviewCommentsByUser(record, '#reviewComments');
 
@@ -587,7 +634,7 @@ function updateViewFromUserdata() {
     teamGraph.centeredIdentifier = userIdentifier;
     teamGraph.selectionChangedListener = function(currentSelection, previousSelection) {
         highlightTableRow('#reviewRequestorTable', currentSelection, previousSelection);
-        highlightTableRow('#leftoverUsersTable', currentSelection, previousSelection);
+        highlightTableRow('#nonRespondingUsersTable', currentSelection, previousSelection);
     };
     teamGraph.create();
 }
