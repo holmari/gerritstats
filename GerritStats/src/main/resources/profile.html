@@ -170,36 +170,40 @@
 
     <div class="clearFloat"></div>
 
-    <div class="panel halfWidth">
-        <h2>They request reviews</h2>
-        <table id="reviewRequestorTable" class="table table-striped">
-            <thead>
-                <th>Name</th>
-                <th class="dataField">times<br>added</th>
-            </thead>
-            <tbody>
-            </tbody>
-            <tfoot>
-                <tr><td colspan="2"></td></tr>
-                <tr>
-                    <th>Total review requestors</th>
-                    <td id="theyAddThisPersonAsReviewerCount"></td>
-                </tr>
-                <tr>
-                    <th>Total review requests</th>
-                    <td id="reviewRequestCount"></td>
-                </tr>
-            </tfoot>
-        </table>
-
-        <h4 class="tableCaption">These users never responded to review requests:</h4>
-        <table id="leftoverUsersTable" class="table table-striped">
-            <thead>
-                <th>Name</th>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+    <div class="panelContainer">
+        <div class="panel halfWidth">
+            <h2>They request reviews</h2>
+            <table id="reviewRequestorTable" class="table table-striped">
+                <thead>
+                    <th>Name</th>
+                    <th class="dataField">times<br>added</th>
+                </thead>
+                <tbody>
+                </tbody>
+                <tfoot>
+                    <tr><td colspan="2"></td></tr>
+                    <tr>
+                        <th>Total review requestors</th>
+                        <td id="theyAddThisPersonAsReviewerCount"></td>
+                    </tr>
+                    <tr>
+                        <th>Total review requests</th>
+                        <td id="reviewRequestCount"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        <div class="clearFloat"></div>
+        <div class="panel halfWidth">
+            <h2>They never responded to review requests</h2>
+            <table id="leftoverUsersTable" class="table table-striped">
+                <thead>
+                    <th>Name</th>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 
     <div class="panel halfWidth">
