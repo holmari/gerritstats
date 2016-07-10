@@ -1,6 +1,5 @@
 package com.holmsted.gerrit.processors.perperson;
 
-import com.google.common.base.Strings;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
@@ -60,7 +59,7 @@ public class IdentityRecord {
     }
 
     public String getPrintableAverageTimeInCodeReview() {
-       return formatPrintableDuration(averageTimeInCodeReview);
+        return formatPrintableDuration(averageTimeInCodeReview);
     }
 
     public String getEmail() {
@@ -157,6 +156,16 @@ public class IdentityRecord {
         } else {
             return 0;
         }
+    }
+
+    public int getAbandonedCommitCount() {
+        int abandonedCommitCount = 0;
+        for (Commit commit : commits) {
+            if (commit.status.equals("ABANDONED")) {
+                ++abandonedCommitCount;
+            }
+        }
+        return abandonedCommitCount;
     }
 
     public float getReviewCommentRatio() {

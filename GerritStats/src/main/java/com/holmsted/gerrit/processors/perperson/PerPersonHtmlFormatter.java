@@ -5,8 +5,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.google.gson.TypeAdapter;
+import com.google.gson.TypeAdapterFactory;
+import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import com.holmsted.file.FileWriter;
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.Commit.Identity;
@@ -132,6 +138,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 .registerTypeAdapter(PatchSetCommentTable.class, new PatchSetCommentTableSerializer())
                 .registerTypeAdapter(ReviewerDataTable.class, new ReviewerDataTableSerializer())
                 .registerTypeAdapter(Identity.class, new IdentitySerializer())
+                .registerTypeAdapterFactory(new IdentityRecordTypeAdapterFactory())
                 .create();
 
         for (IdentityRecord record : orderedList) {
@@ -216,6 +223,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             json.add("receivedCommentRatio", context.serialize(identityRecord.getReceivedCommentRatio()));
             json.add("reviewCommentRatio", context.serialize(identityRecord.getReviewCommentRatio()));
             json.add("addedAsReviewerToCount", context.serialize(identityRecord.addedAsReviewerTo.size()));
+            json.add("abandonedCommitCount", context.serialize(identityRecord.getAbandonedCommitCount()));
 
             List<JsonObject> reviewerList = new ArrayList<>();
             for (Identity reviewer : identityRecord.getMyReviewerList()) {
@@ -227,6 +235,48 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             }
             json.add("myReviewerList", context.serialize(reviewerList));
             return json;
+        }
+    }
+
+    private static class IdentityRecordSerializer implements JsonSerializer<IdentityRecord> {
+
+        @Override
+        public JsonElement serialize(IdentityRecord identityRecord,
+                                     Type typeOfSrc,
+                                     JsonSerializationContext context) {
+            JsonElement json = context.serialize(identityRecord);
+            System.out.println("JSON:" + json);
+            return json;
+         //   json.add("abandonedCommitCount", context.serialize(identityRecord.getAbandonedCommitCount()));
+        }
+    }
+
+    private static class IdentityRecordTypeAdapterFactory implements TypeAdapterFactory {
+
+        @Override
+        public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
+            if (!IdentityRecord.class.isAssignableFrom(type.getRawType())) {
+                return null;
+            }
+
+            final TypeAdapter<T> delegate = gson.getDelegateAdapter(this, type);
+            final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
+            return new TypeAdapter<T>() {
+                @Override public void write(JsonWriter out, T value) throws IOException {
+                    JsonElement tree = delegate.toJsonTree(value);
+
+                    IdentityRecord record = (IdentityRecord) value;
+                    JsonObject object = (JsonObject) tree;
+                    object.add("abandonedCommitCount", new JsonPrimitive(record.getAbandonedCommitCount()));
+
+                    elementAdapter.write(out, tree);
+                }
+
+                @Override public T read(JsonReader in) throws IOException {
+                    JsonElement tree = elementAdapter.read(in);
+                    return delegate.fromJsonTree(tree);
+                }
+            };
         }
     }
 

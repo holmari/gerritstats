@@ -477,6 +477,7 @@ function updateViewFromUserdata() {
     $('#reviewCountReceivedMinus1').html(record.getReceivedReviewsForScore(-1));
     $('#reviewCountReceivedMinus2').html(record.getReceivedReviewsForScore(-2));
     $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
+    $('#commitsAbandoned').html(record.abandonedCommitCount);
 
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
