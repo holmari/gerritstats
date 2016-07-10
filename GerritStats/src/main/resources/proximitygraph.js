@@ -127,7 +127,17 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
 
     this.setSelectedIdentifier = function(userIdentifier) {
         this.selectedIdentifier = userIdentifier;
-        this.render();
+
+        if (this.selectedIdentifier) {
+            var matchingItems = this.svg
+                .selectAll('circle.proximityGraphNode')
+                .filter(function(d, i) {
+                    return d.identity.identifier === userIdentifier;
+                }).classed('selected', true);
+        } else {
+            this.svg
+                .selectAll('circle.proximityGraphNode').classed('selected', false);
+        }
     };
 
     this.updateSelection = function(newSelection) {
