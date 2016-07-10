@@ -185,6 +185,10 @@
                     <th>Total review requestors</th>
                     <td id="theyAddThisPersonAsReviewerCount"></td>
                 </tr>
+                <tr>
+                    <th>Total review requests</th>
+                    <td id="reviewRequestCount"></td>
+                </tr>
             </tfoot>
         </table>
 
@@ -501,6 +505,9 @@ function updateViewFromUserdata() {
     addReviewerRequestorDataToTable('#reviewRequestorTable', reviewRequestorData);
     addReviewerRequestorDataToTable('#leftoverUsersTable', leftoverTeamData);
     $('#theyAddThisPersonAsReviewerCount').html(record.reviewRequestors.length);
+    $('#reviewRequestCount').html(record.reviewRequestors.reduce(function(prevValue, currentValue) {
+        return prevValue += currentValue.approvalData.addedAsReviewerCount;
+    }, 0));
     $('#reviewRequestorTable').tablesorter();
 
     addReviewCommentsByUser(record, '#reviewComments');
