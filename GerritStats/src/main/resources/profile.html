@@ -119,11 +119,13 @@
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
 
-        <div class="horizontalCenterGroup">
-            <div class="numberPanel wide">
-                <div id="selfReviews" class="value">&dash;</div>
-                <div>&nbsp;<div class="title">self-reviews</div></div>
-            </div>
+        <div class="numberPanel">
+            <div id="commentsReceived" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">comments received</div></div>
+        </div>
+        <div class="numberPanel">
+            <div id="selfReviews" class="value">&dash;</div>
+            <div>&nbsp;<div class="title">self-reviews</div></div>
         </div>
     </div>
 
@@ -228,12 +230,25 @@
     </div>
 
     <div class="panel halfWidth">
-        <h2>Received reviews</h2>
+        <h2>Timeline</h2>
+
         <div class="horizontalCenterGroup">
             <div class="numberPanel wide">
-                <div id="commentsReceived" class="value">&dash;</div>
-                <div>&nbsp;<div class="title">comments received</div></div>
+                <div id="firstActiveDate" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">first seen</div></div>
             </div>
+            <div class="clearFloat"></div>
+            <div class="numberPanel wide">
+                <div id="lastActiveDate" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">last seen</div></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel halfWidth">
+        <h2>Received reviews</h2>
+
+        <div class="horizontalCenterGroup">
             <div class="numberPanel wide">
                 <div id="receivedCommentRatio" class="value">&dash;</div>
                 <div>&nbsp;<div class="title">comments per commit</div></div>
@@ -567,6 +582,9 @@ function updateViewFromUserdata() {
     $('#averageTimeInCodeReview').html(formatPrintableDuration(record.averageTimeInCodeReview));
     $('#commitsAbandoned').html(record.abandonedCommitCount);
     $('#commitsInReview').html(record.inReviewCommitCount);
+
+    $('#firstActiveDate').html(moment(record.firstActiveDate).format('YYYY-MM-DD'));
+    $('#lastActiveDate').html(moment(record.lastActiveDate).format('YYYY-MM-DD'));
 
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);

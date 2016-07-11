@@ -6,9 +6,9 @@ import com.holmsted.gerrit.Commit.PatchSet;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
 
-import java.awt.Component;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -68,6 +68,10 @@ public class IdentityRecord {
     int reviewCountPlus1;
     int reviewCountMinus1;
     int reviewCountMinus2;
+
+    // updated when commit or comments written by this user are added
+    long firstActiveDate = Long.MAX_VALUE;
+    long lastActiveDate;
 
     final Hashtable<Integer, Integer> receivedReviews = new Hashtable<>();
 
@@ -402,6 +406,7 @@ public class IdentityRecord {
 
     public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
         commentsWritten.addCommentForCommit(commit, patchSetComment);
+        updateActivityTimestamps(commit.getPatchSetForComment(patchSetComment).createdOnDate);
     }
 
     public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
@@ -425,6 +430,12 @@ public class IdentityRecord {
 
     public void addCommit(@Nonnull Commit commit) {
         commits.add(commit);
+        updateActivityTimestamps(commit.lastUpdatedDate);
+    }
+
+    private void updateActivityTimestamps(long unixEpochMsec) {
+        firstActiveDate = Math.min(unixEpochMsec, firstActiveDate);
+        lastActiveDate = Math.max(unixEpochMsec, lastActiveDate);
     }
 
     void updateAverageTimeInCodeReview(long commitTimeInCodeReviewMsec) {

@@ -225,6 +225,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             json.add("addedAsReviewerToCount", context.serialize(identityRecord.addedAsReviewerTo.size()));
             json.add("selfReviewedCommitCount", context.serialize(identityRecord.getSelfReviewedCommits().size()));
             json.add("abandonedCommitCount", context.serialize(identityRecord.getAbandonedCommitCount()));
+            json.add("firstActiveDate", context.serialize(identityRecord.firstActiveDate));
+            json.add("lastActiveDate", context.serialize(identityRecord.lastActiveDate));
 
             List<JsonObject> reviewerList = new ArrayList<>();
             for (Identity reviewer : identityRecord.getMyReviewerList()) {

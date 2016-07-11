@@ -232,6 +232,10 @@ public class Commit {
             return comments;
         }
 
+        public boolean contains(PatchSetComment patchSetComment) {
+            return comments.indexOf(patchSetComment) != -1;
+        }
+
         static PatchSet fromJson(JSONObject patchSetJson) {
             PatchSet patchSet = new PatchSet();
             patchSet.number = patchSetJson.optInt("number");
@@ -283,6 +287,15 @@ public class Commit {
 
     public int getPatchSetCountForKind(String kind) {
         return getPatchSetCountForKind(PatchSetKind.valueOf(kind));
+    }
+
+    public Commit.PatchSet getPatchSetForComment(PatchSetComment patchSetComment) {
+        for (PatchSet patchSet : patchSets) {
+            if (patchSet.contains(patchSetComment)) {
+                return patchSet;
+            }
+        }
+        throw new IllegalArgumentException("Attempted to query for a comment not in the patch set!");
     }
 
     public int getPatchSetCountForKind(PatchSetKind kind) {
