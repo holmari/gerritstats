@@ -161,16 +161,27 @@ function loadOverviewUserdata() {
         'reviewCountMinus1': new TableCellHighlighter(overviewUserdata, 'reviewCountMinus1'),
         'reviewCountMinus2': new TableCellHighlighter(overviewUserdata, 'reviewCountMinus2'),
         'allCommentsWritten': new TableCellHighlighter(overviewUserdata, 'allCommentsWritten'),
-        'allCommentsReceived': new TableCellHighlighter(overviewUserdata, 'allCommentsReceived'),
-        'commitCount': new TableCellHighlighter(overviewUserdata, 'commitCount'),
+        'allCommentsReceived': new TableCellHighlighter(overviewUserdata, 'allCommentsReceived')
+                                    .setIsAscending(true)
+                                    .setIgnoreFunction(function(element, key) {
+                                        return element.commitCount == 0;
+                                    }),
+        'commitCount': new TableCellHighlighter(overviewUserdata, 'commitCount')
+                                    .setIgnoreZeroes(true),
         'receivedCommentRatio': new TableCellHighlighter(overviewUserdata, 'receivedCommentRatio')
-                                    .setIsAscending(true),
+                                    .setIsAscending(true)
+                                    .setIgnoreFunction(function(element, key) {
+                                        return element.commitCount == 0;
+                                    }),
         'reviewCommentRatio': new TableCellHighlighter(overviewUserdata, 'reviewCommentRatio'),
         'addedAsReviewerToCount': new TableCellHighlighter(overviewUserdata, 'addedAsReviewerToCount'),
         'selfReviewedCommitCount': new TableCellHighlighter(overviewUserdata, 'selfReviewedCommitCount')
-                                    .setIsAscending(true),
+                                    .setIsAscending(true)
+                                    .setHighlightPositiveEntries(false)
+                                    .setIgnoreZeroes(true),
         'averageTimeInCodeReview': new TableCellHighlighter(overviewUserdata, 'averageTimeInCodeReview')
-                                       .setIsAscending(true),
+                                       .setIsAscending(true)
+                                       .setIgnoreZeroes(true),
     };
 
     var highlight = function(item, highlighterName) {
