@@ -6,13 +6,17 @@ import com.holmsted.gerrit.Commit.PatchSet;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
 
+import org.joda.time.DateTime;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
@@ -72,6 +76,9 @@ public class IdentityRecord {
     // updated when commit or comments written by this user are added
     long firstActiveDate = Long.MAX_VALUE;
     long lastActiveDate;
+
+    long activeDayCount;
+    private transient Set<String> activeDays = new HashSet<>();
 
     final Hashtable<Integer, Integer> receivedReviews = new Hashtable<>();
 
@@ -436,6 +443,11 @@ public class IdentityRecord {
     private void updateActivityTimestamps(long unixEpochMsec) {
         firstActiveDate = Math.min(unixEpochMsec, firstActiveDate);
         lastActiveDate = Math.max(unixEpochMsec, lastActiveDate);
+
+        DateTime dateTime = new DateTime(unixEpochMsec);
+        activeDays.add(dateTime.toString("YYYY-MM-DD"));
+
+        activeDayCount = activeDays.size();
     }
 
     void updateAverageTimeInCodeReview(long commitTimeInCodeReviewMsec) {

@@ -237,10 +237,19 @@
                 <div id="firstActiveDate" class="value">&dash;</div>
                 <div>&nbsp;<div class="title">first seen</div></div>
             </div>
-            <div class="clearFloat"></div>
+
             <div class="numberPanel wide">
                 <div id="lastActiveDate" class="value">&dash;</div>
                 <div>&nbsp;<div class="title">last seen</div></div>
+            </div>
+            <div class="clearFloat"></div>
+            <div class="numberPanel">
+                <div id="totalDayCount" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">total days</div></div>
+            </div>
+            <div class="numberPanel">
+                <div id="activeDayCount" class="value">&dash;</div>
+                <div>&nbsp;<div class="title">active days</div></div>
             </div>
         </div>
     </div>
@@ -585,6 +594,8 @@ function updateViewFromUserdata() {
 
     $('#firstActiveDate').html(moment(record.firstActiveDate).format('YYYY-MM-DD'));
     $('#lastActiveDate').html(moment(record.lastActiveDate).format('YYYY-MM-DD'));
+    $('#totalDayCount').html(Math.round((record.lastActiveDate - record.firstActiveDate) / (1000 * 60 * 60 * 24)));
+    $('#activeDayCount').html(record.activeDayCount);
 
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
     reviewerApprovalGraph = new ReviewersAndApprovalsGraph('#reviewersAndApprovalsSvg', reviewerData);
