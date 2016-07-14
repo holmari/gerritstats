@@ -32,7 +32,7 @@ public class GerritStatsDownloaderMain {
             reader.setProjectName(projectName);
             String data = reader.readData();
             if (data.isEmpty()) {
-                System.out.println(String.format("No output was generated for project '%s'").format(projectName));
+                System.out.println(String.format("No output was generated for project '%s'", projectName));
             } else {
                 String outputDir = checkNotNull(commandLine.getOutputDir());
                 String outputFilename = outputDir + File.separator + projectNameToFilename(projectName);
