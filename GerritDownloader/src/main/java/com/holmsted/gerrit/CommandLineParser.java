@@ -49,6 +49,11 @@ public class CommandLineParser {
             converter = ServerAndPort.Converter.class)
     private ServerAndPort serverAndPort;
 
+    @Parameter(names = {"-i", "--private-key"},
+            description = "The SSH private key to access the server. Defaults to ~/.ssh/id_rsa.",
+            required = false)
+    private String privateKey;
+
     @Parameter(names = {"-p", "--project"},
             description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
                     + "If omitted, stats will be retrieved from all projects.")
@@ -107,6 +112,14 @@ public class CommandLineParser {
     @Nullable
     public String getServerName() {
         return serverAndPort != null ? serverAndPort.serverName : null;
+    }
+
+    @Nullable
+    public String getPrivateKey() {
+        if (privateKey != null) {
+          return privateKey;
+        }
+        return "~/.ssh/id_rsa";
     }
 
     @Nullable

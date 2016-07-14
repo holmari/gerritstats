@@ -8,15 +8,16 @@ import javax.annotation.Nonnull;
 public class GerritServer {
 
     private static final int GERRIT_DEFAULT_PORT = 29418;
-
     private final int port;
 
     @Nonnull
     private final String serverName;
+    private final String privateKey;
 
-    public GerritServer(@Nonnull String serverName, int port) {
+    public GerritServer(@Nonnull String serverName, int port, @Nonnull String privateKey) {
         this.serverName = serverName;
         this.port = port != 0 ? port : GERRIT_DEFAULT_PORT;
+        this.privateKey = privateKey;
     }
 
     public String getServerName() {
@@ -25,6 +26,10 @@ public class GerritServer {
 
     public int getPort() {
         return port;
+    }
+
+    public String getPrivateKey() {
+        return privateKey;
     }
 
     @Override

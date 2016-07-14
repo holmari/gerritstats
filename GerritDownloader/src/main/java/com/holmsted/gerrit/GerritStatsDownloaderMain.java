@@ -18,8 +18,10 @@ public class GerritStatsDownloaderMain {
             return;
         }
 
-        GerritServer gerritServer = new GerritServer(commandLine.getServerName(),
-                commandLine.getServerPort());
+        GerritServer gerritServer = new GerritServer(
+                commandLine.getServerName(),
+                commandLine.getServerPort(),
+                commandLine.getPrivateKey());
 
         List<String> projectNames = commandLine.getProjectNames();
         if (projectNames == null || projectNames.isEmpty()) {

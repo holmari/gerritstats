@@ -70,7 +70,7 @@ public class GerritStatReader {
             Runtime runtime = Runtime.getRuntime();
             try {
                 String projectNameList = createProjectNameList();
-                String command = String.format("ssh -p %s %s gerrit query %s "
+                String command = String.format("ssh -p %s -i %s %s gerrit query %s "
                                 + "--format=JSON "
                                 + "--all-approvals "
                                 + "--all-reviewers "
@@ -78,6 +78,7 @@ public class GerritStatReader {
                                 + createStartOffsetArg()
                                 + createLimitArg(),
                         String.valueOf(gerritServer.getPort()),
+                        String.valueOf(gerritServer.getPrivateKey()),
                         gerritServer.getServerName(),
                         projectNameList);
                 System.out.println(command);
