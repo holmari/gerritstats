@@ -50,7 +50,7 @@ function loadJavascriptFile(filename, onLoadCallback) {
  * Loads the userdata .js file for the given user's unique identifier.
  */
 function loadUserdataForUserIdentifier(userIdentifier, onLoadCallback) {
-    loadJavascriptFile('userdata/' + userIdentifier + '.js', onLoadCallback);
+    loadJavascriptFile('data/users/' + userIdentifier + '.js', onLoadCallback);
 }
 
 function hashCode(text) {

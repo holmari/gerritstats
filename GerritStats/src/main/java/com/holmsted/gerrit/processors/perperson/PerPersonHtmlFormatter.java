@@ -20,10 +20,12 @@ import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 import com.holmsted.gerrit.processors.perperson.IdentityRecord.ReviewerData;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -34,27 +36,7 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
-    private static final String RES_OUTPUT_DIR = "res";
-
-    private static final String[] JS_RESOURCES = {
-            "d3.min.js",
-            "style.css",
-            "jquery.min.js",
-            "jquery.tablesorter.min.js",
-            "numeral.min.js",
-            "bootstrap.css",
-            "bootstrap.min.js",
-            "moment.min.js",
-            "gerritstats.js",
-            "tablecellhighlighter.js",
-            "selectedusers.js",
-            "proximitygraph.js"
-    };
-
-    private static final String[] HTML_RESOURCES = {
-            "index.html",
-            "profile.html"
-    };
+    private static final String RES_OUTPUT_DIR = ".";
 
     private File outputDir;
     private File resOutputDir;
@@ -82,10 +64,26 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         createPerPersonFiles(orderedList);
         createIdsJs();
 
-        copyFilesToTarget(resOutputDir, JS_RESOURCES);
-        copyFilesToTarget(outputDir, HTML_RESOURCES);
+        copyFilesToTarget(resOutputDir, getResourceFiles("resList.js"));
 
         System.out.println("Output written to " + outputDir.getAbsolutePath());
+    }
+
+    private List<String> getResourceFiles(String path) {
+        List<String> filenames = new ArrayList<>();
+        ClassLoader classLoader = PerPersonHtmlFormatter.class.getClassLoader();
+
+        InputStream fileListingStream = classLoader.getResourceAsStream(path);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(fileListingStream));
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                filenames.add(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return filenames;
     }
 
     private void createIdsJs() {
@@ -101,6 +99,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         writer.write(String.format("ids = %s;", gson.toJson(identities)));
 
         FileWriter.writeFile(outputDir.getPath()
+                + File.separator + "data"
                 + File.separator + outputFilename, writer.toString());
     }
 
@@ -131,11 +130,11 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         writer.write(String.format("datasetOverview = %s;", gson.toJson(datasetOverview)));
 
         FileWriter.writeFile(outputDir.getPath()
-                + File.separator + "overview"
+                + File.separator + "data"
                 + File.separator + outputFilename, writer.toString());
     }
 
-    private void copyFilesToTarget(File outputDir, String... filenames) {
+    private void copyFilesToTarget(File outputDir, List<String> filenames) {
         for (String filename : filenames) {
             copyFileToTarget(outputDir, filename);
         }
@@ -193,7 +192,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 json));
 
         FileWriter.writeFile(outputDir.getPath()
-                + File.separator + "userdata"
+                + File.separator + "data"
+                + File.separator + "users"
                 + File.separator + outputFilename, writer.toString());
     }
 

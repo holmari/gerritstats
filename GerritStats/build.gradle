@@ -14,4 +14,31 @@ jar {
 
     // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+
+    task generateResourceFileListing() << {
+        assert sourceSets.main.resources.srcDirs.size() == 1;
+
+        java.io.StringWriter filenameListWriter = new StringWriter();
+
+        File baseDir = sourceSets.main.resources.srcDirs.iterator().next();
+        String basePathName = baseDir.absolutePath;
+
+        Stack<File> fileStack = new Stack<>();
+        fileStack.add(baseDir);
+        while (!fileStack.isEmpty()) {
+            File file = fileStack.pop();
+            if (file.isDirectory()) {
+                fileStack.addAll(file.listFiles());
+            } else if (file.isFile() && !file.isHidden()) {
+                String relPath = file.absolutePath.substring(basePathName.length() + 1);
+                filenameListWriter.write(relPath + '\n');
+            }
+        }
+
+        java.io.FileWriter fileWriter = new FileWriter(basePathName + "/resList.js");
+        fileWriter.write(filenameListWriter.toString());
+        fileWriter.close();
+    }
+
+    processResources.dependsOn generateResourceFileListing
 }
