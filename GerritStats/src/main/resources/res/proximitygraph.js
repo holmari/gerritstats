@@ -122,7 +122,11 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
     }
 
     this.getNodeRadius = function(nodeData, medianCommitCount) {
-        return 3 + 2 * Math.sqrt(nodeData.commitCount / medianCommitCount);
+        if (medianCommitCount > 0) {
+            return 3 + 2 * Math.sqrt(nodeData.commitCount / medianCommitCount);
+        } else {
+            return 3;
+        }
     }
 
     this.setSelectedIdentifier = function(userIdentifier) {

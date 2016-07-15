@@ -179,11 +179,19 @@ var userdataScope = {
     },
 
     getFromDate: function() {
-        return new Date(moment(this._fromDate).format('YYYY-MM-DD'));
+        if (this._fromDate) {
+            return new Date(moment(this._fromDate).format('YYYY-MM-DD'));
+        } else {
+            return null;
+        }
     },
 
     getToDate: function() {
-        return new Date(moment(this._toDate).format('YYYY-MM-DD'));
+        if (this._toDate) {
+            return new Date(moment(this._toDate).format('YYYY-MM-DD'));
+        } else {
+            return null;
+        }
     },
 
     printableName: function() {

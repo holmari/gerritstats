@@ -593,9 +593,13 @@ function updateViewFromUserdata() {
     $('#commitsAbandoned').html(record.abandonedCommitCount);
     $('#commitsInReview').html(record.inReviewCommitCount);
 
-    $('#firstActiveDate').html(moment(record.firstActiveDate).format('YYYY-MM-DD'));
-    $('#lastActiveDate').html(moment(record.lastActiveDate).format('YYYY-MM-DD'));
-    $('#totalDayCount').html(Math.round((record.lastActiveDate - record.firstActiveDate) / (1000 * 60 * 60 * 24)));
+    var firstActiveDate = moment(record.firstActiveDate);
+    var activeDayCount = firstActiveDate.isValid() && record.lastActiveDate
+                       ? Math.round((record.lastActiveDate - record.firstActiveDate) / (1000 * 60 * 60 * 24))
+                       : "&dash;";
+    $('#firstActiveDate').html(firstActiveDate.isValid() ? moment(firstActiveDate).format('YYYY-MM-DD') : "&dash;");
+    $('#lastActiveDate').html(record.lastActiveDate ? moment(record.lastActiveDate).format('YYYY-MM-DD') : "&dash;");
+    $('#totalDayCount').html(activeDayCount);
     $('#activeDayCount').html(record.activeDayCount);
 
     var reviewerData = record.getFilteredReviewerDataForOwnCommits(usersInAnalysis);
