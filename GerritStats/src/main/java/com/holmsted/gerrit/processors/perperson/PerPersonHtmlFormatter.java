@@ -241,19 +241,6 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         }
     }
 
-    private static class IdentityRecordSerializer implements JsonSerializer<IdentityRecord> {
-
-        @Override
-        public JsonElement serialize(IdentityRecord identityRecord,
-                                     Type typeOfSrc,
-                                     JsonSerializationContext context) {
-            JsonElement json = context.serialize(identityRecord);
-            System.out.println("JSON:" + json);
-            return json;
-         //   json.add("abandonedCommitCount", context.serialize(identityRecord.getAbandonedCommitCount()));
-        }
-    }
-
     private static class IdentityRecordTypeAdapterFactory implements TypeAdapterFactory {
 
         @Override
