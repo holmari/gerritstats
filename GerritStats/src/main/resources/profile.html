@@ -19,6 +19,7 @@
 <script src="res/selectedusers.js"></script>
 <script src="res/reviewersapprovalsgraph.js"></script>
 <script src="data/ids.js"></script>
+<script src="data/datasetOverview.js"></script>
 <script src="data/overview.js"></script>
 <head>
     <link type="text/css" rel="stylesheet" media="screen" href="res/bootstrap.css" />
@@ -354,7 +355,7 @@ $('nav li').click(function(event) {
 });
 
 var userIdentifier = getUrlParameter('user');
-var usersInAnalysis = new SelectedUsers(overviewUserdata);
+var usersInAnalysis = new SelectedUsers(overviewUserdata, datasetOverview.hashCode);
 var reviewerApprovalGraph = null;
 var teamGraph = null;
 var iterationTimelineGraph = null;

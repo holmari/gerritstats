@@ -60,7 +60,8 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
             identities.put(identity.getIdentifier(), identity);
         }
 
-        createOverviewJs(data, orderedList);
+        createOverviewJs(orderedList);
+        createDatasetOverviewJs(data);
         createPerPersonFiles(orderedList);
         createIdsJs();
 
@@ -87,26 +88,19 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
     }
 
     private void createIdsJs() {
-        String outputFilename = "ids.js";
-        System.out.println("Creating " + outputFilename);
-
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Identity.class, new IdentitySerializer())
                 .create();
 
-        StringWriter writer = new StringWriter();
-        writer.write(String.format("ids = %s;", gson.toJson(identities)));
-
-        FileWriter.writeFile(outputDir.getPath()
-                + File.separator + "data"
-                + File.separator + outputFilename, writer.toString());
+        new JsonFileBuilder()
+                .setOutputFilename("ids.js")
+                .setMemberName("ids")
+                .setSerializedJs(gson.toJson(identities))
+                .build();
     }
 
-    private void createOverviewJs(PerPersonData perPersonData, IdentityRecordList identityRecords) {
-        String outputFilename = "overview.js";
-        System.out.println("Creating " + outputFilename);
-
+    private void createOverviewJs(IdentityRecordList identityRecords) {
         Gson gson = new GsonBuilder()
                 .setPrettyPrinting()
                 .registerTypeAdapter(Identity.class, new IdentityMappingSerializer())
@@ -115,8 +109,20 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
 
         String json = gson.toJson(identityRecords);
         json = IdentityMappingSerializer.postprocess(json);
-        StringWriter writer = new StringWriter();
-        writer.write(String.format("overviewUserdata = %s;", json));
+
+        new JsonFileBuilder()
+                .setOutputFilename("overview.js")
+                .setMemberName("overviewUserdata")
+                .setSerializedJs(json)
+                .build();
+    }
+
+    private void createDatasetOverviewJs(PerPersonData perPersonData) {
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(Identity.class, new IdentityMappingSerializer())
+                .registerTypeAdapter(IdentityRecord.class, new IdentityRecordOverviewSerializer())
+                .create();
 
         JsonObject datasetOverview = new JsonObject();
         datasetOverview.add("projectName", gson.toJsonTree(perPersonData.getQueryData().getDisplayableProjectName()));
@@ -125,13 +131,14 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         datasetOverview.add("fromDate", gson.toJsonTree(perPersonData.getFromDate()));
         datasetOverview.add("toDate", gson.toJsonTree(perPersonData.getToDate()));
         datasetOverview.add("generatedDate", gson.toJsonTree(new Date().getTime()));
+        datasetOverview.add("hashCode", gson.toJsonTree(perPersonData.getQueryData().getDatasetKey()));
 
-        writer.write('\n');
-        writer.write(String.format("datasetOverview = %s;", gson.toJson(datasetOverview)));
 
-        FileWriter.writeFile(outputDir.getPath()
-                + File.separator + "data"
-                + File.separator + outputFilename, writer.toString());
+        new JsonFileBuilder()
+                .setOutputFilename("datasetOverview.js")
+                .setMemberName("datasetOverview")
+                .setSerializedJs(gson.toJson(datasetOverview))
+                .build();
     }
 
     private void copyFilesToTarget(File outputDir, List<String> filenames) {
@@ -342,6 +349,42 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
          */
         public static String postprocess(String serializedJson) {
             return serializedJson.replaceAll("\"__\\$\\$ids\\[(.+)\\]\"", "ids[\"$1\"]");
+        }
+    }
+
+    private class JsonFileBuilder {
+
+        private String outputFilename;
+        private String serializedJs;
+        private String memberVariableName;
+
+        private String dataPath = "data";
+
+        public JsonFileBuilder setOutputFilename(String outputFilename) {
+            this.outputFilename = outputFilename;
+            System.out.println("Creating " + this.outputFilename);
+            return this;
+        }
+
+        public JsonFileBuilder setMemberName(String memberVariableName) {
+            this.memberVariableName = memberVariableName;
+            return this;
+        }
+
+        public JsonFileBuilder setSerializedJs(String serializedJs) {
+            this.serializedJs = serializedJs;
+            return this;
+        }
+
+        public void build() {
+            StringWriter writer = new StringWriter();
+            writer.write(String.format("%s = %s;",
+                    memberVariableName,
+                    serializedJs));
+
+            FileWriter.writeFile(outputDir.getPath()
+                    + File.separator + dataPath
+                    + File.separator + outputFilename, writer.toString());
         }
     }
 }

@@ -14,6 +14,7 @@
 <script src="res/selectedusers.js"></script>
 <script src="res/tablecellhighlighter.js"></script>
 <script src="data/ids.js"></script>
+<script src="data/datasetOverview.js"></script>
 <script src="data/overview.js"></script>
 
 <head>
@@ -151,7 +152,7 @@ function onSelectAllCheckboxClicked(checkbox) {
     updateOnUserSelectionChange();
 }
 
-var usersInAnalysis = new SelectedUsers(overviewUserdata);
+var usersInAnalysis = new SelectedUsers(overviewUserdata, datasetOverview.hashCode);
 
 function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody')

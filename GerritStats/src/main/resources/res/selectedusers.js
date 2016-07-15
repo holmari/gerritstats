@@ -1,10 +1,11 @@
 /**
  * Keeps track of users selected into the analysis.
  */
-function SelectedUsers(overviewUserdata) {
+function SelectedUsers(overviewUserdata, primaryStorageKey) {
 
     this.users = {};
-    this.storageKey = 'selectedUsers';
+    this.groupKey = 'selectedUsers';
+    this.storageKey = primaryStorageKey + '.' + this.groupKey;
 
     this.isUserSelected = function(userDataOrIdentifier) {
         var identifier = typeof(userDataOrIdentifier) == 'string'
