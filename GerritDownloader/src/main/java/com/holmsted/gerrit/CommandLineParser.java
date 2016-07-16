@@ -117,9 +117,12 @@ public class CommandLineParser {
     @Nullable
     public String getPrivateKey() {
         if (privateKey != null) {
-          return privateKey;
+            if (privateKey.startsWith("~" + File.separator)) {
+                privateKey = System.getProperty("user.home") + privateKey.substring(1);
+            }
+            return privateKey;
         }
-        return "~/.ssh/id_rsa";
+        return System.getProperty("user.home") + ".ssh/id_rsa";
     }
 
     @Nullable
