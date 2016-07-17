@@ -1,7 +1,7 @@
 /**
  * Highlights top / bottom entries of the table cells.
  */
-function TableCellHighlighter(overviewUserdata, dataKey) {
+function TableCellHighlighter(overviewUserdata, usersInAnalysis, dataKey) {
     // best to worst
     this.colorsTopEntries = ['#7fffc4', '#c9ffc7', '#e9fac8', '#faf4c8', '#ffedc9']
     // worst to best
@@ -22,10 +22,16 @@ function TableCellHighlighter(overviewUserdata, dataKey) {
         if (this.ignoreFunction && this.ignoreFunction(element, key)) {
             return true;
         }
+        if (!usersInAnalysis.isUserSelected(element.identity.identifier)) {
+            return true;
+        }
         return false;
     }
 
-    /** Returns a sorted, unique list of values from a given array, for the given key. */
+    /**
+     * Returns a sorted, unique list of values from a given array, for the given key.
+     * Also removes all users not included in analysis.
+     */
     this.sortUniqueValues = function() {
         var descendingSorter = function(l, r) {
             return r[dataKey] - l[dataKey];
@@ -57,7 +63,7 @@ function TableCellHighlighter(overviewUserdata, dataKey) {
         var topRangeCutoffIndex = Math.min(this.colorsTopEntries.length - 1, this.sortedData.length - 1);
         if (this.highlightPositiveEntries && value >= this.sortedData[topRangeCutoffIndex]) {
             var colorIndex = this.sortedData.findIndex(indexFinder(value));
-            return 'style=background:' + this.colorsTopEntries[colorIndex];
+            return this.colorsTopEntries[colorIndex];
         }
 
         var leastBottomItemIndex = this.sortedData.length >= this.colorsBottomEntries.length
@@ -67,7 +73,7 @@ function TableCellHighlighter(overviewUserdata, dataKey) {
         if (this.highlightNegativeEntries && value <= leastBottomItemValue) {
             var idx = this.sortedData.findIndex(indexFinder(value));
             var colorIndex = this.sortedData.length - 1 - idx;
-            return 'style=background:' + this.colorsBottomEntries[colorIndex];
+            return this.colorsBottomEntries[colorIndex];
         }
 
         return '';
@@ -78,7 +84,7 @@ function TableCellHighlighter(overviewUserdata, dataKey) {
         var leastTopItemValue = this.sortedData[topRangeCutoffIndex];
         if (this.highlightPositiveEntries && value <= leastTopItemValue) {
             var colorIndex = this.sortedData.findIndex(indexFinder(value));
-            return 'style=background:' + this.colorsTopEntries[colorIndex];
+            return this.colorsTopEntries[colorIndex];
         }
 
         var leastBottomItemIndex = this.sortedData.length >= this.colorsBottomEntries.length
@@ -88,26 +94,28 @@ function TableCellHighlighter(overviewUserdata, dataKey) {
         if (this.highlightNegativeEntries && value >= leastBottomItemValue) {
             var idx = this.sortedData.findIndex(indexFinder(value));
             var colorIndex = this.sortedData.length - 1 - idx;
-            return 'style=background:' + this.colorsBottomEntries[colorIndex];
+            return this.colorsBottomEntries[colorIndex];
         }
 
         return '';
     }
 
-    this.highlight = function(object) {
-        if (!this.sortedData) {
+    this.getHighlightColor = function(object) {
+        if (!this.sortedData || this.needsUpdate) {
             this.sortedData = this.sortUniqueValues();
+            this.needsUpdate = false;
+        }
+
+        if (!this.sortedData.length || this.isFiltered(object, dataKey)) {
+            return '';
         }
 
         var value = object[dataKey];
-        if (this.sortedData.length == 0 || (this.ignoreZeroes && value == 0)) {
-            return '';
-        }
-        if (this.ignoreFunction && this.ignoreFunction(object, dataKey)) {
-            return '';
-        }
-
         return this.useAscendingSort ? this.highlightAscending(value) : this.highlightDescending(value);
+    }
+
+    this.setNeedsUpdate = function() {
+        this.needsUpdate = true;
     }
 
     this.setIsAscending = function(valueToSet) {
