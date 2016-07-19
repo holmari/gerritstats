@@ -145,6 +145,9 @@ function onIdentityCheckboxClicked(checkbox) {
 
     usersInAnalysis.setUserSelected(userIdentifier, checkbox.checked);
     updateOnUserSelectionChange();
+
+    var row = $(checkbox).parent().parent();
+    indexTableHighlighter.applySelectionStyle(row, checkbox.checked);
 }
 
 function onSelectAllCheckboxClicked(checkbox) {
@@ -195,6 +198,10 @@ function IndexTableHighlighter(overviewUserdata, usersInAnalysis) {
         }
     };
 
+    this.applySelectionStyle = function(row, isSelected) {
+        row.css('color', isSelected ? '' : '#cccccc');
+    };
+
     this.highlight = function() {
         var that = this;
         for (fieldName in this.highlighters) {
@@ -223,12 +230,14 @@ function loadOverviewUserdata() {
     var tbody = $('#overviewTableBody');
     for (var i = 0; i < overviewUserdata.length; ++i) {
         var item = overviewUserdata[i];
+        var isSelected = usersInAnalysis.isUserSelected(item);
+
         tbody.append(
         '<tr data-index="' + i + '">\
             <td><input class="identityCheckbox" \
                        data-identifier="' + item.identifier + '"\
                        type="checkbox" '
-                    + (usersInAnalysis.isUserSelected(item) ? 'checked' : '') + '\
+                    + (isSelected ? 'checked' : '') + '\
                        onclick="onIdentityCheckboxClicked(this)" /></td>\
             <td><a href="profile.html?user=' + item.identifier + '">' + getPrintableName(item.identity) + '</a></td>\
             <td class="dataField reviewCountPlus2">' + item.reviewCountPlus2 + '</td>\
@@ -245,6 +254,7 @@ function loadOverviewUserdata() {
             <td class="dataField averageTimeInCodeReview" data-unixtime="' + item.averageTimeInCodeReview + '">'
                 + formatPrintableDuration(item.averageTimeInCodeReview) + '</td>\
         </tr>');
+        indexTableHighlighter.applySelectionStyle(tbody.find('tr').last(), isSelected);
     };
 
     indexTableHighlighter.highlight();
