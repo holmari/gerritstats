@@ -3,9 +3,9 @@
  */
 function TableCellHighlighter(overviewUserdata, usersInAnalysis, dataKey) {
     // best to worst
-    this.colorsTopEntries = ['#7fffc4', '#c9ffc7', '#e9fac8', '#faf4c8', '#ffedc9']
+    this.colorsTopEntries = ['#beffec', '#eeffed', '#f9feee', '#fefcee', '#fffaee']
     // worst to best
-    this.colorsBottomEntries = ['#ff90d5', '#ffaadf', '#ffacce', '#ffbdcd', '#ffcecc']
+    this.colorsBottomEntries = ['#ffcdf3', '#ffdff6', '#ffe0f0', '#ffc2d4', '#fff0ef']
 
     this.useAscendingSort = false;
     this.ignoreZeroes = false;
