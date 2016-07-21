@@ -1,3 +1,14 @@
+plugins {
+    id 'com.moowork.node' version '0.13'
+}
+
+// Use a local npm version to avoid any path problems with e.g. Android Studio.
+// Note that npm is not copied into the final output although it's installed
+// as a local module.
+node {
+    npmVersion = '3.10.5'
+}
+
 dependencies {
     compile group: 'joda-time', name: 'joda-time', version: '2.8.2'
     compile group: 'com.beust', name: 'jcommander', version: '1.48'
@@ -15,6 +26,17 @@ jar {
 
     // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+
+    task cleanupNpmDependencies(type: Delete) {
+        delete 'src/main/resources/res/node_modules'
+    }
+
+    task copyNpmDependenciesToResources(type: Copy) {
+        from('node_modules') {
+            exclude 'npm/**'
+        }
+        into 'src/main/resources/res/node_modules'
+    }
 
     task generateResourceFileListing() << {
         assert sourceSets.main.resources.srcDirs.size() == 1;
@@ -41,5 +63,8 @@ jar {
         fileWriter.close();
     }
 
+    cleanupNpmDependencies.dependsOn npmInstall
+    copyNpmDependenciesToResources.dependsOn cleanupNpmDependencies
+    generateResourceFileListing.dependsOn copyNpmDependenciesToResources
     processResources.dependsOn generateResourceFileListing
 }

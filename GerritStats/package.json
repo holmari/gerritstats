@@ -1,0 +1,26 @@
+{
+  "name": "gerritstats",
+  "version": "1.0.0",
+  "description": "GerritStats - Gerrit Code Review statistics analysis tool",
+  "main": "index.html",
+  "author": "Lasse Holmstedt",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "css-element-queries": "^0.3.2",
+    "d3": "<4.x.x",
+    "jquery": "<3.x.x",
+    "moment": "^2.14.1",
+    "numeral": "^1.5.3",
+    "tablesorter": "^2.26.6"
+  },
+  "scripts": {
+    "clean": "../gradlew clean",
+    "build": "../gradlew build",
+    "test": "../gradlew test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:holmari/gerritstats.git"
+  }
+}
