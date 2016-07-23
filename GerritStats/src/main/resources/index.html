@@ -60,18 +60,18 @@
     <thead>
         <th id="checkboxColumn"><input name='selectAll' type='checkbox' checked='true' onclick='onSelectAllCheckboxClicked(this)' /></th>
         <th id="nameColumn">Name</th>
-        <th class="dataField">+2<br>given</th>
-        <th class="dataField">+1<br>given</th>
-        <th class="dataField">-1<br>given</th>
-        <th class="dataField">-2<br>given</th>
-        <th class="dataField">Comments<br>written</th>
-        <th class="dataField">Comments<br>received</th>
-        <th class="dataField">Commits</th>
-        <th class="dataField">Comments<br>/ commit</th>
-        <th class="dataField">Comments<br>/ review<br>requests</th>
-        <th class="dataField">Added as<br>reviewer</th>
-        <th class="dataField">Self-reviews</th>
-        <th class="dataField">Average time<br>in review</th>
+        <th title="Number of +2 reviews given by this user." class="dataField">+2<br>given</th>
+        <th title="Number of +1 reviews given by this user." class="dataField">+1<br>given</th>
+        <th title="Number of -1 reviews given by this user." class="dataField">-1<br>given</th>
+        <th title="Number of -2 reviews given by this user." class="dataField">-2<br>given</th>
+        <th title="Number of review comments written to other people's commits by this user." class="dataField">Comments<br>written</th>
+        <th title="Number of review comments received by this user." class="dataField">Comments<br>received</th>
+        <th title="Number of commits made by this user." class="dataField">Commits</th>
+        <th title="The ratio of comments received by user per commit." class="dataField">Comments<br>/ commit</th>
+        <th title="The ratio of comments written by this user per a review request." class="dataField">Comments<br>/ review<br>requests</th>
+        <th title="Number of times this user wa added as a reviewer." class="dataField">Added as<br>reviewer</th>
+        <th title="Number of times the user merged a change after self-reviewing it, without having any reviews in any patch set from other users." class="dataField">Self-reviews</th>
+        <th title="Average time the user's commits spent in review." class="dataField">Average time<br>in review</th>
     </thead>
     <tbody id="overviewTableBody">
     </tbody>
@@ -322,7 +322,6 @@ $(document).ready(function() {
         }
     });
 });
-
 </script>
 </content>
 <footer>

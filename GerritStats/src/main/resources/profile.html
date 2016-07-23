@@ -7,6 +7,7 @@
 <script src="res/node_modules/jquery/dist/jquery.min.js"></script>
 <script src="res/node_modules/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
 <script src="res/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+<script src="res/node_modules/bootstrap/js/tooltip.js"></script>
 <script src="res/node_modules/moment/min/moment.min.js"></script>
 <script src="res/node_modules/numeral/min/numeral.min.js"></script>
 
@@ -67,65 +68,77 @@
     <div class="panel thirdWidth">
         <a name="#overall"></a>
         <h2>Reviews given</h2>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of +1 reviews received by this user.">
             <div id="reviewCountGivenPlus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">+1</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of +2 reviews received by this user.">
             <div id="reviewCountGivenPlus1" class="value">&dash;</div>
             <div>&nbsp;<div class="title">+2</div></div>
         </div>
         <div class="clearFloat"></div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of -1 reviews received by this user.">
             <div id="reviewCountGivenMinus1" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-1</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of -2 reviews received by this user.">
             <div id="reviewCountGivenMinus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of review comments written to others by this user.">
             <div id="commentsWritten" class="value">&dash;</div>
             <div>&nbsp;<div class="title">comments written</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="How many comments this user wrote to others, per a review request. A higher number indicates that the user tends to respond often to review requests with written feedback.">
             <div id="reviewCommentRatio" class="value">&dash;</div>
             <div>&nbsp;<div class="title">comments / review req.</div></div>
         </div>
     </div>
     <div class="panel thirdWidth">
         <h2>Reviews received</h2>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of +1 reviews received by this user.">
             <div id="reviewCountReceivedPlus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">+1</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of +2 reviews received by this user.">
             <div id="reviewCountReceivedPlus1" class="value">&dash;</div>
             <div>&nbsp;<div class="title">+2</div></div>
         </div>
         <div class="clearFloat"></div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of -1 reviews received by this user.">
             <div id="reviewCountReceivedMinus1" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-1</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of -2 reviews received by this user.">
             <div id="reviewCountReceivedMinus2" class="value">&dash;</div>
             <div>&nbsp;<div class="title">-2</div></div>
         </div>
 
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of comments received by this user.">
             <div id="commentsReceived" class="value">&dash;</div>
             <div>&nbsp;<div class="title">comments received</div></div>
         </div>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of self-reviewed commits: commits that were +2'd by the author and then submitted, with no reviews by others in any of the patch sets. In standard Gerrit usage, this number should be very low, and a high number for a particular is often a red flag.">
             <div id="selfReviews" class="value">&dash;</div>
             <div>&nbsp;<div class="title">self-reviews</div></div>
         </div>
@@ -133,25 +146,30 @@
 
     <div class="panel thirdWidth">
         <h2>Commits</h2>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of total commits for the user.">
             <div id="commitsSize" class="value">&dash;</div>
             <div>&nbsp;<div class="title">total commits</div></div>
         </div>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of times that the user was added as a reviewer.">
             <div id="addedAsReviewerTo" class="value">&dash;</div>
             <div>&nbsp;<div class="title">added as reviewer</div></div>
         </div>
         <div class="clearFloat"></div>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="The highest number of patch sets of all the user's commits. See 'Iteration' for details.">
             <div id="maxPatchSetCount" class="value">&dash;</div>
             <div>&nbsp;<div class="title">max patch set count</div></div>
         </div>
-        <div class="numberPanel">
+        <div class="numberPanel" data-toggle="tooltip"
+                title="Number of abandoned commits, which were never merged to a branch.">
             <div id="commitsAbandoned" class="value">&dash;</div>
             <div>&nbsp;<div class="title">abandoned</div></div>
         </div>
 
-        <div class="horizontalCenterGroup">
+        <div class="horizontalCenterGroup" data-toggle="tooltip"
+                title="Number of commits currently in review by this user.">
             <div class="numberPanel wide">
                 <div id="commitsInReview" class="value">&dash;</div>
                 <div>&nbsp;<div class="title">in review</div></div>
@@ -706,6 +724,8 @@ function groupReviewCommentsByDate(comments) {
 loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
     updateViewFromUserdata();
 });
+
+$('[data-toggle="tooltip"]').tooltip()
 
 </script>
 </body>
