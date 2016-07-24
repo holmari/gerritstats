@@ -34,7 +34,7 @@ function IterationTimelineGraph(svgId, userData) {
         // max date is the end of the year of the data set
         this.maxDate = this.commitData.reduce(function(prevValue, currentValue) {
             return Math.max(prevValue, currentValue.commit.createdOnDate);
-        }, 0);
+        }, new Date().getTime());
         this.maxDate = moment(this.maxDate).endOf('year');
 
         this.domain = [this.minDate, this.maxDate];
