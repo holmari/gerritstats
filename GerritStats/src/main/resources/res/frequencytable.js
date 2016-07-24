@@ -112,7 +112,7 @@ function FrequencyTable(svgId, record, data) {
                 .style('text-anchor', 'end')
                 .style('fill-opacity', 0.75)
                 .style('font-size', '12px')
-                .text('Avg (excl. weekends): ' + this.averageReviewsPerDay.toFixed(1));
+                .text('Avg (excl. weekends): ' + this.averageReviewsPerDay.toFixed(2));
         }
 
         this.svg.append('g')

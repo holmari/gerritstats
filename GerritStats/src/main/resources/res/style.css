@@ -417,6 +417,36 @@ header a img {
     fill: #303138;
 }
 
+.chartLegend {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 12px;
+    fill: #303138;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+/******************************************************************************
+ * Graphs: cumulative stats
+ *****************************************************************************/
+
+.lineCommits {
+  fill: none;
+  stroke: #ff0000;
+  stroke-width: 2px;
+}
+
+.lineWrittenComments {
+  fill: none;
+  stroke: #0000ff;
+  stroke-width: 2px;
+}
+
+.lineReceivedComments {
+  fill: none;
+  stroke: #00ff00;
+  stroke-width: 2px;
+}
+
 /******************************************************************************
  * Graphs: iterative commits
  *****************************************************************************/

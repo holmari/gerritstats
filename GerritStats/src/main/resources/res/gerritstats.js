@@ -151,15 +151,8 @@ var userdataScope = {
             return item.createdOnDate;
         });
 
-        record.commits.forEach(function(commit) {
-            var lastUpdatedDate = commit.lastUpdatedDate
-            if (!record._fromDate || lastUpdatedDate < record._fromDate) {
-                record._fromDate = lastUpdatedDate;
-            }
-            if (!record._toDate || lastUpdatedDate > record._toDate) {
-                record._toDate = lastUpdatedDate;
-            }
-        });
+        record._fromDate = record.firstActiveDate;
+        record._toDate = record.lastActiveDate;
 
         // reshuffle the comments so that they're all added separately;
         // else, the count per month will show number of commits where comments were added,

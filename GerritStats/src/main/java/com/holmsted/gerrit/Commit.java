@@ -165,6 +165,11 @@ public class Commit {
         public Identity reviewer;
         public String message;
 
+        // Note: there is no timestamp field in the json from Gerrit.
+        // To have a better approximation on when a comment was written,
+        // this field is set when initializing these objects.
+        public long patchSetTimestamp;
+
         public String getFile() {
             return file;
         }
@@ -237,7 +242,7 @@ public class Commit {
         }
 
         static PatchSet fromJson(JSONObject patchSetJson) {
-            PatchSet patchSet = new PatchSet();
+            final PatchSet patchSet = new PatchSet();
             patchSet.number = patchSetJson.optInt("number");
             patchSet.revision = patchSetJson.optString("revision");
             patchSet.parents.addAll(JsonUtils.readStringArray(patchSetJson.optJSONArray("parents")));
@@ -262,6 +267,9 @@ public class Commit {
 
             patchSet.approvals.addAll(Approval.fromJson(patchSetJson.optJSONArray("approvals")));
             patchSet.comments.addAll(PatchSetComment.fromJson(patchSetJson.optJSONArray("comments")));
+            for (PatchSetComment comment : patchSet.comments) {
+                comment.patchSetTimestamp = patchSet.createdOnDate;
+            }
             patchSet.sizeInsertions = patchSetJson.optInt("sizeInsertions");
             patchSet.sizeDeletions = patchSetJson.optInt("sizeDeletions");
             return patchSet;

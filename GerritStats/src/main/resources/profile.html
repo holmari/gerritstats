@@ -4,6 +4,7 @@
 <script src="res/node_modules/css-element-queries/css-element-queries/src/ResizeSensor.js"></script>
 <script src="res/node_modules/css-element-queries/css-element-queries/src/ElementQueries.js"></script>
 <script src="res/node_modules/d3/d3.min.js"></script>
+<script src="res/node_modules/d3-svg-legend/d3-legend.min.js"></script>
 <script src="res/node_modules/jquery/dist/jquery.min.js"></script>
 <script src="res/node_modules/tablesorter/dist/js/jquery.tablesorter.min.js"></script>
 <script src="res/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
@@ -13,6 +14,7 @@
 
 <script src="res/d3_common.js"></script>
 <script src="res/gerritstats.js"></script>
+<script src="res/cumulativegraph.js"></script>
 <script src="res/frequencytable.js"></script>
 <script src="res/iterationtimelinegraph.js"></script>
 <script src="res/permonthstats.js"></script>
@@ -294,6 +296,15 @@
         <h2>Review comments per day</h2>
         <p>Comments written by this user per day. The timescale includes weekends, while the average value excludes them.</p>
         <div id="commentsPerDaySvg">
+        </div>
+    </div>
+
+    <div class="clearFloat"></div>
+
+    <div class="panel fullWidth">
+        <h2>Cumulative statistics</h2>
+        <p>Written and received comments and commits by user, displayed cumulatively over time.</p>
+        <div id="cumulativeGraphSvg">
         </div>
     </div>
 
@@ -662,6 +673,8 @@ function updateViewFromUserdata() {
 
     new PerMonthStats('#perMonthStats', record);
     new FrequencyTable("#commentsPerDaySvg", record, groupReviewCommentsByDate(record.getReviewCommentDates()));
+    new CumulativeGraph('#cumulativeGraphSvg', record);
+
     iterationGraph = new IterationTimelineGraph("#highPatchSetCountCommitsSvg", record);
     iterationGraph.highPatchSetCountThreshold = outputConfig.highPatchSetCountThreshold;
     iterationGraph.selectionChangedListener = function(currentSelection, previousSelection) {

@@ -438,6 +438,7 @@ public class IdentityRecord {
     public void addCommit(@Nonnull Commit commit) {
         commits.add(commit);
         updateActivityTimestamps(commit.lastUpdatedDate);
+        updateActivityTimestamps(commit.createdOnDate);
     }
 
     private void updateActivityTimestamps(long unixEpochMsec) {
