@@ -141,7 +141,8 @@ public class GerritStatReader {
     /**
      * Sets how many commits' stats are downloaded. If this number exceeds the server limit,
      * multiple requests will be made to fulfill the goal.
-     * <p> TODO this does not get respected if the limit is not a multiple of the server limit.
+     * <p>
+     * Note: this does not get respected if the limit is not a multiple of the server limit.
      */
     public void setCommitLimit(int overallLimit) {
         overallCommitLimit = overallLimit;

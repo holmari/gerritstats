@@ -67,7 +67,9 @@ public class CommandLineParser {
 
     @Parameter(names = {"-l", "--limit"},
             description = "The number of commits which to retrieve from the server. "
-            + "If omitted, stats will be retrieved until no further records are available.")
+            + "If omitted, stats will be retrieved until no further records are available. "
+            + "This value is an approximation; the actual number of downloaded commit data "
+            + "will be a multiple of the limit set on the Gerrit server.")
     private int limit = GerritStatReader.NO_COMMIT_LIMIT;
 
     @Nonnull
