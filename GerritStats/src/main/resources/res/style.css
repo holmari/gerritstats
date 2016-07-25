@@ -405,10 +405,8 @@ header a img {
 }
 
 .chartGuideline {
-    stroke: red; /* replaced at runtime */
-    stroke-width: 0.75;
-    fill-opacity: 1.0;
-    stroke-dasharray: ("10, 10");
+    stroke: #303138;
+    stroke-width: 0.5;
 }
 
 .chartGuidelineText {
@@ -425,31 +423,63 @@ header a img {
     cursor: pointer;
 }
 
+.chartDynamicLegendTitle {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    fill: #303138;
+}
+
+.chartDynamicLegendBox {
+    fill-opacity: 0.9;
+    fill: #fefefe;
+    stroke: #dedede;
+    stroke-width: 0.5px;
+}
+
 /******************************************************************************
  * Graphs: cumulative stats
  *****************************************************************************/
 
 .lineCommits {
   fill: none;
-  stroke: #ff0000;
+  stroke: #4A91FF;
   stroke-width: 2px;
 }
 
 .lineWrittenComments {
   fill: none;
-  stroke: #0000ff;
+  stroke: #A3CC27;
   stroke-width: 2px;
 }
 
 .lineReceivedComments {
   fill: none;
-  stroke: #00ff00;
+  stroke: #FF8270;
   stroke-width: 2px;
+}
+
+.focusCircleCommitCount {
+    fill: #4A91FF;
+}
+
+.focusCircleCommentsWritten {
+    fill: #A3CC27;
+}
+
+.focusCircleCommentsReceived {
+    fill: #FF8270;
 }
 
 /******************************************************************************
  * Graphs: iterative commits
  *****************************************************************************/
+
+.iterativeChartGuideline {
+    stroke: red; /* replaced at runtime */
+    stroke-width: 0.75;
+    fill-opacity: 1.0;
+    stroke-dasharray: ("10, 10");
+}
 
 .iterativeCommitChartAxis {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;

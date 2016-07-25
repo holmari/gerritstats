@@ -64,7 +64,7 @@ function IterationTimelineGraph(svgId, userData) {
              .attr('fill-opacity', 0.5);
 
         this.verticalGuide = this.svg.append('line')
-             .attr('class', 'chartGuideline')
+             .attr('class', 'iterativeChartGuideline')
              .attr('x1', 100)
              .attr('y1', this.height / 2)
              .attr('x2', 100)
@@ -79,7 +79,7 @@ function IterationTimelineGraph(svgId, userData) {
              .style('visibility', 'hidden');
 
         this.svg.append('g')
-            .attr('class', 'x iterativeCommitChartAxis')
+             .attr('class', 'x iterativeCommitChartAxis')
              .attr('transform', 'translate(0, ' + this.height + ')');
 
         this.svg.append('g')
