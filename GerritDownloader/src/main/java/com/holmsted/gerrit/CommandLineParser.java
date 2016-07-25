@@ -95,6 +95,8 @@ public class CommandLineParser {
             return false;
         }
 
+        outputDir = resolveOutputDir(outputDir);
+
         return getServerName() != null;
     }
 
