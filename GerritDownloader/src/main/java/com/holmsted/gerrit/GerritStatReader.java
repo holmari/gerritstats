@@ -1,13 +1,10 @@
 package com.holmsted.gerrit;
 
 import com.google.common.base.Strings;
+import com.holmsted.gerrit.downloaders.ssh.GerritSshCommand;
 import com.holmsted.json.JsonUtils;
 
 import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 import javax.annotation.Nonnull;
 
@@ -67,54 +64,18 @@ public class GerritStatReader {
         }
 
         public GerritOutput readData() {
-            Runtime runtime = Runtime.getRuntime();
-            try {
-                String projectNameList = createProjectNameList();
-                String command = String.format("ssh -p %s -i %s %s gerrit query %s "
-                                + "--format=JSON "
-                                + "--all-approvals "
-                                + "--all-reviewers "
-                                + "--comments "
-                                + createStartOffsetArg()
-                                + createLimitArg(),
-                        String.valueOf(gerritServer.getPort()),
-                        String.valueOf(gerritServer.getPrivateKey()),
-                        gerritServer.getServerName(),
-                        projectNameList);
-                System.out.println(command);
+            String projectNameList = createProjectNameList();
+            GerritSshCommand sshCommand = new GerritSshCommand(gerritServer);
+            String output = sshCommand.exec(String.format("query %s "
+                            + "--format=JSON "
+                            + "--all-approvals "
+                            + "--all-reviewers " // Since Gerrit 2.9
+                            + "--comments "
+                            + createStartOffsetArg()
+                            + createLimitArg(),
+                    projectNameList));
 
-                Process exec = runtime.exec(command, null);
-
-                char[] buffer = new char[1024];
-                int readChars;
-
-                BufferedReader readerOut = new BufferedReader(new InputStreamReader(exec.getInputStream()));
-                StringBuilder output = new StringBuilder();
-                while ((readChars = readerOut.read(buffer)) != -1) {
-                    output.append(String.copyValueOf(buffer, 0, readChars));
-                }
-                readerOut.close();
-
-                BufferedReader readerErr = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
-                StringBuilder error = new StringBuilder();
-                while ((readChars = readerErr.read(buffer)) != -1) {
-                    error.append(String.copyValueOf(buffer, 0, readChars));
-                }
-                readerErr.close();
-
-                int errorCode = exec.waitFor();
-                if (errorCode != 0) {
-                    System.err.println("Process exited with return code " + errorCode + " and output:");
-                    System.err.println(error);
-                    return null;
-                }
-
-                return new GerritOutput(Strings.nullToEmpty(output.toString()));
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
-
-            return null;
+            return new GerritOutput(Strings.nullToEmpty(output));
         }
 
         private String createStartOffsetArg() {

@@ -19,8 +19,11 @@ public class GerritSshCommand {
     public String exec(@Nonnull String gerritCommand) {
         Runtime runtime = Runtime.getRuntime();
         try {
-            String command = String.format("ssh -p %s %s gerrit %s",
-                    String.valueOf(gerritServer.getPort()), gerritServer.getServerName(),
+            String privateKey = gerritServer.getPrivateKey();
+            String command = String.format("ssh -p %s %s %s gerrit %s",
+                    String.valueOf(gerritServer.getPort()),
+                            privateKey != null ? "-i " + privateKey : "",
+                            gerritServer.getServerName(),
                     gerritCommand);
             System.out.println(command);
 
