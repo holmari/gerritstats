@@ -25,16 +25,26 @@ public class CommandLineParser {
     public static class ServerAndPort {
         private String serverName;
         private int serverPort;
+        private String protocol;
 
         public static class Converter implements IStringConverter<ServerAndPort> {
             @Override
             public ServerAndPort convert(String value) {
                 ServerAndPort result = new ServerAndPort();
-                result.serverName = value;
-                int portSeparator = result.serverName.indexOf(':');
-                if (portSeparator != -1) {
-                    result.serverPort = Integer.valueOf(result.serverName.substring(portSeparator + 1));
-                    result.serverName = result.serverName.substring(0, portSeparator);
+
+                int protocolSeparator = value.indexOf("://");
+                int portSeparator = value.lastIndexOf(':');
+                int serverNameEnd = value.length();
+                if (portSeparator != -1 && portSeparator != protocolSeparator) {
+                    result.serverPort = Integer.valueOf(value.substring(portSeparator + 1));
+                    serverNameEnd = portSeparator;
+                }
+
+                int serverNameStart = protocolSeparator != -1 ? protocolSeparator + 3 : 0;
+                result.serverName = value.substring(serverNameStart, serverNameEnd);
+
+                if (protocolSeparator != -1) {
+                    result.protocol = value.substring(0, protocolSeparator);
                 }
                 return result;
             }
