@@ -4,6 +4,7 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+import com.holmsted.gerrit.downloaders.ssh.SshDownloader;
 
 import java.io.File;
 import java.io.IOException;
@@ -83,7 +84,7 @@ public class CommandLineParser {
             + "If omitted, stats will be retrieved until no further records are available. "
             + "This value is an approximation; the actual number of downloaded commit data "
             + "will be a multiple of the limit set on the Gerrit server.")
-    private int limit = GerritStatReader.NO_COMMIT_LIMIT;
+    private int limit = SshDownloader.NO_COMMIT_LIMIT;
 
     @Nonnull
     private final JCommander jCommander = new JCommander(this);

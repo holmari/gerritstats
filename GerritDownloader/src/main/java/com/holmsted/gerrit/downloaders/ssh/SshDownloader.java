@@ -1,20 +1,22 @@
-package com.holmsted.gerrit;
+package com.holmsted.gerrit.downloaders.ssh;
 
 import com.google.common.base.Strings;
-import com.holmsted.gerrit.downloaders.ssh.GerritSsh;
+import com.holmsted.gerrit.GerritServer;
+import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
 import com.holmsted.gerrit.downloaders.ssh.GerritSsh.Version;
-import com.holmsted.gerrit.downloaders.ssh.GerritSshCommand;
 import com.holmsted.json.JsonUtils;
 
 import org.json.JSONObject;
 
 import javax.annotation.Nonnull;
 
-public class GerritStatReader {
+public class SshDownloader extends AbstractGerritStatsDownloader {
 
     public static final int NO_COMMIT_LIMIT = -1;
 
-    private GerritServer gerritServer;
+    @Nonnull
+    private final Version gerritVersion;
+
     private String projectName;
     private int perQueryCommitLimit = NO_COMMIT_LIMIT;
     private int overallCommitLimit = NO_COMMIT_LIMIT;
@@ -63,8 +65,8 @@ public class GerritStatReader {
 
         private Version gerritVersion;
 
-        public GerritDataReader() {
-            gerritVersion = GerritSsh.version(gerritServer);
+        public GerritDataReader(@Nonnull Version gerritVersion) {
+            this.gerritVersion = gerritVersion;
         }
 
         public void setStartOffset(int startOffset) {
@@ -73,7 +75,7 @@ public class GerritStatReader {
 
         public GerritOutput readData() {
             String projectNameList = createProjectNameList();
-            GerritSshCommand sshCommand = new GerritSshCommand(gerritServer);
+            GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
             String reviewersArg = gerritVersion.isAtLeast(2, 9) ? "--all-reviewers " : "";
             String output = sshCommand.exec(String.format("query %s "
                             + "--format=JSON "
@@ -94,8 +96,9 @@ public class GerritStatReader {
         }
     }
 
-    public GerritStatReader(@Nonnull GerritServer gerritServer) {
-        this.gerritServer = gerritServer;
+    public SshDownloader(@Nonnull GerritServer gerritServer, @Nonnull Version gerritVersion) {
+        super(gerritServer);
+        this.gerritVersion = gerritVersion;
     }
 
     public void setProjectName(String projectName) {
@@ -125,12 +128,12 @@ public class GerritStatReader {
      */
     public String readData() {
         if (overallCommitLimit != NO_COMMIT_LIMIT) {
-            System.out.println("Reading data from " + gerritServer + " for last " + overallCommitLimit + " commits");
+            System.out.println("Reading data from " + getGerritServer() + " for last " + overallCommitLimit + " commits");
         } else {
-            System.out.println("Reading all commit data from " + gerritServer);
+            System.out.println("Reading all commit data from " + getGerritServer());
         }
 
-        GerritDataReader connection = new GerritDataReader();
+        GerritDataReader connection = new GerritDataReader(gerritVersion);
         StringBuilder builder = new StringBuilder();
 
         boolean hasMoreChanges = true;
