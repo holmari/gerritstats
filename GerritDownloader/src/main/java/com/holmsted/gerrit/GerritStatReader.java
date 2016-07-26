@@ -1,6 +1,8 @@
 package com.holmsted.gerrit;
 
 import com.google.common.base.Strings;
+import com.holmsted.gerrit.downloaders.ssh.GerritSsh;
+import com.holmsted.gerrit.downloaders.ssh.GerritSsh.Version;
 import com.holmsted.gerrit.downloaders.ssh.GerritSshCommand;
 import com.holmsted.json.JsonUtils;
 
@@ -59,6 +61,12 @@ public class GerritStatReader {
     class GerritDataReader {
         private int startOffset;
 
+        private Version gerritVersion;
+
+        public GerritDataReader() {
+            gerritVersion = GerritSsh.version(gerritServer);
+        }
+
         public void setStartOffset(int startOffset) {
             this.startOffset = startOffset;
         }
@@ -66,14 +74,17 @@ public class GerritStatReader {
         public GerritOutput readData() {
             String projectNameList = createProjectNameList();
             GerritSshCommand sshCommand = new GerritSshCommand(gerritServer);
+            String reviewersArg = gerritVersion.isAtLeast(2, 9) ? "--all-reviewers " : "";
             String output = sshCommand.exec(String.format("query %s "
                             + "--format=JSON "
                             + "--all-approvals "
-                            + "--all-reviewers " // Since Gerrit 2.9
                             + "--comments "
+                            + "%s "
                             + createStartOffsetArg()
                             + createLimitArg(),
-                    projectNameList));
+                    projectNameList,
+                    reviewersArg
+                    ));
 
             return new GerritOutput(Strings.nullToEmpty(output));
         }
