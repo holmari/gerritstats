@@ -42,6 +42,9 @@ public class CommandLineParser {
 
                 int serverNameStart = protocolSeparator != -1 ? protocolSeparator + 3 : 0;
                 result.serverName = value.substring(serverNameStart, serverNameEnd);
+                if (result.serverName.endsWith("/")) {
+                    result.serverName = result.serverName.substring(0, result.serverName.length() - 1);
+                }
 
                 if (protocolSeparator != -1) {
                     result.protocol = value.substring(0, protocolSeparator);
