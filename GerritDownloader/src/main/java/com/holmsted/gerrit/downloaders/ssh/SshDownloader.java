@@ -17,19 +17,20 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     @Nonnull
     private final Version gerritVersion;
 
-    private String projectName;
-    private int perQueryCommitLimit = NO_COMMIT_LIMIT;
-    private int overallCommitLimit = NO_COMMIT_LIMIT;
-
-    class GerritOutput {
+    static class GerritOutput {
         private String output;
         private int rowCount;
         private int runtimeMsec;
         private boolean moreChanges;
         private int lastLineStartIndex = -1;
+        private String resumeSortkey;
 
-        public GerritOutput(@Nonnull String output) {
+        @Nonnull
+        private final Version gerritVersion;
+
+        public GerritOutput(@Nonnull String output, @Nonnull Version gerritVersion) {
             this.output = output;
+            this.gerritVersion = gerritVersion;
             int lastLineBreak = output.lastIndexOf('\n');
             if (lastLineBreak != -1) {
                 lastLineStartIndex = output.lastIndexOf('\n', lastLineBreak - 1);
@@ -38,12 +39,21 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
                     moreChanges = metadata.optBoolean("moreChanges");
                     rowCount = metadata.optInt("rowCount");
                     runtimeMsec = metadata.optInt("runTimeMilliseconds");
+                    resumeSortkey = metadata.optString("resumeSortKey");
                 }
             }
         }
 
         public boolean hasMoreChanges() {
-            return moreChanges;
+            if (gerritVersion.isAtLeast(2, 9)) {
+                return moreChanges;
+            } else {
+                return !Strings.nullToEmpty(resumeSortkey).isEmpty();
+            }
+        }
+
+        public String getResumeSortkey() {
+            return resumeSortkey;
         }
 
         public int getRowCount() {
@@ -60,35 +70,154 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
     }
 
-    class GerritDataReader {
-        private int startOffset;
+    static abstract class DataReader {
+        private int overallCommitLimit;
+        private String projectNameList;
 
+        private GerritServer gerritServer;
         private Version gerritVersion;
 
-        public GerritDataReader(@Nonnull Version gerritVersion) {
+        public abstract String readUntilLimit();
+
+        public void setGerritServer(@Nonnull GerritServer gerritServer) {
+            this.gerritServer = gerritServer;
+        }
+
+        public GerritServer getGerritServer() {
+            return gerritServer;
+        }
+
+        public void setOverallCommitLimit(int overallCommitLimit) {
+            this.overallCommitLimit = overallCommitLimit;
+        }
+
+        public int getOverallCommitLimit() {
+            return overallCommitLimit;
+        }
+
+        public void setProjectNameList(String projectNameList) {
+            this.projectNameList = projectNameList;
+        }
+
+        public String getProjectNameList() {
+            return projectNameList;
+        }
+
+        public void setGerritVersion(@Nonnull Version gerritVersion) {
             this.gerritVersion = gerritVersion;
         }
+
+        public Version getGerritVersion() {
+            return gerritVersion;
+        }
+    }
+
+    /**
+     * Data reader with Gerrit pre-2.9 support. The following problems are being worked around:
+     *
+     * 1) if no status query is passed, only open commits are listed. So this reader manually
+     *    queries for open, merged and abandoned commits.
+     * 2) the resume/limit behavior is not implemented in pre-2.9, so resume_sortKey is used instead.
+     */
+    static class LegacyDataReader extends DataReader {
+
+        private String resumeSortkey;
+
+        private int rowCount;
+
+        @Override
+        public String readUntilLimit() {
+            rowCount = 0;
+
+            StringBuilder builder = new StringBuilder();
+
+            String[] statusQueries = {"status:merged", "status:open", "status:abandoned"};
+
+            for (String statusQuery : statusQueries) {
+                builder.append(readOutputWithStatusQueryUntilLimit(statusQuery));
+            }
+
+            return builder.toString();
+        }
+
+        private String readOutputWithStatusQueryUntilLimit(@Nonnull String statusQuery) {
+            StringBuilder builder = new StringBuilder();
+
+            boolean hasMoreChanges = true;
+            while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
+                GerritOutput gerritOutput = readOutputWithStatusQuery(statusQuery);
+                builder.append(gerritOutput.toString());
+
+                resumeSortkey = gerritOutput.getResumeSortkey();
+                hasMoreChanges = gerritOutput.hasMoreChanges();
+                rowCount += gerritOutput.getRowCount();
+            }
+
+            return builder.toString();
+        }
+
+        private GerritOutput readOutputWithStatusQuery(String statusQuery) {
+            String projectNameList = getProjectNameList();
+            GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
+            String resumeSortkeyArg = !Strings.nullToEmpty(resumeSortkey).isEmpty()
+                    ?  "resume_sortkey:" + resumeSortkey : "";
+
+            String output = sshCommand.exec(String.format("query %s %s "
+                    + "--format=JSON "
+                    + "--all-approvals "
+                    + "--comments "
+                    + "%s ",
+                projectNameList,
+                statusQuery,
+                resumeSortkeyArg
+            ));
+
+            return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
+        }
+    }
+
+    /**
+     * Reads data from Gerrit versions 2.9 and higher.
+     */
+    static class DefaultDataReader extends DataReader {
+        private int startOffset;
 
         public void setStartOffset(int startOffset) {
             this.startOffset = startOffset;
         }
 
         public GerritOutput readData() {
-            String projectNameList = createProjectNameList();
+            String projectNameList = getProjectNameList();
             GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
-            String reviewersArg = gerritVersion.isAtLeast(2, 9) ? "--all-reviewers " : "";
+
             String output = sshCommand.exec(String.format("query %s "
                             + "--format=JSON "
                             + "--all-approvals "
                             + "--comments "
-                            + "%s "
-                            + createStartOffsetArg()
-                            + createLimitArg(),
-                    projectNameList,
-                    reviewersArg
+                            + "--all-reviewers "
+                            + createStartOffsetArg(),
+                    projectNameList
                     ));
 
-            return new GerritOutput(Strings.nullToEmpty(output));
+            return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
+        }
+
+        @Override
+        public String readUntilLimit() {
+            StringBuilder builder = new StringBuilder();
+            boolean hasMoreChanges = true;
+            int rowCount = 0;
+
+            while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
+                GerritOutput gerritOutput = readData();
+                builder.append(gerritOutput.toString());
+
+                hasMoreChanges = gerritOutput.hasMoreChanges();
+                rowCount += gerritOutput.getRowCount();
+                setStartOffset(startOffset + gerritOutput.getRowCount());
+            }
+
+            return builder.toString();
         }
 
         private String createStartOffsetArg() {
@@ -101,67 +230,41 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         this.gerritVersion = gerritVersion;
     }
 
-    public void setProjectName(String projectName) {
-        this.projectName = projectName;
-    }
-
-    /**
-     * Fetch only x commits per query.
-     * Server maximum is respected; it's typically 500 or something similar.
-     */
-    public void setPerQueryCommitLimit(int limit) {
-        perQueryCommitLimit = limit;
-    }
-
-    /**
-     * Sets how many commits' stats are downloaded. If this number exceeds the server limit,
-     * multiple requests will be made to fulfill the goal.
-     * <p>
-     * Note: this does not get respected if the limit is not a multiple of the server limit.
-     */
-    public void setCommitLimit(int overallLimit) {
-        overallCommitLimit = overallLimit;
-    }
-
     /**
      * Reads the data in json format from gerrit.
      */
     public String readData() {
-        if (overallCommitLimit != NO_COMMIT_LIMIT) {
-            System.out.println("Reading data from " + getGerritServer() + " for last " + overallCommitLimit + " commits");
+        if (getOverallCommitLimit() != NO_COMMIT_LIMIT) {
+            System.out.println("Reading data from " + getGerritServer() + " for last " + getOverallCommitLimit() + " commits");
         } else {
             System.out.println("Reading all commit data from " + getGerritServer());
         }
 
-        GerritDataReader connection = new GerritDataReader(gerritVersion);
-        StringBuilder builder = new StringBuilder();
-
-        boolean hasMoreChanges = true;
-        int offset = 0;
-        while (hasMoreChanges && (offset < overallCommitLimit || overallCommitLimit == NO_COMMIT_LIMIT)) {
-            connection.setStartOffset(offset);
-            GerritOutput gerritOutput = connection.readData();
-            if (gerritOutput == null) {
-                break;
-            }
-            builder.append(gerritOutput.toString());
-            hasMoreChanges = gerritOutput.hasMoreChanges();
-            offset += gerritOutput.getRowCount();
-        }
-
-        return builder.toString();
+        DataReader reader = createDataReader();
+        return reader.readUntilLimit();
     }
 
-    private String createLimitArg() {
-        return perQueryCommitLimit != NO_COMMIT_LIMIT ? "limit:" + String.valueOf(perQueryCommitLimit) : "";
+    private DataReader createDataReader() {
+        DataReader reader;
+        if (gerritVersion.isAtLeast(2, 9)) {
+            reader = new DefaultDataReader();
+        } else {
+            reader = new LegacyDataReader();
+        }
+        reader.setGerritServer(getGerritServer());
+        reader.setOverallCommitLimit(getOverallCommitLimit());
+        reader.setProjectNameList(createProjectNameList());
+        reader.setGerritVersion(gerritVersion);
+
+        return reader;
     }
 
     private String createProjectNameList() {
         StringBuilder builder = new StringBuilder("project:^");
-        if (projectName.isEmpty()) {
+        if (getProjectName().isEmpty()) {
             throw new IllegalStateException("No project name defined!");
         }
-        builder.append(projectName);
+        builder.append(getProjectName());
         return builder.toString();
     }
 }

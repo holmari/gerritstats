@@ -10,7 +10,6 @@ public abstract class AbstractGerritStatsDownloader {
     private GerritServer gerritServer;
     private String projectName;
 
-    private int perQueryCommitLimit = NO_COMMIT_LIMIT;
     private int overallCommitLimit = NO_COMMIT_LIMIT;
 
     public AbstractGerritStatsDownloader(@Nonnull GerritServer gerritServer) {
@@ -28,18 +27,6 @@ public abstract class AbstractGerritStatsDownloader {
 
     public String getProjectName() {
         return projectName;
-    }
-
-    /**
-     * Fetch only x commits per query.
-     * Server maximum is respected; it's typically 500 or something similar.
-     */
-    public void setPerQueryCommitLimit(int limit) {
-        perQueryCommitLimit = limit;
-    }
-
-    public int getPerQueryCommitLimit() {
-        return perQueryCommitLimit;
     }
 
     /**
