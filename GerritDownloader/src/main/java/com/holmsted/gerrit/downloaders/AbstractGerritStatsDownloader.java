@@ -2,6 +2,10 @@ package com.holmsted.gerrit.downloaders;
 
 import com.holmsted.gerrit.GerritServer;
 
+import org.json.JSONObject;
+
+import java.util.List;
+
 import javax.annotation.Nonnull;
 
 public abstract class AbstractGerritStatsDownloader {
@@ -47,5 +51,5 @@ public abstract class AbstractGerritStatsDownloader {
      * Reads data from the server. Returns data in JSON-like format, which can be parsed by
      * GerritStats tool.
      */
-    public abstract String readData();
+    public abstract List<JSONObject> readData();
 }

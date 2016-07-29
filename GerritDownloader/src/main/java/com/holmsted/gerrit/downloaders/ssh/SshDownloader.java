@@ -1,5 +1,6 @@
 package com.holmsted.gerrit.downloaders.ssh;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.holmsted.gerrit.GerritServer;
 import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
@@ -7,6 +8,10 @@ import com.holmsted.gerrit.downloaders.ssh.GerritSsh.Version;
 import com.holmsted.json.JsonUtils;
 
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 
@@ -17,56 +22,70 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     @Nonnull
     private final Version gerritVersion;
 
+    static class QueryMetadata {
+        final int rowCount;
+        final int runtimeMsec;
+        final boolean moreChanges;
+        final String resumeSortkey;
+
+        static QueryMetadata fromOutputString(String output) {
+            JSONObject lastLineData = JsonUtils.readJsonString(output);
+            if (lastLineData.get("rowCount") != null) {
+                return new QueryMetadata(lastLineData);
+            } else {
+                return null;
+            }
+        }
+
+        private QueryMetadata(JSONObject metadata) {
+            moreChanges = metadata.optBoolean("moreChanges");
+            rowCount = metadata.optInt("rowCount");
+            runtimeMsec = metadata.optInt("runTimeMilliseconds");
+            resumeSortkey = metadata.optString("resumeSortKey");
+        }
+    }
+
     static class GerritOutput {
-        private String output;
-        private int rowCount;
-        private int runtimeMsec;
-        private boolean moreChanges;
-        private int lastLineStartIndex = -1;
-        private String resumeSortkey;
+        private final List<JSONObject> output = new ArrayList<>();
+        private QueryMetadata metadata;
 
         @Nonnull
         private final Version gerritVersion;
 
         public GerritOutput(@Nonnull String output, @Nonnull Version gerritVersion) {
-            this.output = output;
-            this.gerritVersion = gerritVersion;
-            int lastLineBreak = output.lastIndexOf('\n');
-            if (lastLineBreak != -1) {
-                lastLineStartIndex = output.lastIndexOf('\n', lastLineBreak - 1);
-                if (lastLineStartIndex != -1) {
-                    JSONObject metadata = JsonUtils.readJsonString(this.output.substring(lastLineStartIndex));
-                    moreChanges = metadata.optBoolean("moreChanges");
-                    rowCount = metadata.optInt("rowCount");
-                    runtimeMsec = metadata.optInt("runTimeMilliseconds");
-                    resumeSortkey = metadata.optString("resumeSortKey");
-                }
+            List<String> strings = Arrays.asList(output.split("\n"));
+
+            String lastLine = strings.get(strings.size() - 1);
+            this.metadata = Preconditions.checkNotNull(QueryMetadata.fromOutputString(lastLine));
+
+            for (int i = 0; i < strings.size() - 1; ++i) {
+                this.output.add(new JSONObject(strings.get(i)));
             }
+            this.gerritVersion = gerritVersion;
         }
 
         public boolean hasMoreChanges() {
             if (gerritVersion.isAtLeast(2, 9)) {
-                return moreChanges;
+                return metadata.moreChanges;
             } else {
-                return !Strings.nullToEmpty(resumeSortkey).isEmpty();
+                return !Strings.nullToEmpty(metadata.resumeSortkey).isEmpty();
             }
         }
 
         public String getResumeSortkey() {
-            return resumeSortkey;
+            return metadata.resumeSortkey;
         }
 
         public int getRowCount() {
-            return rowCount;
+            return metadata.rowCount;
         }
 
         public int getRuntimeMec() {
-            return runtimeMsec;
+            return metadata.runtimeMsec;
         }
 
-        @Override
-        public String toString() {
-            return (lastLineStartIndex != -1) ? output.substring(0, lastLineStartIndex) : output;
+        public List<JSONObject> getOutput() {
+            return output;
         }
     }
 
@@ -77,7 +96,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private GerritServer gerritServer;
         private Version gerritVersion;
 
-        public abstract String readUntilLimit();
+        public abstract List<JSONObject> readUntilLimit();
 
         public void setGerritServer(@Nonnull GerritServer gerritServer) {
             this.gerritServer = gerritServer;
@@ -126,34 +145,34 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private int rowCount;
 
         @Override
-        public String readUntilLimit() {
+        public List<JSONObject> readUntilLimit() {
             rowCount = 0;
 
-            StringBuilder builder = new StringBuilder();
+            List<JSONObject> items = new ArrayList<>();
 
             String[] statusQueries = {"status:merged", "status:open", "status:abandoned"};
 
             for (String statusQuery : statusQueries) {
-                builder.append(readOutputWithStatusQueryUntilLimit(statusQuery));
+                items.addAll(readOutputWithStatusQueryUntilLimit(statusQuery));
             }
 
-            return builder.toString();
+            return items;
         }
 
-        private String readOutputWithStatusQueryUntilLimit(@Nonnull String statusQuery) {
-            StringBuilder builder = new StringBuilder();
+        private List<JSONObject> readOutputWithStatusQueryUntilLimit(@Nonnull String statusQuery) {
+            List<JSONObject> items = new ArrayList<>();
 
             boolean hasMoreChanges = true;
             while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
                 GerritOutput gerritOutput = readOutputWithStatusQuery(statusQuery);
-                builder.append(gerritOutput.toString());
+                items.addAll(gerritOutput.getOutput());
 
                 resumeSortkey = gerritOutput.getResumeSortkey();
                 hasMoreChanges = gerritOutput.hasMoreChanges();
                 rowCount += gerritOutput.getRowCount();
             }
 
-            return builder.toString();
+            return items;
         }
 
         private GerritOutput readOutputWithStatusQuery(String statusQuery) {
@@ -203,21 +222,21 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         @Override
-        public String readUntilLimit() {
-            StringBuilder builder = new StringBuilder();
+        public List<JSONObject> readUntilLimit() {
+            List<JSONObject> items = new ArrayList<>();
             boolean hasMoreChanges = true;
             int rowCount = 0;
 
             while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
                 GerritOutput gerritOutput = readData();
-                builder.append(gerritOutput.toString());
+                items.addAll(gerritOutput.getOutput());
 
                 hasMoreChanges = gerritOutput.hasMoreChanges();
                 rowCount += gerritOutput.getRowCount();
                 setStartOffset(startOffset + gerritOutput.getRowCount());
             }
 
-            return builder.toString();
+            return items;
         }
 
         private String createStartOffsetArg() {
@@ -233,7 +252,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     /**
      * Reads the data in json format from gerrit.
      */
-    public String readData() {
+    public List<JSONObject> readData() {
         if (getOverallCommitLimit() != NO_COMMIT_LIMIT) {
             System.out.println("Reading data from " + getGerritServer() + " for last " + getOverallCommitLimit() + " commits");
         } else {

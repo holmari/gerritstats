@@ -22,8 +22,11 @@ public class GerritSsh {
     public static Version version(@Nonnull GerritServer gerritServer) {
         GerritSshCommand sshCommand = new GerritSshCommand(gerritServer);
         String output = sshCommand.exec("version");
-
-        return Version.fromString(output.substring(output.lastIndexOf(' ') + 1));
+        if (output != null) {
+            return Version.fromString(output.substring(output.lastIndexOf(' ') + 1));
+        } else {
+            return null;
+        }
     }
 
     public static class Version {
