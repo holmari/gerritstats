@@ -1,5 +1,6 @@
 package com.holmsted.gerrit;
 
+import com.holmsted.gerrit.GerritStatParser.GerritData;
 import com.holmsted.gerrit.processors.perperson.PerPersonDataProcessor;
 import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
@@ -36,7 +37,8 @@ public class GerritStatsMain {
 
         for (String filename : filenames) {
             String data = FileReader.readFile(filename);
-            commits.addAll(commitDataParser.parseCommits(data));
+            GerritData gerritData = commitDataParser.parseJsonData(data);
+            commits.addAll(gerritData.commits);
         }
 
         QueryData queryData = new QueryData(commandLine, commits);

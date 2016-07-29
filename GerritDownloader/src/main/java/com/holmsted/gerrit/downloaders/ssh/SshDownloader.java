@@ -3,8 +3,8 @@ package com.holmsted.gerrit.downloaders.ssh;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.holmsted.gerrit.GerritServer;
+import com.holmsted.gerrit.GerritVersion;
 import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
-import com.holmsted.gerrit.downloaders.ssh.GerritSsh.Version;
 import com.holmsted.json.JsonUtils;
 
 import org.json.JSONObject;
@@ -20,7 +20,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     public static final int NO_COMMIT_LIMIT = -1;
 
     @Nonnull
-    private final Version gerritVersion;
+    private final GerritVersion gerritVersion;
 
     static class QueryMetadata {
         final int rowCount;
@@ -50,9 +50,9 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private QueryMetadata metadata;
 
         @Nonnull
-        private final Version gerritVersion;
+        private final GerritVersion gerritVersion;
 
-        public GerritOutput(@Nonnull String output, @Nonnull Version gerritVersion) {
+        public GerritOutput(@Nonnull String output, @Nonnull GerritVersion gerritVersion) {
             List<String> strings = Arrays.asList(output.split("\n"));
 
             String lastLine = strings.get(strings.size() - 1);
@@ -94,7 +94,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private String projectNameList;
 
         private GerritServer gerritServer;
-        private Version gerritVersion;
+        private GerritVersion gerritVersion;
 
         public abstract List<JSONObject> readUntilLimit();
 
@@ -122,11 +122,11 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return projectNameList;
         }
 
-        public void setGerritVersion(@Nonnull Version gerritVersion) {
+        public void setGerritVersion(@Nonnull GerritVersion gerritVersion) {
             this.gerritVersion = gerritVersion;
         }
 
-        public Version getGerritVersion() {
+        public GerritVersion getGerritVersion() {
             return gerritVersion;
         }
     }
@@ -244,7 +244,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
     }
 
-    public SshDownloader(@Nonnull GerritServer gerritServer, @Nonnull Version gerritVersion) {
+    public SshDownloader(@Nonnull GerritServer gerritServer, @Nonnull GerritVersion gerritVersion) {
         super(gerritServer);
         this.gerritVersion = gerritVersion;
     }

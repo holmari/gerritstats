@@ -9,52 +9,79 @@ import java.util.List;
 
 import com.holmsted.json.JsonUtils;
 
+import javax.annotation.Nonnull;
+
 public class GerritStatParser {
 
-    public List<Commit> parseCommits(String jsonCommitData) {
-        List<Commit> commits;
+    public static class ParserContext {
+        final GerritVersion version;
+
+        ParserContext(@Nonnull GerritVersion version) {
+            this.version = version;
+        }
+    }
+
+    public static class GerritData {
+        final GerritVersion version;
+        final List<Commit> commits = new ArrayList<>();
+
+        GerritData(@Nonnull GerritVersion version) {
+            this.version = version;
+        }
+    }
+
+
+    public GerritData parseJsonData(String jsonFileData) {
+        GerritData data;
         try {
-            JSONObject object = JsonUtils.readJsonString(jsonCommitData);
+            JSONObject object = JsonUtils.readJsonString(jsonFileData);
             int gerritStatsVersion = object.optInt("gerritStatsVersion");
             if (gerritStatsVersion == 0) {
-                commits = parseLegacyFormatData(jsonCommitData);
+                data = parseLegacyFormatData(jsonFileData);
             } else {
-                commits = parseJsonObject(object);
+                data = parseJsonObject(object);
             }
         } catch(JSONException e) {
             // the earlier versions of GerritDownloader output were not valid json, but
             // instead files with line-by-line json.
-            commits = parseLegacyFormatData(jsonCommitData);
+            data = parseLegacyFormatData(jsonFileData);
         }
 
-        return commits;
+        return data;
     }
 
-    private List<Commit> parseJsonObject(JSONObject rootObject) {
-        List<Commit> commits = new ArrayList<>();
-
+    private GerritData parseJsonObject(JSONObject rootObject) {
         JSONArray jsonCommits = rootObject.getJSONArray("commits");
+        GerritVersion gerritVersion = GerritVersion.fromString(rootObject.getString("gerritVersion"));
+        ParserContext context = new ParserContext(gerritVersion);
+        GerritData data = new GerritData(gerritVersion);
+
         for (int i = 0; i < jsonCommits.length(); ++i) {
             JSONObject jsonCommit = jsonCommits.getJSONObject(i);
             if (Commit.isCommit(jsonCommit)) {
-                commits.add(Commit.fromJson(jsonCommit));
+                data.commits.add(Commit.fromJson(jsonCommit, context));
             }
         }
 
-        return commits;
+        return data;
     }
 
-    List<Commit> parseLegacyFormatData(String jsonCommitData) {
+    private GerritData parseLegacyFormatData(String jsonCommitData) {
         System.out.println("Using legacy file format parser for GerritStats .json file(s).");
-        System.out.println("Rerun GerritDownloader to start using the new format.");
+        System.out.println("This file format has some limitations.");
+        System.out.println("Please rerun GerritDownloader to start using the new format.");
 
-        List<Commit> commits = new ArrayList<>();
+        GerritVersion gerritVersion = GerritVersion.makeInvalid();
+
+        GerritData data = new GerritData(gerritVersion);
+        ParserContext context = new ParserContext(gerritVersion);
+
         String[] lines = jsonCommitData.split("\n");
         for (String line : lines) {
             try {
                 JSONObject lineJson = JsonUtils.readJsonString(line);
                 if (Commit.isCommit(lineJson)) {
-                    commits.add(Commit.fromJson(lineJson));
+                    data.commits.add(Commit.fromJson(lineJson, context));
                     // ignore the stats, log the rest in case the format changes
                 } else if (!lineJson.get("type").equals("stats")) {
                     System.err.println("Ignored line " + line);
@@ -63,6 +90,6 @@ public class GerritStatParser {
                 System.err.println(String.format("Not JsonObject: '%s'", line));
             }
         }
-        return commits;
+        return data;
     }
 }

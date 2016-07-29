@@ -4,7 +4,7 @@ import com.holmsted.file.FileWriter;
 import com.holmsted.gerrit.CommandLineParser;
 import com.holmsted.gerrit.GerritServer;
 import com.holmsted.gerrit.downloaders.ssh.GerritSsh;
-import com.holmsted.gerrit.downloaders.ssh.GerritSsh.Version;
+import com.holmsted.gerrit.GerritVersion;
 import com.holmsted.gerrit.downloaders.ssh.SshDownloader;
 import com.holmsted.gerrit.downloaders.ssh.SshProjectLister;
 
@@ -26,7 +26,7 @@ public class Downloader {
     @Nonnull
     private final GerritServer gerritServer;
 
-    private Version gerritVersion;
+    private GerritVersion gerritVersion;
 
     public Downloader(CommandLineParser commandLine) {
         this.commandLine = commandLine;
@@ -68,6 +68,7 @@ public class Downloader {
     private void writeJsonFile(@Nonnull String outputFilename, @Nonnull List<JSONObject> data) {
         JSONObject root = new JSONObject();
         root.put("gerritStatsVersion", FILE_FORMAT_VERSION);
+        root.put("gerritVersion", gerritVersion.toString());
         root.put("commits", data);
 
         FileWriter.writeFile(outputFilename, root.toString());

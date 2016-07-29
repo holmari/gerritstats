@@ -1,6 +1,8 @@
 package com.holmsted.gerrit;
 
 import com.google.common.base.Strings;
+import com.holmsted.gerrit.GerritStatParser.ParserContext;
+import com.holmsted.json.JsonUtils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -10,8 +12,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.annotation.Nonnull;
-
-import com.holmsted.json.JsonUtils;
 
 public class Commit {
     private static final long SEC_TO_MSEC = 1000;
@@ -48,7 +48,7 @@ public class Commit {
             return username;
         }
 
-        public static Identity fromJson(JSONObject ownerJson) {
+        public static Identity fromJson(JSONObject ownerJson, @Nonnull ParserContext context) {
             Identity identity = new Identity();
             identity.name = ownerJson.optString("name");
             identity.email = ownerJson.optString("email");
@@ -113,10 +113,10 @@ public class Commit {
         public Identity reviewer;
         public String message;
 
-        static ChangeComment fromJson(JSONObject commentJson) {
+        static ChangeComment fromJson(JSONObject commentJson, @Nonnull ParserContext context) {
             ChangeComment comment = new ChangeComment();
             comment.timestamp = commentJson.optLong("timestamp") * SEC_TO_MSEC;
-            comment.reviewer = Identity.fromJson(commentJson.optJSONObject("reviewer"));
+            comment.reviewer = Identity.fromJson(commentJson.optJSONObject("reviewer"), context);
             comment.message = commentJson.optString("message");
             return comment;
         }
@@ -138,23 +138,23 @@ public class Commit {
             return new Date(grantedOnDate);
         }
 
-        public static List<Approval> fromJson(JSONArray approvals) {
+        public static List<Approval> fromJson(JSONArray approvals, @Nonnull ParserContext context) {
             List<Approval> result = new ArrayList<>();
             if (approvals != null) {
                 for (int i = 0; i < approvals.length(); ++i) {
-                    result.add(Approval.fromJson(approvals.getJSONObject(i)));
+                    result.add(Approval.fromJson(approvals.getJSONObject(i), context));
                 }
             }
             return result;
         }
 
-        public static Approval fromJson(JSONObject approvalJson) {
+        public static Approval fromJson(JSONObject approvalJson, @Nonnull ParserContext context) {
             Approval approval = new Approval();
             approval.type = approvalJson.optString("type");
             approval.description = approvalJson.optString("description");
             approval.value = approvalJson.optInt("value");
             approval.grantedOnDate = approvalJson.optLong("grantedOn") * SEC_TO_MSEC;
-            approval.grantedBy = Identity.fromJson(approvalJson.getJSONObject("by"));
+            approval.grantedBy = Identity.fromJson(approvalJson.getJSONObject("by"), context);
             return approval;
         }
     }
@@ -186,21 +186,21 @@ public class Commit {
             return message;
         }
 
-        public static List<PatchSetComment> fromJson(JSONArray comments) {
+        public static List<PatchSetComment> fromJson(JSONArray comments, @Nonnull ParserContext context) {
             List<PatchSetComment> result = new ArrayList<>();
             if (comments != null) {
                 for (int i = 0; i < comments.length(); ++i) {
-                    result.add(PatchSetComment.fromJson(comments.getJSONObject(i)));
+                    result.add(PatchSetComment.fromJson(comments.getJSONObject(i), context));
                 }
             }
             return result;
         }
 
-        public static PatchSetComment fromJson(JSONObject commentJson) {
+        public static PatchSetComment fromJson(JSONObject commentJson, @Nonnull ParserContext context) {
             PatchSetComment comment = new PatchSetComment();
             comment.file = commentJson.optString("file");
             comment.line = commentJson.optInt("line");
-            comment.reviewer = Identity.fromJson(commentJson.getJSONObject("reviewer"));
+            comment.reviewer = Identity.fromJson(commentJson.getJSONObject("reviewer"), context);
             comment.message = commentJson.optString("message");
             return comment;
         }
@@ -241,18 +241,18 @@ public class Commit {
             return comments.indexOf(patchSetComment) != -1;
         }
 
-        static PatchSet fromJson(JSONObject patchSetJson) {
+        static PatchSet fromJson(JSONObject patchSetJson, @Nonnull ParserContext context) {
             final PatchSet patchSet = new PatchSet();
             patchSet.number = patchSetJson.optInt("number");
             patchSet.revision = patchSetJson.optString("revision");
             patchSet.parents.addAll(JsonUtils.readStringArray(patchSetJson.optJSONArray("parents")));
             patchSet.ref = patchSetJson.optString("ref");
-            patchSet.uploader = Identity.fromJson(patchSetJson.optJSONObject("uploader"));
+            patchSet.uploader = Identity.fromJson(patchSetJson.optJSONObject("uploader"), context);
             patchSet.createdOnDate = patchSetJson.optLong("createdOn") * SEC_TO_MSEC;
 
             JSONObject authorJson = patchSetJson.optJSONObject("author");
             if (authorJson != null) {
-                patchSet.author = Identity.fromJson(authorJson);
+                patchSet.author = Identity.fromJson(authorJson, context);
             } else {
                 patchSet.author = patchSet.uploader;
             }
@@ -262,11 +262,17 @@ public class Commit {
             try {
                 patchSet.kind = PatchSetKind.valueOf(patchSetKind);
             } catch (IllegalArgumentException e) {
-                System.err.println("Unknown patch set kind '" + patchSetKind + "'");
+                if (context.version.isAtLeast(2, 9)) {
+                    System.err.println("Unknown patch set kind '" + patchSetKind + "'");
+                } else {
+                    // the 'kind' field does not exist before Gerrit 2.9 or so.
+                    patchSet.kind = PatchSetKind.REWORK;
+                }
             }
 
-            patchSet.approvals.addAll(Approval.fromJson(patchSetJson.optJSONArray("approvals")));
-            patchSet.comments.addAll(PatchSetComment.fromJson(patchSetJson.optJSONArray("comments")));
+            patchSet.approvals.addAll(Approval.fromJson(patchSetJson.optJSONArray("approvals"), context));
+            patchSet.comments.addAll(PatchSetComment.fromJson(
+                    patchSetJson.optJSONArray("comments"), context));
             for (PatchSetComment comment : patchSet.comments) {
                 comment.patchSetTimestamp = patchSet.createdOnDate;
             }
@@ -344,7 +350,7 @@ public class Commit {
         return lineJson.opt("status") != null;
     }
 
-    static Commit fromJson(JSONObject commitJson) {
+    static Commit fromJson(JSONObject commitJson, @Nonnull ParserContext context) {
         Commit commit = new Commit();
         commit.project = commitJson.optString("project");
         commit.branch = commitJson.optString("branch");
@@ -352,7 +358,7 @@ public class Commit {
         commit.id = commitJson.optString("id");
         commit.commitNumber = commitJson.optInt("number");
         commit.subject = commitJson.optString("subject");
-        commit.owner = Identity.fromJson(commitJson.optJSONObject("owner"));
+        commit.owner = Identity.fromJson(commitJson.optJSONObject("owner"), context);
         commit.url = commitJson.optString("url");
         commit.commitMessage = commitJson.optString("commitMessage");
         commit.createdOnDate = commitJson.optLong("createdOn") * SEC_TO_MSEC;
@@ -360,33 +366,33 @@ public class Commit {
         commit.isOpen = commitJson.optBoolean("open");
         commit.status = commitJson.optString("status");
 
-        commit.setReviewersFromJson(commitJson.optJSONArray("allReviewers"));
-        commit.setCommentsFromJson(commitJson.optJSONArray("comments"));
-        commit.setPatchSetsFromJson(commitJson.optJSONArray("patchSets"));
+        commit.setReviewersFromJson(commitJson.optJSONArray("allReviewers"), context);
+        commit.setCommentsFromJson(commitJson.optJSONArray("comments"), context);
+        commit.setPatchSetsFromJson(commitJson.optJSONArray("patchSets"), context);
 
         return commit;
     }
 
-    private void setReviewersFromJson(JSONArray reviewers) {
+    private void setReviewersFromJson(JSONArray reviewers, @Nonnull ParserContext context) {
         if (reviewers != null) {
             for (int i = 0; i < reviewers.length(); ++i) {
                 JSONObject identityJson = reviewers.getJSONObject(i);
-                this.reviewers.add(Identity.fromJson(identityJson));
+                this.reviewers.add(Identity.fromJson(identityJson, context));
             }
         }
     }
 
-    private void setCommentsFromJson(JSONArray comments) {
+    private void setCommentsFromJson(JSONArray comments, @Nonnull ParserContext context) {
         for (int i = 0; i < comments.length(); ++i) {
             JSONObject commentJson = comments.getJSONObject(i);
-            this.comments.add(ChangeComment.fromJson(commentJson));
+            this.comments.add(ChangeComment.fromJson(commentJson, context));
         }
     }
 
-    private void setPatchSetsFromJson(JSONArray patchSets) {
+    private void setPatchSetsFromJson(JSONArray patchSets, @Nonnull ParserContext context) {
         for (int i = 0; i < patchSets.length(); ++i) {
             JSONObject patchSetJson = patchSets.getJSONObject(i);
-            this.patchSets.add(PatchSet.fromJson(patchSetJson));
+            this.patchSets.add(PatchSet.fromJson(patchSetJson, context));
         }
     }
 }
