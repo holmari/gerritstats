@@ -19,13 +19,12 @@ import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 import com.holmsted.gerrit.processors.perperson.IdentityRecord.ReviewerData;
+import com.holmsted.resources.ResourceReader;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOError;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -65,26 +64,9 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         createPerPersonFiles(orderedList);
         createIdsJs();
 
-        copyFilesToTarget(resOutputDir, getResourceFiles("resList.js"));
+        copyFilesToTarget(resOutputDir, ResourceReader.readResourceFile("resList.js"));
 
         System.out.println("Output written to " + outputDir.getAbsolutePath());
-    }
-
-    private List<String> getResourceFiles(String path) {
-        List<String> filenames = new ArrayList<>();
-        ClassLoader classLoader = PerPersonHtmlFormatter.class.getClassLoader();
-
-        InputStream fileListingStream = classLoader.getResourceAsStream(path);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(fileListingStream));
-        String line;
-        try {
-            while ((line = reader.readLine()) != null) {
-                filenames.add(line);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return filenames;
     }
 
     private void createIdsJs() {

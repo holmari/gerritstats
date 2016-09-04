@@ -84,6 +84,14 @@ public class CommandLineParser {
     @Nonnull
     private String outputDir = DEFAULT_OUTPUT_DIR;
 
+    @Parameter(names = {"-a", "--anonymize"},
+            description = "Replace real data, like user name and email, with generated identities, "
+                    + "and replace all other identifiable data with similarly generated names. "
+                    + "Lorem ipsumizes all review comments. The statistic numbers are kept intact. "
+                    + "Useful for demonstration purposes outside an organization.")
+    @Nonnull
+    private boolean anonymizeData;
+
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
 
@@ -155,6 +163,10 @@ public class CommandLineParser {
 
     public int getCommitPatchSetCountThreshold() {
         return commitPatchSetCountThreshold;
+    }
+
+    public boolean getAnonymizeData() {
+        return anonymizeData;
     }
 
     public void printUsage() {

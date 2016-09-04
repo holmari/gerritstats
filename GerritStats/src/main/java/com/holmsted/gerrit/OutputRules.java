@@ -23,4 +23,8 @@ public class OutputRules {
     public String getOutputDir() {
         return commandLine.getOutputDir();
     }
+
+    public boolean getAnonymizeData() {
+        return commandLine.getAnonymizeData();
+    }
 }

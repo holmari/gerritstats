@@ -41,7 +41,13 @@ public class GerritStatsMain {
             commits.addAll(gerritData.commits);
         }
 
-        QueryData queryData = new QueryData(commandLine, commits);
+        QueryData queryData = new QueryData(commandLine.getFilenames(),
+                commandLine.getIncludeBranches(),
+                commits);
+        if (outputRules.getAnonymizeData()) {
+            queryData = queryData.anonymize();
+        }
+
         switch (commandLine.getOutput()) {
             case REVIEW_COMMENT_CSV:
                 ReviewerProcessor reviewerFormatter = new ReviewerProcessor(filter, outputRules);

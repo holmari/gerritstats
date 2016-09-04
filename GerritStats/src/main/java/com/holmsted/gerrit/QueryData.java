@@ -1,6 +1,8 @@
 package com.holmsted.gerrit;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.holmsted.gerrit.anonymizer.CommitAnonymizer;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -11,27 +13,30 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class QueryData {
-    private final CommandLineParser commandLine;
-    private final List<Commit> commits = new ArrayList<>();
+    private final List<Commit> commits;
+    private final List<String> filenames;
+    private final List<String> includeBranches;
 
     private String datasetKey;
 
-    QueryData(@Nonnull CommandLineParser commandLine, @Nonnull List<Commit> commits) {
-        this.commandLine = commandLine;
-        this.commits.addAll(commits);
+    QueryData(@Nonnull List<String> filenames,
+              @Nonnull List<String> includeBranches,
+              @Nonnull List<Commit> commits) {
+
+        this.filenames = ImmutableList.copyOf(filenames);
+        this.includeBranches = ImmutableList.copyOf(includeBranches);
+        this.commits = ImmutableList.copyOf(commits);
     }
 
     public String getDisplayableProjectName() {
-        List<String> filenames = commandLine.getFilenames();
-        return String.format("all data from file(s) %s", Joiner.on(", ").join(filenames));
+        return String.format("all data from file(s) %s", Joiner.on(", ").join(this.filenames));
     }
 
     public List<String> getFilenames() {
-        return commandLine.getFilenames();
+        return this.filenames;
     }
 
     public String getDisplayableBranchList() {
-        List<String> includeBranches = commandLine.getIncludeBranches();
         if (includeBranches.isEmpty()) {
             return "(all branches)";
         }
@@ -59,5 +64,11 @@ public class QueryData {
         }
 
         return this.datasetKey;
+    }
+
+    public QueryData anonymize() {
+        CommitAnonymizer anonymizer = new CommitAnonymizer();
+        List<Commit> anonymizedCommits = anonymizer.process(commits);
+        return new QueryData(ImmutableList.of(), ImmutableList.of(), anonymizedCommits);
     }
 }
