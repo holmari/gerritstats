@@ -4,22 +4,28 @@ import org.joda.time.DateTime;
 
 import java.text.NumberFormat;
 
+import javax.annotation.Nonnull;
+
 public class MonthlyTimeFormat {
+
     public static boolean isPastCurrentDate(int year, int month) {
         DateTime currentDate = new DateTime();
         return year >= currentDate.getYear() && month > currentDate.getMonthOfYear();
     }
 
+    @Nonnull
     public static NumberFormat getNumberFormatter() {
         NumberFormat percentFormat = NumberFormat.getPercentInstance();
         percentFormat.setMaximumFractionDigits(1);
         return percentFormat;
     }
 
+    @Nonnull
     public static String formatRateOfChange(float prevValue, float nextValue) {
         return formatFloat(getSafeRateOfChange(prevValue, nextValue));
     }
 
+    @Nonnull
     public static String formatFloat(float rateOfChange) {
         if (!Float.isNaN(rateOfChange)) {
             return getNumberFormatter().format(rateOfChange);

@@ -1,16 +1,15 @@
 package com.holmsted.gerrit;
 
+import com.holmsted.file.FileReader;
 import com.holmsted.gerrit.GerritStatParser.GerritData;
 import com.holmsted.gerrit.processors.perperson.PerPersonDataProcessor;
 import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.holmsted.file.FileReader;
-
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -38,7 +37,7 @@ public class GerritStatsMain {
         GerritStatParser commitDataParser = new GerritStatParser();
 
         List<String> filenames = processFilenames(commandLine.getFilenames());
-        GerritVersion minVersion = null;
+        GerritVersion minVersion = GerritVersion.makeInvalid();
 
         for (String filename : filenames) {
             @Nullable
@@ -46,11 +45,11 @@ public class GerritStatsMain {
             if (data != null) {
                 GerritData gerritData = commitDataParser.parseJsonData(data);
                 commits.addAll(gerritData.commits);
-                if (minVersion == null || !gerritData.version.isAtLeast(minVersion)) {
+                if (minVersion.isInvalid() || !gerritData.version.isAtLeast(minVersion)) {
                     minVersion = gerritData.version;
                 }
             } else {
-                System.err.println(String.format("Could not read file '%s'" + filename));
+                System.err.println(String.format("Could not read file '%s'", filename));
             }
         }
 
@@ -76,7 +75,8 @@ public class GerritStatsMain {
         }
     }
 
-    private static List<String> processFilenames(List<String> filenames) {
+    @Nonnull
+    private static List<String> processFilenames(@Nonnull List<String> filenames) {
         List<String> result = new ArrayList<>();
         for (String filename : filenames) {
             File file = new File(filename);
@@ -87,11 +87,8 @@ public class GerritStatsMain {
             if (file.isFile()) {
                 result.add(filename);
             } else {
-                File[] subdirFiles = file.listFiles(new FilenameFilter() {
-                    @Override
-                    public boolean accept(File dir, String name) {
-                        return name.endsWith(".json");
-                    }
+                File[] subdirFiles = file.listFiles((dir, name) -> {
+                    return name.endsWith(".json");
                 });
                 for (File subdirFile : subdirFiles) {
                     result.add(subdirFile.getAbsolutePath());

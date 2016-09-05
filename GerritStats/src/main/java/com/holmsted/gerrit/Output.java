@@ -1,5 +1,7 @@
 package com.holmsted.gerrit;
 
+import javax.annotation.Nonnull;
+
 public enum Output {
     /**
      * Code reviews listed in CSV format, including date, and reviewer and author identities.
@@ -10,12 +12,14 @@ public enum Output {
      */
     PER_PERSON_DATA("per-person-data");
 
+    @Nonnull
     private final String name;
 
-    Output(String name) {
+    Output(@Nonnull String name) {
         this.name = name;
     }
 
+    @Nonnull
     public static Output fromString(String formatName) {
         if (formatName.equals(REVIEW_COMMENT_CSV.name)) {
             return REVIEW_COMMENT_CSV;

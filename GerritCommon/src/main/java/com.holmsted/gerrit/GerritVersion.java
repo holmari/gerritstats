@@ -62,6 +62,10 @@ public class GerritVersion {
         return isAtLeast(otherVersion.major, otherVersion.minor);
     }
 
+    public boolean isInvalid() {
+        return major == -1 && minor == -1 && patch == -1;
+    }
+
     public String toString() {
         return String.format("%d.%d.%d", major, minor, patch);
     }

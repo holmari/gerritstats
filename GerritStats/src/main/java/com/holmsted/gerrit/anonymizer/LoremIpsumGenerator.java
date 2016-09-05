@@ -1,5 +1,6 @@
 package com.holmsted.gerrit.anonymizer;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class LoremIpsumGenerator {
@@ -55,6 +56,7 @@ public class LoremIpsumGenerator {
             "Nullam at sem ut ante sollicitudin faucibus quis ut eros."
     };
 
+    @Nonnull
     public static String makeLoremIpsum(int length) {
         StringBuilder ipsum = new StringBuilder();
 
@@ -67,6 +69,7 @@ public class LoremIpsumGenerator {
         return ipsum.toString();
     }
 
+    @Nullable
     public static String makeLoremIpsum(@Nullable String stringToMatch) {
         if (stringToMatch != null) {
             return makeLoremIpsum(stringToMatch.length());

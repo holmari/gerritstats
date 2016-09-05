@@ -39,11 +39,11 @@ public class CommitAnonymizer {
     private final IdentityGenerator generator = new IdentityGenerator();
     private final FakeFilenameGenerator filenameGenerator = new FakeFilenameGenerator();
 
-    private Map<Identity, Identity> identityMapping = new HashMap<>();
-    private Map<String, String> urlMapping = new HashMap<>();
-    private Map<String, String> filenameMapping = new HashMap<>();
-    private Map<String, String> projectNameMapping = new HashMap<>();
-    private Map<ProjectAndBranch, String> branchNameMapping = new HashMap<>();
+    private final Map<Identity, Identity> identityMapping = new HashMap<>();
+    private final Map<String, String> urlMapping = new HashMap<>();
+    private final Map<String, String> filenameMapping = new HashMap<>();
+    private final Map<String, String> projectNameMapping = new HashMap<>();
+    private final Map<ProjectAndBranch, String> branchNameMapping = new HashMap<>();
 
     private int nextCommitNumber = 1;
     private int devBranchNameSuffix = 1;
@@ -80,7 +80,7 @@ public class CommitAnonymizer {
     @Nullable
     private String getBranchForProject(@Nullable String projectName, @Nullable String branchName) {
         if (projectName != null && branchName != null) {
-            if (branchName == "master") {
+            if (branchName.equals("master")) {
                 return "master";
             } else {
                 ProjectAndBranch key = new ProjectAndBranch(projectName, branchName);

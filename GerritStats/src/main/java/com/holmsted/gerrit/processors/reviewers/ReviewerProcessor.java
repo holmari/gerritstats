@@ -23,7 +23,8 @@ public class ReviewerProcessor extends CommitDataProcessor<PatchSetCommentDataLi
 
     static class CsvFormatter implements OutputFormatter<PatchSetCommentDataList> {
 
-        private SimpleDateFormat dateFormat;
+        @Nonnull
+        private final SimpleDateFormat dateFormat;
 
         public CsvFormatter() {
             dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);

@@ -7,6 +7,8 @@ import com.holmsted.resources.ResourceReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 public class IdentityGenerator {
 
     private final static String[] DOMAIN_SUFFIXES = {
@@ -25,11 +27,14 @@ public class IdentityGenerator {
     };
 
     private static class Name {
+        @Nonnull
         public final String firstName;
+        @Nonnull
         public final String lastName;
+        @Nonnull
         public final String username;
 
-        public Name(String firstName, String lastName) {
+        public Name(@Nonnull String firstName, @Nonnull String lastName) {
             this.firstName = firstName;
             this.lastName = lastName;
 
@@ -52,6 +57,7 @@ public class IdentityGenerator {
     private final List<String> firstNames = new ArrayList<>();
     private final List<String> lastNames = new ArrayList<>();
 
+    @Nonnull
     public Commit.Identity generateIdentity() {
         Commit.Identity identity = new Commit.Identity();
         Name generatedName = generateName();
@@ -64,6 +70,7 @@ public class IdentityGenerator {
         return identity;
     }
 
+    @Nonnull
     private String generateDomain() {
         if (domainBasenames.isEmpty()) {
             domainBasenames.addAll(ResourceReader.readResourceFile("name_generator/domains.txt"));
@@ -75,6 +82,7 @@ public class IdentityGenerator {
                 domainSuffix);
     }
 
+    @Nonnull
     private Name generateName() {
         if (firstNames.isEmpty() || lastNames.isEmpty()) {
             firstNames.addAll(ResourceReader.readResourceFile("name_generator/first_names.txt"));

@@ -2,7 +2,6 @@ package com.holmsted.gerrit.anonymizer;
 
 import com.holmsted.RandomLists;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
