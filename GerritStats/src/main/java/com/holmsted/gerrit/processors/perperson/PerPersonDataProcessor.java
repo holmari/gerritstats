@@ -70,7 +70,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                             }
                             break;
                         }
-                        case Commit.Approval.TYPE_SUBM: {
+                        case Commit.Approval.TYPE_SUBMITTED: {
                             ownerRecord.updateAverageTimeInCodeReview(approval.grantedOnDate - commit.createdOnDate);
                             break;
                         }

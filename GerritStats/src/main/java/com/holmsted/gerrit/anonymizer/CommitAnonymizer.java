@@ -19,7 +19,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class CommitAnonymizer {
-
     private static final String ACME_CORP_URL = "https://acme.corp/gerrit";
     private static final String URL_ACME_HOST = "acme.corp";
     private static final int URL_ACME_PORT = 29418;
@@ -61,12 +60,17 @@ public class CommitAnonymizer {
         }
     }
 
+    @Nullable
     private String generateAcmeCorpUrl(@Nonnull Commit commitToAnonymize) {
         try {
-            URL url = new URL(commitToAnonymize.url);
-            URL newUrl = new URL(url.getProtocol(), URL_ACME_HOST, URL_ACME_PORT,
-                    "/c/acme/" + String.valueOf(commitToAnonymize.commitNumber));
-            return newUrl.toString();
+            if (commitToAnonymize.url != null) {
+                URL url = new URL(commitToAnonymize.url);
+                URL newUrl = new URL(url.getProtocol(), URL_ACME_HOST, URL_ACME_PORT,
+                        "/c/acme/" + String.valueOf(commitToAnonymize.commitNumber));
+                return newUrl.toString();
+            } else {
+                return null;
+            }
         } catch (MalformedURLException e) {
             return ACME_CORP_URL;
         }
@@ -92,6 +96,7 @@ public class CommitAnonymizer {
         }
     }
 
+    @Nullable
     private String getOrCreateUrlForCommit(@Nonnull Commit commit) {
         if (commit.url == null) {
             return null;
@@ -118,40 +123,72 @@ public class CommitAnonymizer {
         return "I" + UUID.randomUUID();
     }
 
-    private Commit anonymizeCommit(@Nonnull Commit commit) {
-        commit.commitNumber = nextCommitNumber++;
-        commit.id = generateId();
-        commit.url = getOrCreateUrlForCommit(commit);
-        commit.owner = getOrCreateIdentity(commit.owner);
-        commit.project = getOrCreateProject(commit.project);
+    private Commit anonymizeCommit(@Nonnull Commit commitToAnonymize) {
+        List<Identity> reviewers = commitToAnonymize.reviewers.stream().map(
+                this::getOrCreateIdentity).collect(Collectors.toList());
 
-        commit.subject = FakeCommitTitleGenerator.generate();
-        commit.commitMessage = loremIpsumize(commit.commitMessage);
+        List<ChangeComment> changeComments = commitToAnonymize.comments.stream().map(
+                comment -> new ChangeComment(comment.timestamp,
+                        getOrCreateIdentity(comment.reviewer),
+                        loremIpsumize(comment.message)))
+                .collect(Collectors.toList());
 
-        List<Identity> reviewers = commit.reviewers.stream().map(this::getOrCreateIdentity).collect(Collectors.toList());
-        commit.reviewers.clear();
-        commit.reviewers.addAll(reviewers);
+        List<PatchSet> patchSets = commitToAnonymize.patchSets.stream().map(
+                patchSet -> anonymizePatchSet(commitToAnonymize, patchSet)
+        ).collect(Collectors.toList());
 
-        commit.branch = getBranchForProject(commit.project, commit.branch);
+        return new Commit(
+                getOrCreateProject(commitToAnonymize.project),
+                getBranchForProject(commitToAnonymize.project, commitToAnonymize.branch),
+                generateId(),
+                nextCommitNumber++,
+                FakeCommitTitleGenerator.generate(),
+                getOrCreateIdentity(commitToAnonymize.owner),
+                getOrCreateUrlForCommit(commitToAnonymize),
+                loremIpsumize(commitToAnonymize.commitMessage),
+                commitToAnonymize.createdOnDate,
+                commitToAnonymize.lastUpdatedDate,
+                commitToAnonymize.isOpen,
+                commitToAnonymize.status,
+                reviewers,
+                changeComments,
+                patchSets
+        );
+    }
 
-        for (PatchSet patchSet : commit.patchSets) {
-            patchSet.author = getOrCreateIdentity(patchSet.author);
-            patchSet.uploader = getOrCreateIdentity(patchSet.uploader);
-            for (Approval approval : patchSet.approvals) {
-                approval.grantedBy = getOrCreateIdentity(approval.grantedBy);
-            }
-            for (PatchSetComment comment : patchSet.comments) {
-                comment.reviewer = getOrCreateIdentity(comment.reviewer);
-                comment.file = getOrCreateFilename(commit, comment.file);
-                comment.message = loremIpsumize(comment.message);
-            }
-        }
+    private PatchSet anonymizePatchSet(Commit commit, PatchSet toAnonymize) {
+        List<Approval> approvals = toAnonymize.approvals.stream().map(
+                approval ->
+                        new Approval(approval.type,
+                                approval.description,
+                                approval.value,
+                                approval.grantedOnDate,
+                                getOrCreateIdentity(approval.grantedBy)))
+                .collect(Collectors.toList());
 
-        for (ChangeComment comment : commit.comments) {
-            comment.reviewer = getOrCreateIdentity(comment.reviewer);
-            comment.message = loremIpsumize(comment.message);
-        }
+        List<PatchSetComment> comments = toAnonymize.comments.stream().map(
+                comment ->
+                        new PatchSetComment(getOrCreateFilename(commit, comment.file),
+                                comment.line,
+                                getOrCreateIdentity(comment.reviewer),
+                                loremIpsumize(comment.message),
+                                comment.patchSetTimestamp
+                        )).collect(Collectors.toList());
 
-        return commit;
+        return new PatchSet(
+                toAnonymize.number,
+                toAnonymize.revision,
+                toAnonymize.parents,
+                toAnonymize.ref,
+                getOrCreateIdentity(toAnonymize.uploader),
+                toAnonymize.createdOnDate,
+                getOrCreateIdentity(toAnonymize.author),
+                toAnonymize.isDraft,
+                toAnonymize.kind,
+                approvals,
+                comments,
+                toAnonymize.sizeInsertions,
+                toAnonymize.sizeDeletions
+        );
     }
 }

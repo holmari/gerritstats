@@ -59,15 +59,13 @@ public class IdentityGenerator {
 
     @Nonnull
     public Commit.Identity generateIdentity() {
-        Commit.Identity identity = new Commit.Identity();
         Name generatedName = generateName();
         String domain = generateDomain();
 
-        identity.name = generatedName.getDisplayName();
-        identity.email = generatedName.getEmail(domain);
-        identity.username = generatedName.username;
-
-        return identity;
+        return new Commit.Identity(
+                generatedName.getDisplayName(),
+                generatedName.getEmail(domain),
+                generatedName.username);
     }
 
     @Nonnull
