@@ -61,6 +61,10 @@
     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
     <strong>Old Gerrit version warning</strong>: Some or all of this data has been generated with data from an old Gerrit version (<span id="gerritOldVersionField"></span>). Versions prior to 2.9 do not provide enough information on who was added as a reviewer, so much of the data will be incorrect. Update Gerrit to get better statistics!
 </div>
+<div id="unknownGerritVersionAlert" class="alert alert-warning alert-dismissible" style="display:none" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Unknown Gerrit version warning</strong>: Some or all of this data has been generated with data from an unknown Gerrit version. Some data is not included in the sources. Rerun GerritDownloader and GerritStats to get rid of this message.
+</div>
 
 <table id="identities" class="table table-striped">
     <thead>
@@ -275,7 +279,9 @@ proximityGraph.create();
 
 loadOverviewUserdata();
 
-if (!datasetOverview.gerritVersion.isAtLeast(2, 9)) {
+if (datasetOverview.gerritVersion.isUnknown()) {
+    $('#unknownGerritVersionAlert').show();
+} else if (!datasetOverview.gerritVersion.isAtLeast(2, 9)) {
     $('#gerritOldVersionField').text(datasetOverview.gerritVersion.toString());
     $('#oldGerritVersionAlert').show();
 }

@@ -482,6 +482,12 @@ var datasetOverviewScope = {
                  + overviewRecord.gerritVersion.minor + "."
                  + overviewRecord.gerritVersion.patch;
         };
+
+        overviewRecord.gerritVersion.isUnknown = function() {
+            return overviewRecord.gerritVersion.major == -1
+                && overviewRecord.gerritVersion.minor == -1
+                && overviewRecord.gerritVersion.patch == -1;
+        };
     }
 }; // datasetOverviewScope
 
