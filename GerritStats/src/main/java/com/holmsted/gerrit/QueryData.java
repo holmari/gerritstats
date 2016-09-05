@@ -13,25 +13,33 @@ import java.util.List;
 import javax.annotation.Nonnull;
 
 public class QueryData {
+    @Nonnull
     private final List<Commit> commits;
+    @Nonnull
     private final List<String> filenames;
+    @Nonnull
     private final List<String> includeBranches;
+    @Nonnull
+    private final GerritVersion minVersion;
 
     private String datasetKey;
 
     QueryData(@Nonnull List<String> filenames,
               @Nonnull List<String> includeBranches,
-              @Nonnull List<Commit> commits) {
+              @Nonnull List<Commit> commits,
+              @Nonnull GerritVersion minVersion) {
 
         this.filenames = ImmutableList.copyOf(filenames);
         this.includeBranches = ImmutableList.copyOf(includeBranches);
         this.commits = ImmutableList.copyOf(commits);
+        this.minVersion = minVersion;
     }
 
     public String getDisplayableProjectName() {
         return String.format("all data from file(s) %s", Joiner.on(", ").join(this.filenames));
     }
 
+    @Nonnull
     public List<String> getFilenames() {
         return this.filenames;
     }
@@ -44,6 +52,7 @@ public class QueryData {
         return Joiner.on(", ").join(includeBranches);
     }
 
+    @Nonnull
     public List<Commit> getCommits() {
         return commits;
     }
@@ -52,6 +61,7 @@ public class QueryData {
      * Returns a unique hashcode formed out of the filenames. This can be used as a rudimentary
      * check for whether the data was generated with the same files.
      */
+    @Nonnull
     public String getDatasetKey() {
         if (this.datasetKey == null) {
             List<String> filenames = new ArrayList<>(getFilenames());
@@ -66,9 +76,14 @@ public class QueryData {
         return this.datasetKey;
     }
 
+    @Nonnull
     public QueryData anonymize() {
         CommitAnonymizer anonymizer = new CommitAnonymizer();
         List<Commit> anonymizedCommits = anonymizer.process(commits);
-        return new QueryData(ImmutableList.of(), ImmutableList.of(), anonymizedCommits);
+        return new QueryData(ImmutableList.of(), ImmutableList.of(), anonymizedCommits, minVersion);
+    }
+
+    public GerritVersion getMinGerritVersion() {
+        return minVersion;
     }
 }

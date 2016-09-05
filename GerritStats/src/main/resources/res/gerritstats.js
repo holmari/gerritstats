@@ -469,6 +469,21 @@ var userdataScope = {
 
 }; // userdataScope
 
+var datasetOverviewScope = {
+
+    initialize: function(overviewRecord) {
+        overviewRecord.gerritVersion.isAtLeast = function(major, minor) {
+            return overviewRecord.gerritVersion.major >= major
+                && overviewRecord.gerritVersion.minor >= minor;
+        };
+
+        overviewRecord.gerritVersion.toString = function() {
+            return overviewRecord.gerritVersion.major + "."
+                 + overviewRecord.gerritVersion.minor + "."
+                 + overviewRecord.gerritVersion.patch;
+        };
+    }
+}; // datasetOverviewScope
 
 var MonthlyTimeFormat = {
     formatFloat: function(value) {

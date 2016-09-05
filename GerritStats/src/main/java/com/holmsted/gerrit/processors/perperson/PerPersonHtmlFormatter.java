@@ -114,6 +114,7 @@ class PerPersonHtmlFormatter implements CommitDataProcessor.OutputFormatter<PerP
         datasetOverview.add("toDate", gson.toJsonTree(perPersonData.getToDate()));
         datasetOverview.add("generatedDate", gson.toJsonTree(new Date().getTime()));
         datasetOverview.add("hashCode", gson.toJsonTree(perPersonData.getQueryData().getDatasetKey()));
+        datasetOverview.add("gerritVersion", gson.toJsonTree(perPersonData.getQueryData().getMinGerritVersion()));
 
         new JsonFileBuilder()
                 .setOutputFilename("datasetOverview.js")

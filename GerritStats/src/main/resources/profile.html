@@ -67,6 +67,11 @@
 </nav>
 
 <content id="content" class="centered">
+    <div id="oldGerritVersionAlert" class="alert alert-warning alert-dismissible" style="display:none" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>Old Gerrit version warning</strong>: Some or all of this data has been generated with data from an old Gerrit version (<span id="gerritOldVersionField"></span>). Versions prior to 2.9 do not provide enough information on who was added as a reviewer, so much of the data will be incorrect. Update Gerrit to get better statistics!
+    </div>
+
     <div class="panel thirdWidth">
         <a name="#overall"></a>
         <h2>Reviews given</h2>
@@ -370,6 +375,8 @@
 </footer>
 
 <script>
+datasetOverviewScope.initialize(datasetOverview);
+
 $('nav li').click(function(event) {
     event.preventDefault();
     var navElement = $(this);
@@ -739,6 +746,11 @@ loadUserdataForUserIdentifier(userIdentifier, function onLoad() {
 });
 
 $('[data-toggle="tooltip"]').tooltip()
+
+if (!datasetOverview.gerritVersion.isAtLeast(2, 9)) {
+    $('#gerritOldVersionField').text(datasetOverview.gerritVersion.toString());
+    $('#oldGerritVersionAlert').show();
+}
 
 </script>
 </body>

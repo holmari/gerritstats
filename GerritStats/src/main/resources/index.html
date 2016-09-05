@@ -56,6 +56,12 @@
 </nav>
 
 <content id="content">
+
+<div id="oldGerritVersionAlert" class="alert alert-warning alert-dismissible" style="display:none" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Old Gerrit version warning</strong>: Some or all of this data has been generated with data from an old Gerrit version (<span id="gerritOldVersionField"></span>). Versions prior to 2.9 do not provide enough information on who was added as a reviewer, so much of the data will be incorrect. Update Gerrit to get better statistics!
+</div>
+
 <table id="identities" class="table table-striped">
     <thead>
         <th id="checkboxColumn"><input name='selectAll' type='checkbox' checked='true' onclick='onSelectAllCheckboxClicked(this)' /></th>
@@ -69,7 +75,7 @@
         <th title="Number of commits made by this user." class="dataField">Commits</th>
         <th title="The ratio of comments received by user per commit." class="dataField">Comments<br>/ commit</th>
         <th title="The ratio of comments written by this user per a review request." class="dataField">Comments<br>/ review<br>requests</th>
-        <th title="Number of times this user wa added as a reviewer." class="dataField">Added as<br>reviewer</th>
+        <th title="Number of times this user was added as a reviewer." class="dataField">Added as<br>reviewer</th>
         <th title="Number of times the user merged a change after self-reviewing it, without having any reviews in any patch set from other users." class="dataField">Self-reviews</th>
         <th title="Average time the user's commits spent in review." class="dataField">Average time<br>in review</th>
     </thead>
@@ -82,6 +88,8 @@
 </div>
 
 <script>
+datasetOverviewScope.initialize(datasetOverview);
+
 $('nav li').click(function(event) {
     event.preventDefault();
     var navElement = $(this);
@@ -266,6 +274,11 @@ var proximityGraph = new ProximityGraph(identityGraph, usersInAnalysis, '#proxim
 proximityGraph.create();
 
 loadOverviewUserdata();
+
+if (!datasetOverview.gerritVersion.isAtLeast(2, 9)) {
+    $('#gerritOldVersionField').text(datasetOverview.gerritVersion.toString());
+    $('#oldGerritVersionAlert').show();
+}
 
 $(document).ready(function() {
     document.title = "GerritStats for " + datasetOverview.projectName;

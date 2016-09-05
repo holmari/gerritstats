@@ -22,7 +22,9 @@ public class GerritStatParser {
     }
 
     public static class GerritData {
+        @Nonnull
         final GerritVersion version;
+        @Nonnull
         final List<Commit> commits = new ArrayList<>();
 
         GerritData(@Nonnull GerritVersion version) {
@@ -31,7 +33,8 @@ public class GerritStatParser {
     }
 
 
-    public GerritData parseJsonData(String jsonFileData) {
+    @Nonnull
+    public GerritData parseJsonData(@Nonnull String jsonFileData) {
         GerritData data;
         try {
             JSONObject object = JsonUtils.readJsonString(jsonFileData);
@@ -50,7 +53,8 @@ public class GerritStatParser {
         return data;
     }
 
-    private GerritData parseJsonObject(JSONObject rootObject) {
+    @Nonnull
+    private GerritData parseJsonObject(@Nonnull JSONObject rootObject) {
         JSONArray jsonCommits = rootObject.getJSONArray("commits");
         GerritVersion gerritVersion = GerritVersion.fromString(rootObject.getString("gerritVersion"));
         ParserContext context = new ParserContext(gerritVersion);
@@ -66,7 +70,8 @@ public class GerritStatParser {
         return data;
     }
 
-    private GerritData parseLegacyFormatData(String jsonCommitData) {
+    @Nonnull
+    private GerritData parseLegacyFormatData(@Nonnull String jsonCommitData) {
         System.out.println("Using legacy file format parser for GerritStats .json file(s).");
         System.out.println("This file format has some limitations.");
         System.out.println("Please rerun GerritDownloader to start using the new format.");

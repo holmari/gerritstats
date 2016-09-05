@@ -1,5 +1,6 @@
 package com.holmsted.gerrit;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class GerritVersion {
@@ -55,6 +56,10 @@ public class GerritVersion {
 
     public boolean isAtLeast(int expectedMajor, int expectedMinor) {
         return this.major >= expectedMajor && this.minor >= expectedMinor;
+    }
+
+    public boolean isAtLeast(@Nonnull GerritVersion otherVersion) {
+        return isAtLeast(otherVersion.major, otherVersion.minor);
     }
 
     public String toString() {

@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.holmsted.file.FileReader;
 
+import javax.annotation.Nullable;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class GerritStatsMain {
@@ -36,16 +38,27 @@ public class GerritStatsMain {
         GerritStatParser commitDataParser = new GerritStatParser();
 
         List<String> filenames = processFilenames(commandLine.getFilenames());
+        GerritVersion minVersion = null;
 
         for (String filename : filenames) {
+            @Nullable
             String data = FileReader.readFile(checkNotNull(filename));
-            GerritData gerritData = commitDataParser.parseJsonData(data);
-            commits.addAll(gerritData.commits);
+            if (data != null) {
+                GerritData gerritData = commitDataParser.parseJsonData(data);
+                commits.addAll(gerritData.commits);
+                if (minVersion == null || !gerritData.version.isAtLeast(minVersion)) {
+                    minVersion = gerritData.version;
+                }
+            } else {
+                System.err.println(String.format("Could not read file '%s'" + filename));
+            }
         }
 
         QueryData queryData = new QueryData(commandLine.getFilenames(),
                 commandLine.getIncludeBranches(),
-                commits);
+                commits,
+                minVersion);
+
         if (outputRules.getAnonymizeData()) {
             queryData = queryData.anonymize();
         }
