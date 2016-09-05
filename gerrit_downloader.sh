@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar GerritDownloader/build/libs/GerritDownloader.jar "$@"
+java -Xmx2048m -Xms256m -jar GerritDownloader/build/libs/GerritDownloader.jar "$@"
