@@ -80,10 +80,6 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return metadata.rowCount;
         }
 
-        public int getRuntimeMec() {
-            return metadata.runtimeMsec;
-        }
-
         public List<JSONObject> getOutput() {
             return output;
         }
@@ -96,6 +92,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private GerritServer gerritServer;
         private GerritVersion gerritVersion;
 
+        @Nonnull
         public abstract List<JSONObject> readUntilLimit();
 
         public void setGerritServer(@Nonnull GerritServer gerritServer) {
@@ -144,6 +141,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
         private int rowCount;
 
+        @Nonnull
         @Override
         public List<JSONObject> readUntilLimit() {
             rowCount = 0;
@@ -221,6 +219,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
         }
 
+        @Nonnull
         @Override
         public List<JSONObject> readUntilLimit() {
             List<JSONObject> items = new ArrayList<>();
@@ -252,6 +251,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     /**
      * Reads the data in json format from gerrit.
      */
+    @Nonnull
     public List<JSONObject> readData() {
         if (getOverallCommitLimit() != NO_COMMIT_LIMIT) {
             System.out.println("Reading data from " + getGerritServer() + " for last " + getOverallCommitLimit() + " commits");
@@ -263,6 +263,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         return reader.readUntilLimit();
     }
 
+    @Nonnull
     private DataReader createDataReader() {
         DataReader reader;
         if (gerritVersion.isAtLeast(2, 9)) {
@@ -278,6 +279,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         return reader;
     }
 
+    @Nonnull
     private String createProjectNameList() {
         StringBuilder builder = new StringBuilder("project:^");
         if (getProjectName().isEmpty()) {

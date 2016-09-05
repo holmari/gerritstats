@@ -8,9 +8,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class FileReader {
 
+    @Nullable
     public static String readFile(@Nonnull String filename) {
         File dataFile = new File(filename);
         FileInputStream inputStream;

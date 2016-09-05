@@ -28,7 +28,7 @@ public class Downloader {
 
     private GerritVersion gerritVersion;
 
-    public Downloader(CommandLineParser commandLine) {
+    public Downloader(@Nonnull CommandLineParser commandLine) {
         this.commandLine = commandLine;
         gerritServer = new GerritServer(
                 commandLine.getServerName(),
@@ -82,11 +82,13 @@ public class Downloader {
         return new SshDownloader(gerritServer, checkNotNull(gerritVersion));
     }
 
-    private static String projectNameToFilename(String projectName) {
+    @Nonnull
+    private static String projectNameToFilename(@Nonnull String projectName) {
         return sanitizeFilename(projectName) + ".json";
     }
 
-    private static String sanitizeFilename(String filename) {
+    @Nonnull
+    private static String sanitizeFilename(@Nonnull String filename) {
         return filename.replaceAll("[^a-zA-Z0-9.-]", "_");
     }
 }

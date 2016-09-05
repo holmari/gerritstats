@@ -1,7 +1,7 @@
 package com.holmsted.gerrit.processors.reviewers;
 
 class PatchSetCommentData {
-    long patchSetDate;
+    final long patchSetDate;
     String reviewerEmail;
     String authorEmail;
 

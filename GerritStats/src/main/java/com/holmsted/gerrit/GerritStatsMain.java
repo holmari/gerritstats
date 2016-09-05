@@ -11,6 +11,8 @@ import java.util.List;
 
 import com.holmsted.file.FileReader;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class GerritStatsMain {
 
     public static void main(String[] args) {
@@ -36,7 +38,7 @@ public class GerritStatsMain {
         List<String> filenames = processFilenames(commandLine.getFilenames());
 
         for (String filename : filenames) {
-            String data = FileReader.readFile(filename);
+            String data = FileReader.readFile(checkNotNull(filename));
             GerritData gerritData = commitDataParser.parseJsonData(data);
             commits.addAll(gerritData.commits);
         }

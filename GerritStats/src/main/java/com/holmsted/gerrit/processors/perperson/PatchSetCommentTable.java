@@ -37,6 +37,7 @@ public class PatchSetCommentTable extends Hashtable<Commit, List<Commit.PatchSet
         put(commit, patchSetComments);
     }
 
+    @Nonnull
     public DatedPatchSetCommentList getAllComments() {
         return allComments;
     }

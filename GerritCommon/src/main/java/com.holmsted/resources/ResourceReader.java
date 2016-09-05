@@ -7,9 +7,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 public class ResourceReader {
 
-    public static List<String> readResourceFile(String resourceFilename) {
+    public static List<String> readResourceFile(@Nonnull String resourceFilename) {
         ClassLoader classLoader = ResourceReader.class.getClassLoader();
         InputStream resourceStream = classLoader.getResourceAsStream(resourceFilename);
         if (resourceStream == null) {

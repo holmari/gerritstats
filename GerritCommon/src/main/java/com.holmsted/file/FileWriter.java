@@ -12,7 +12,7 @@ import javax.annotation.Nonnull;
 
 public class FileWriter {
 
-    public static void writeFile(String filename, String contents) {
+    public static void writeFile(@Nonnull String filename, @Nonnull String contents) {
         File dataFile = new File(filename);
         mkdirsForFile(dataFile);
 
@@ -27,7 +27,7 @@ public class FileWriter {
         }
     }
 
-    public static void writeFile(String filename, InputStream inputStream) {
+    public static void writeFile(@Nonnull String filename, @Nonnull InputStream inputStream) {
         File dataFile = new File(filename);
         mkdirsForFile(dataFile);
 

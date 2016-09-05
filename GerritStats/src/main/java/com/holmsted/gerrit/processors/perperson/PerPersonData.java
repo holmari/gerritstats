@@ -15,7 +15,7 @@ public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
     private long fromDate;
     private long toDate;
 
-    public IdentityRecordList toOrderedList(Comparator<? super IdentityRecord> comparator) {
+    public IdentityRecordList toOrderedList(@Nonnull Comparator<? super IdentityRecord> comparator) {
         IdentityRecordList orderedList = new IdentityRecordList();
         orderedList.addAll(values());
         Collections.sort(orderedList, comparator);

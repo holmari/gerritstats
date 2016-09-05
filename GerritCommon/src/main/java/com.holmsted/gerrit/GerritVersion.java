@@ -1,6 +1,6 @@
 package com.holmsted.gerrit;
 
-import com.google.common.base.Preconditions;
+import javax.annotation.Nullable;
 
 public class GerritVersion {
     public final int major;
@@ -41,9 +41,13 @@ public class GerritVersion {
         this.patch = patch;
     }
 
-    private static int safeValueOf(String numberAsString) {
+    private static int safeValueOf(@Nullable String numberAsString) {
         try {
-            return Integer.valueOf(numberAsString);
+            if (numberAsString != null) {
+                return Integer.valueOf(numberAsString);
+            } else {
+                return -1;
+            }
         } catch (NumberFormatException ex) {
             return -1;
         }

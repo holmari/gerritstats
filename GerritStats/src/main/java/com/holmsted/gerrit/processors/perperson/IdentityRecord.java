@@ -10,7 +10,6 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -36,10 +35,15 @@ public class IdentityRecord {
     }
 
     public static class Repository {
-        String name;
-        String url;
+        final String name;
+        final String url;
 
         int commitCountForUser;
+
+        private Repository(String project, String url) {
+            this.name = project;
+            this.url = url;
+        }
 
         @Override
         public int hashCode() {
@@ -57,12 +61,10 @@ public class IdentityRecord {
         }
 
         public static Repository fromCommit(Commit commit) {
-            Repository repo = new Repository();
-            repo.name = commit.project;
-            repo.url = String.format("%s/#/q/project:%s",
+            String url = String.format("%s/#/q/project:%s",
                     commit.url.substring(0, commit.url.lastIndexOf('/')),
                     commit.project);
-            return repo;
+            return new Repository(commit.project, url);
         }
     }
 

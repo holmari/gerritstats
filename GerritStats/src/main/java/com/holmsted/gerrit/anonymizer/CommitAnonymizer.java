@@ -9,12 +9,11 @@ import com.holmsted.gerrit.Commit.PatchSetComment;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -50,11 +49,7 @@ public class CommitAnonymizer {
     private int devBranchNameSuffix = 1;
 
     public List<Commit> process(@Nonnull List<Commit> commits) {
-        List<Commit> anonymizedCommits = new ArrayList<>();
-        for (Commit commit : commits) {
-            anonymizedCommits.add(anonymizeCommit(commit));
-        }
-        return anonymizedCommits;
+        return commits.stream().map(this::anonymizeCommit).collect(Collectors.toList());
     }
 
     private Identity getOrCreateIdentity(@Nullable Commit.Identity identityToAnonymize) {
