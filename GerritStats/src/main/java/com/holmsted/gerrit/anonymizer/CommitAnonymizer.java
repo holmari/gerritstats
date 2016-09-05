@@ -106,7 +106,7 @@ public class CommitAnonymizer {
             return null;
         } else {
             return projectNameMapping.computeIfAbsent(projectName,
-                    name -> filenameGenerator.generateProjectName());
+                    name -> filenameGenerator.generateUniqueProjectName());
         }
     }
 

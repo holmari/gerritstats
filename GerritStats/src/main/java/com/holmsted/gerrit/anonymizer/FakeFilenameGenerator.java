@@ -2,7 +2,13 @@ package com.holmsted.gerrit.anonymizer;
 
 import com.holmsted.RandomLists;
 
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FakeFilenameGenerator {
 
@@ -23,18 +29,63 @@ public class FakeFilenameGenerator {
             "resources"
     };
 
-    private static String[] SOFTWARE_BASE_NAMES = {
-            "moustache_3d_modeler",
-            "stackoverflow_copypaster",
-            "nebula_incubator",
-            "social_network",
-            "supply_chain_aggregator",
-            "big_data_pipeline",
-            "game_theory_planner",
-            "deep_knowledge_graph",
-            "selfie_stick_expander",
-            "crowdsourcing_facilitator",
-            "realtime_mobility_pokedex",
+    private static String[] PROJECT_BEGIN_PARTS = {
+            "moustache",
+            "stackoverflow",
+            "copypaste",
+            "nebula",
+            "social",
+            "particle",
+            "supply_chain",
+            "big_data",
+            "game_theory",
+            "deep_knowledge",
+            "selfie_stick",
+            "crowdsourcing",
+            "realtime_mobility",
+            "automated",
+            "non_deterministic",
+            "ui_spec",
+            "marble",
+            "audio",
+            "video",
+            "gpu",
+            "backend",
+            "middleware",
+            "notification",
+            "sid_meiers",
+    };
+
+    private static String[] PROJECT_END_PARTS = {
+            "3d_modeler",
+            "copypaster",
+            "incubator",
+            "network",
+            "aggregator",
+            "pipeline",
+            "planner",
+            "graph",
+            "expander",
+            "facilitator",
+            "pokedex",
+            "lib",
+            "extension",
+            "effectron",
+            "signaller",
+            "generator",
+            "game",
+            "platform",
+            "nanny",
+            "driver",
+            "reviewer",
+            "automaton",
+            "randomizer",
+            "rasterizer",
+            "stack",
+            "definer",
+            "robotron",
+            "pinball",
+            "fascinator"
     };
 
     private static String[] FILENAME_BEGIN_PARTS = {
@@ -100,6 +151,8 @@ public class FakeFilenameGenerator {
             "Predicate"
     };
 
+    private Set<String> usedProjectNames = new HashSet<>();
+
     private String generateFileBasename() {
         StringBuilder builder = new StringBuilder();
         builder.append(RandomLists.randomItemFrom(FILENAME_BEGIN_PARTS));
@@ -111,7 +164,10 @@ public class FakeFilenameGenerator {
 
     public String generateFilenameFromProjectName(@Nullable String projectName) {
         StringBuilder builder = new StringBuilder();
-        projectName = projectName != null  ? projectName : RandomLists.randomItemFrom(SOFTWARE_BASE_NAMES);
+        projectName = projectName != null
+                ? projectName
+                : RandomLists.randomItemFrom(PROJECT_BEGIN_PARTS)
+                + '/' + RandomLists.randomItemFrom(PROJECT_END_PARTS);
 
         builder.append("src/main/java/com/");
         builder.append(projectName).append('/');
@@ -121,7 +177,21 @@ public class FakeFilenameGenerator {
         return builder.toString();
     }
 
-    public String generateProjectName() {
-        return "acme/" + RandomLists.randomItemFrom(SOFTWARE_BASE_NAMES);
+    public String generateUniqueProjectName() {
+        String candidate = null;
+        int maxLoops = PROJECT_BEGIN_PARTS.length * PROJECT_END_PARTS.length;
+        for (int i = 0; i < maxLoops; ++i) {
+            candidate = RandomLists.randomItemFrom(PROJECT_BEGIN_PARTS)
+                    + '_' + RandomLists.randomItemFrom(PROJECT_END_PARTS);
+            if (!usedProjectNames.contains(candidate)) {
+                usedProjectNames.add(checkNotNull(candidate));
+                return "acme/" + candidate;
+            }
+        }
+
+        // this is very unlikely; you need to have a lot of projects for the
+        // above loop to fail max out; but, it is possible.
+        candidate = candidate + "_" + String.valueOf(System.currentTimeMillis());
+        return "acme/" + candidate;
     }
 }
