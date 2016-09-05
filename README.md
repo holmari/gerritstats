@@ -11,7 +11,10 @@ There are two separate tools:
 
 ## How to build
 
+
 ```
+# Prerequisite: install brew from http://brew.sh
+brew install npm
 ./gradlew assemble
 ```
 
