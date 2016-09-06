@@ -1,2 +1,2 @@
 #!/bin/sh
-java -Xmx2048m -Xms256m -jar GerritStats/build/libs/GerritStats.jar "$@"
+java -Xmx4096m -Xms256m -jar GerritStats/build/libs/GerritStats.jar "$@"
