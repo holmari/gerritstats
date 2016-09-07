@@ -51,7 +51,10 @@ jar {
         while (!fileStack.isEmpty()) {
             File file = fileStack.pop();
             if (file.isDirectory()) {
-                fileStack.addAll(file.listFiles());
+                File[] files = file.listFiles();
+                if (files.findIndexOf { f -> f.name =~ /^.*\.ignore$/ } == -1) {
+                    fileStack.addAll(files);
+                }
             } else if (file.isFile() && !file.isHidden()) {
                 String relPath = file.absolutePath.substring(basePathName.length() + 1);
                 filenameListWriter.write(relPath + '\n');
