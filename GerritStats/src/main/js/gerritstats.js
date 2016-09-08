@@ -143,7 +143,7 @@ var userdataScope = {
 
     initializeRecord: function(record) {
         // attach all userdata-related objects to record, to make it behave like an object
-        for (objectName in userdataScope) {
+        for (var objectName in userdataScope) {
             record[objectName] = userdataScope[objectName];
         }
 
@@ -250,7 +250,7 @@ var userdataScope = {
     },
 
     getReceivedReviewsForScore: function(score) {
-        reviews = this.receivedReviews[score.toString()];
+        var reviews = this.receivedReviews[score.toString()];
         if (!reviews) {
             reviews = 0;
         }

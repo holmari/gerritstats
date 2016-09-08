@@ -18,10 +18,17 @@
   "scripts": {
     "clean": "../gradlew clean",
     "build": "../gradlew build",
-    "test": "../gradlew test"
+    "test": "../gradlew test",
+    "babel": "babel src/main/js --out-dir src/main/resources/res/"
   },
   "repository": {
     "type": "git",
     "url": "git@github.com:holmari/gerritstats.git"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.14.0",
+    "babel-core": "^6.14.0",
+    "babel-loader": "^6.2.5",
+    "babel-preset-es2015": "^6.14.0"
   }
 }

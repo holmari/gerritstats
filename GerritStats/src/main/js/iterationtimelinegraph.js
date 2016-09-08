@@ -136,8 +136,8 @@ function IterationTimelineGraph(svgId, userData) {
     this.renderPoints = function() {
         var g = this.svg.select('g.iterativeCommits');
 
-        points = g.selectAll('circle.iterativeCommitBubble')
-                    .data(this.commitData);
+        var points = g.selectAll('circle.iterativeCommitBubble')
+                      .data(this.commitData);
 
         var graph = this;
         points.enter()

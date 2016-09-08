@@ -104,8 +104,9 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
     this.renderPoints = function() {
         var g = this.svg.select('g.reviewerApprovals');
 
-        points = g.selectAll('circle.reviewerApproval')
-                    .data(reviewerData);
+        var points = g.selectAll('circle.reviewerApproval')
+                      .data(reviewerData);
+
         var graph = this;
         points.enter()
             .append('circle')

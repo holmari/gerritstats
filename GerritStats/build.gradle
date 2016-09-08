@@ -27,8 +27,9 @@ jar {
     // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 
-    task cleanupNpmDependencies(type: Delete) {
+    task cleanupNpmDependenciesAndGeneratedJS(type: Delete) {
         delete 'src/main/resources/res/node_modules'
+        delete 'src/main/resources/res/*.js'
     }
 
     task copyNpmDependenciesToResources(type: Copy) {
@@ -66,8 +67,11 @@ jar {
         fileWriter.close();
     }
 
-    cleanupNpmDependencies.dependsOn npmInstall
-    copyNpmDependenciesToResources.dependsOn cleanupNpmDependencies
+    cleanupNpmDependenciesAndGeneratedJS.dependsOn npmInstall
+    // npm_run_* is a magic command whose suffix takes the npm script name.
+    npm_run_babel.dependsOn npmInstall
+    copyNpmDependenciesToResources.dependsOn npm_run_babel
+    copyNpmDependenciesToResources.dependsOn cleanupNpmDependenciesAndGeneratedJS
     generateResourceFileListing.dependsOn copyNpmDependenciesToResources
     processResources.dependsOn generateResourceFileListing
 }
