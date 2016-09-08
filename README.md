@@ -106,7 +106,7 @@ developer5@domain.com	   1293	             328	              257	            0.1
 
 ## How to execute: HTML output
 
-The default output of the tool is HTML.
+The default output of the tool is HTML. A demo of the HTML output is available at http://gerritstats-demo.firebaseapp.com
 
 This will generate a set of HTML files that include graphs and charts, such as a proximity graph of the developers,
 based on how many review comments they write to each other, as well as a per-developer page that lists all their review
