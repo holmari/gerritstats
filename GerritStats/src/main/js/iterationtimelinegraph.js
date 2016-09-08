@@ -1,28 +1,29 @@
-function IterationTimelineGraph(svgId, userData) {
-    this.margin = {
-        top: 20,
-        right: 20,
-        bottom: 20,
-        left: 20
-    };
-    this.width = 685 - this.margin.left - this.margin.right;
-    this.height = 480 - this.margin.top - this.margin.bottom;
+class IterationTimelineGraph {
 
-    this.colors = d3.scale.category10();
+    constructor(svgId, userData) {
+        this.margin = {
+            top: 20,
+            right: 20,
+            bottom: 20,
+            left: 20
+        };
+        this.width = 685 - this.margin.left - this.margin.right;
+        this.height = 480 - this.margin.top - this.margin.bottom;
 
-    /** Allows listening to highlight changes caused by user interaction. */
-    this.selectionChangedListener = null;
-    /** The selected (hovered or otherwise) item, or null if nothing is selected. */
-    this.selectedCommitUrl = null;
+        this.colors = d3.scale.category10();
 
-    /** The patch set count threshold after which the commits are considered as iterative. */
-    this.highPatchSetCountThreshold = 5;
+        /** Allows listening to highlight changes caused by user interaction. */
+        this.selectionChangedListener = null;
+        /** The selected (hovered or otherwise) item, or null if nothing is selected. */
+        this.selectedCommitUrl = null;
 
-    this.commitData = userData.getDatedCommitsWithHighPatchSetCount();
+        /** The patch set count threshold after which the commits are considered as iterative. */
+        this.highPatchSetCountThreshold = 5;
 
-    this.defaultItemOpacity = 0.3;
+        this.commitData = userData.getDatedCommitsWithHighPatchSetCount();
 
-    this.initialize = function() {
+        this.defaultItemOpacity = 0.3;
+
         this.maxValue = 0;
 
         // min date is the beginning of the year of the data set
@@ -86,7 +87,7 @@ function IterationTimelineGraph(svgId, userData) {
             .attr('class', 'iterativeCommits')
     };
 
-    this.setSelectedCommitUrl = function(commitUrl) {
+    setSelectedCommitUrl(commitUrl) {
         this.selectedCommitUrl = commitUrl;
 
         if (this.selectedCommitUrl) {
@@ -104,7 +105,7 @@ function IterationTimelineGraph(svgId, userData) {
         }
     };
 
-    this.updateSelection = function(newSelection) {
+    updateSelection(newSelection) {
         var previousSelection = this.selectedCommitUrl;
         this.selectedCommitUrl = newSelection;
         if (this.selectionChangedListener) {
@@ -112,7 +113,7 @@ function IterationTimelineGraph(svgId, userData) {
         }
     };
 
-    this.updateTooltip = function(selectedObject) {
+    updateTooltip(selectedObject) {
         if (this.selectedCommitUrl) {
             this.verticalGuide.style('visibility', 'visible');
             this.helpTextLabel.style('visibility', 'visible');
@@ -133,7 +134,7 @@ function IterationTimelineGraph(svgId, userData) {
         }
     }
 
-    this.renderPoints = function() {
+    renderPoints() {
         var g = this.svg.select('g.iterativeCommits');
 
         var points = g.selectAll('circle.iterativeCommitBubble')
@@ -174,12 +175,10 @@ function IterationTimelineGraph(svgId, userData) {
             });
     };
 
-    this.render = function() {
+    render() {
         this.svg.select('g.x.iterativeCommitChartAxis')
             .call(this.xAxis);
 
         this.renderPoints();
     };
-
-    this.initialize();
 }

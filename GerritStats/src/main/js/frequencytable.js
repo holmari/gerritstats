@@ -1,33 +1,39 @@
 /**
  * Renders a simple 2d bar chart.
  */
-function FrequencyTable(svgId, record, data) {
-    this.xDomain = record.getFromDate() && record.getToDate()
-                 ? [record.getFromDate(), record.getToDate()]
-                 : [];
-    this.margin = {
-        top: 20,
-        right: 20,
-        bottom: 60,
-        left: 60
-    };
+class FrequencyTable {
 
-    this.width = 1050 - this.margin.left - this.margin.right;
-    this.height = 500 - this.margin.top - this.margin.bottom;
+    constructor(svgId, record, data) {
+        this.xDomain = record.getFromDate() && record.getToDate()
+                     ? [record.getFromDate(), record.getToDate()]
+                     : [];
+        this.svgId = svgId;
+        this.data = data;
+        this.margin = {
+            top: 20,
+            right: 20,
+            bottom: 60,
+            left: 60
+        };
 
-    this.colors = d3.scale.linear().domain([0, 10]).range(['#ffc400', '#02b221']);
-    // The range is intentionally different; it seems quite rare to have high daily averages
-    // even for most prolific reviewers.
-    this.averageLineColors = d3.scale.linear().domain([0, 5]).range(['#ffc400', '#02b221']);
+        this.width = 1050 - this.margin.left - this.margin.right;
+        this.height = 500 - this.margin.top - this.margin.bottom;
 
-    this.msecsInDay = 1000 * 60 * 60 * 24;
+        this.colors = d3.scale.linear().domain([0, 10]).range(['#ffc400', '#02b221']);
+        // The range is intentionally different; it seems quite rare to have high daily averages
+        // even for most prolific reviewers.
+        this.averageLineColors = d3.scale.linear().domain([0, 5]).range(['#ffc400', '#02b221']);
 
+        this.msecsInDay = 1000 * 60 * 60 * 24;
 
-    this.isValid = function() {
-        return (this.xDomain.length == 2);
+        this.render();
     }
 
-    this.getDaysInDomain = function() {
+    isValid() {
+        return this.xDomain.length == 2;
+    }
+
+    getDaysInDomain() {
         if (this.isValid()) {
             var msecsInDay = 1000 * 60 * 60 * 24;
             return Math.round((this.xDomain[1].getTime() - this.xDomain[0].getTime()) / msecsInDay);
@@ -36,7 +42,7 @@ function FrequencyTable(svgId, record, data) {
         }
     }
 
-    this.initialize = function() {
+    render() {
         var that = this;
 
         this.x = d3.time.scale().range([0, this.width]);
@@ -50,9 +56,9 @@ function FrequencyTable(svgId, record, data) {
                         .scale(this.y)
                         .orient('left');
         this.x.domain(this.xDomain);
-        this.y.domain([0, d3.max(data, function(d) { return d.count; })]);
+        this.y.domain([0, d3.max(this.data, function(d) { return d.count; })]);
 
-        this.svg = d3.select(svgId)
+        this.svg = d3.select(this.svgId)
             .append('svg')
                 .attr('width', this.width + this.margin.left + this.margin.right)
                 .attr('height', this.height + this.margin.top + this.margin.bottom)
@@ -67,7 +73,7 @@ function FrequencyTable(svgId, record, data) {
         }
 
         this.averageReviewsPerDay = daysInDomain > 0
-            ? data.reduce(function(prevValue, currentValue) {
+            ? this.data.reduce(function(prevValue, currentValue) {
                 return prevValue + currentValue.count;
             }, 0) / daysInDomain
             : 0;
@@ -85,7 +91,7 @@ function FrequencyTable(svgId, record, data) {
         var barWidth = Math.max((this.width - this.margin.left - this.margin.top) / daysInDomain, 1);
         if (this.isValid()) {
             this.svg.selectAll('.bar')
-                .data(data).enter()
+                .data(this.data).enter()
                 .append('rect')
                   .attr('class', 'commentChartBar')
                   .attr('x', function(d) { return that.x(d.date); })
@@ -124,6 +130,4 @@ function FrequencyTable(svgId, record, data) {
             .attr('class', 'y chartAxis')
             .call(this.yAxis);
     }
-
-    this.initialize();
 }

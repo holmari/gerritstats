@@ -1,20 +1,24 @@
 /**
  * Keeps track of users selected into the analysis.
  */
-function SelectedUsers(overviewUserdata, primaryStorageKey) {
+class SelectedUsers {
 
-    this.users = {};
-    this.groupKey = 'selectedUsers';
-    this.storageKey = primaryStorageKey + '.' + this.groupKey;
+    constructor(overviewUserdata, primaryStorageKey) {
+        this.users = {};
+        this.groupKey = 'selectedUsers';
+        this.storageKey = primaryStorageKey + '.' + this.groupKey;
 
-    this.isUserSelected = function(userDataOrIdentifier) {
-        var identifier = typeof(userDataOrIdentifier) == 'string'
-            ? userDataOrIdentifier
-            : userDataOrIdentifier.identifier;
-        return this.users[identifier] === '1';
+        this.isUserSelected = function(userDataOrIdentifier) {
+            var identifier = typeof(userDataOrIdentifier) == 'string'
+                ? userDataOrIdentifier
+                : userDataOrIdentifier.identifier;
+            return this.users[identifier] === '1';
+        }
+
+        this.users = this.loadFromLocalStorage();
     }
 
-    this.setUserSelected = function(userIdentifier, isUserSelected) {
+    setUserSelected(userIdentifier, isUserSelected) {
         if (isUserSelected) {
             this.users[userIdentifier] = '1';
         } else {
@@ -22,23 +26,23 @@ function SelectedUsers(overviewUserdata, primaryStorageKey) {
         }
     }
 
-    this.writeToStorage = function() {
+    writeToStorage() {
         localStorage.setItem(this.storageKey, JSON.stringify(this.users));
     }
 
-    this.getSelectedUserCount = function() {
+    getSelectedUserCount() {
         return Object.keys(this.users).length;
     }
 
-    this.getTotalUserCount = function() {
+    getTotalUserCount() {
         return overviewUserdata.length;
     }
 
-    this.getPrintableUserCount = function() {
+    getPrintableUserCount() {
         return this.getSelectedUserCount() + ' / ' + this.getTotalUserCount();
     }
 
-    this.loadFromLocalStorage = function() {
+    loadFromLocalStorage() {
         var users = JSON.parse(localStorage.getItem(this.storageKey));
         if (users === null) {
             users = {};
@@ -49,10 +53,4 @@ function SelectedUsers(overviewUserdata, primaryStorageKey) {
         }
         return users;
     }
-
-    this.initialize = function(overviewUserdata) {
-        this.users = this.loadFromLocalStorage();
-    }
-
-    this.initialize(overviewUserdata);
 }

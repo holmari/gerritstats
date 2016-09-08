@@ -56,53 +56,59 @@ function getIndexOfIdentity(identity, userData) {
  * Creates a force-directed graph that illustrates team dynamics
  * and how many cross-reviews are done.
  */
-function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
-    this.width = 1200;
-    this.height = 800;
+class ProximityGraph {
 
-    this.lowConnectionColors = [
-        '#e6550d', // less connections
-        '#fd8d3c',
-        '#fdae6b',
-        '#fdd0a2', // more connections
-    ];
+    constructor(identityGraph, selectedUsers, objectSelector) {
+        this.width = 1200;
+        this.height = 800;
 
-    this.highConnectionColors = [
-        '#c7e9c0', // less connections
-        '#a1d99b',
-        '#74c476',
-        '#31a354', // more connections
-    ];
+        this.lowConnectionColors = [
+            '#e6550d', // less connections
+            '#fd8d3c',
+            '#fdae6b',
+            '#fdd0a2', // more connections
+        ];
 
-    // Source data
-    this.identityGraph = identityGraph;
+        this.highConnectionColors = [
+            '#c7e9c0', // less connections
+            '#a1d99b',
+            '#74c476',
+            '#31a354', // more connections
+        ];
 
-    /** Filter out all the connections that are below the given threshold */
-    this.relativeLinkValueThreshold = 0.1;
+        this.selectedUsers = selectedUsers;
+        this.objectSelector = objectSelector;
 
-    /** If set, this item will be locked in to center of the view. */
-    this.centeredIdentifier = null;
-    this.centeredItemRadius = 15;
+        // Source data
+        this.identityGraph = identityGraph;
 
-    this.drawCrosshair = false;
-    this.crosshairMargin = 35;
+        /** Filter out all the connections that are below the given threshold */
+        this.relativeLinkValueThreshold = 0.1;
 
-    // Allows listening to highlight changes caused by user interaction.
-    this.selectionChangedListener = null;
-    /** Identifier of selected item (hovered or otherwise), or null if nothing is selected. */
-    this.selectedIdentifier = null;
+        /** If set, this item will be locked in to center of the view. */
+        this.centeredIdentifier = null;
+        this.centeredItemRadius = 15;
 
-    this.highlightSelection = false;
-    this.defaultItemOpacity = 1.0;
+        this.drawCrosshair = false;
+        this.crosshairMargin = 35;
 
-    /** How far the nodes end up being from each other. Smaller (negative) values will result in further distance. */
-    this.charge = -450;
-    this.linkDistance = 45;
-    // d3
-    this.svg = null;
+        // Allows listening to highlight changes caused by user interaction.
+        this.selectionChangedListener = null;
+        /** Identifier of selected item (hovered or otherwise), or null if nothing is selected. */
+        this.selectedIdentifier = null;
 
-    this.create = function() {
-        this.svg = d3.select(objectSelector).append('svg')
+        this.highlightSelection = false;
+        this.defaultItemOpacity = 1.0;
+
+        /** How far the nodes end up being from each other. Smaller (negative) values will result in further distance. */
+        this.charge = -450;
+        this.linkDistance = 45;
+        // d3
+        this.svg = null;
+    }
+
+    create() {
+        this.svg = d3.select(this.objectSelector).append('svg')
             .attr('width', this.width)
             .attr('height', this.height);
 
@@ -114,14 +120,14 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         this.render();
     }
 
-    this.updateSize = function() {
-        this.width = $(objectSelector).width();
-        this.height = $(objectSelector).height();
+    updateSize() {
+        this.width = $(this.objectSelector).width();
+        this.height = $(this.objectSelector).height();
         this.svg.attr('width', this.width).attr('height', this.height);
         this.forceLayout.size([this.width, this.height]).resume();
     }
 
-    this.getNodeRadius = function(nodeData, medianCommitCount) {
+    getNodeRadius(nodeData, medianCommitCount) {
         if (medianCommitCount > 0) {
             return 3 + 2 * Math.sqrt(nodeData.commitCount / medianCommitCount);
         } else {
@@ -129,7 +135,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         }
     }
 
-    this.setSelectedIdentifier = function(userIdentifier) {
+    setSelectedIdentifier(userIdentifier) {
         this.selectedIdentifier = userIdentifier;
 
         if (this.selectedIdentifier) {
@@ -144,7 +150,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         }
     };
 
-    this.updateSelection = function(newSelection) {
+    updateSelection(newSelection) {
         var previousSelection = this.selectedIdentifier;
         this.selectedIdentifier = newSelection;
         if (this.selectionChangedListener) {
@@ -152,7 +158,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         }
     };
 
-    this.render = function() {
+    render() {
         this.svg.html('');
 
         var that = this;
@@ -292,7 +298,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         });
     }
 
-    this.getMaxLinkValue = function(graph) {
+    getMaxLinkValue(graph) {
         var that = this;
         return graph.links.reduce(function(previousValue, currentLink, index, links) {
             if (that.isLinkSelected(graph.nodes, currentLink)) {
@@ -303,18 +309,18 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         }, -1);
     }
 
-    this.filterNodes = function(nodeData) {
+    filterNodes(nodeData) {
         var that = this;
         return nodeData.filter(function(node, index, array) {
             return that.isNodeSelected(node.identifier);
         }, []);
     }
 
-    this.isNodeSelected = function(identifier) {
-        return selectedUsers.isUserSelected(identifier);
+    isNodeSelected(identifier) {
+        return this.selectedUsers.isUserSelected(identifier);
     }
 
-    this.isLinkSelected = function(nodes, link) {
+    isLinkSelected(nodes, link) {
         return this.isNodeSelected(link.source.identifier)
             && this.isNodeSelected(link.target.identifier);
     }
@@ -324,7 +330,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
      * For example, if relativeThreshold is 0.1, all links that have under 10% of the maximum
      * interaction are filtered out.
      */
-    this.filterLinks = function(nodes, links, maxLinkValue, relativeThreshold) {
+    filterLinks(nodes, links, maxLinkValue, relativeThreshold) {
         var that = this;
         var sourceLinks = jQuery.extend(true, [], links);
         return sourceLinks.filter(function(currentLink, index, array) {
@@ -333,7 +339,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         }, []);
     }
 
-    this.getConnectionCount = function(nodeIndex, links) {
+    getConnectionCount(nodeIndex, links) {
         var connectionCount = 0;
         for (var i = 0; i < links.length; ++i) {
             if (links[i].source.index == nodeIndex || links[i].target.index == nodeIndex) {
@@ -343,15 +349,15 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         return connectionCount;
     }
 
-    this.isVarDefined = function(variable) {
+    isVarDefined(variable) {
         return typeof variable !== 'undefined';
     }
 
-    this.safeIncrement = function(initialValue, toAdd) {
+    safeIncrement(initialValue, toAdd) {
         return !this.isVarDefined(initialValue) ? toAdd : initialValue + toAdd;
     }
 
-    this.createConnectionsPerIdentifierTable = function(links) {
+    createConnectionsPerIdentifierTable(links) {
         var connectionsPerIdentifier = {};
         for (var i = 0; i < links.length; ++i) {
             var connectionCount = links[i].value;
@@ -363,27 +369,27 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         return connectionsPerIdentifier;
     }
 
-    this.numberComparator = function(left, right) {
+    numberComparator(left, right) {
         return left - right;
     }
 
-    this.filterObjectArray = function(objectList, key) {
+    filterObjectArray(objectList, key) {
         return objectList.map(function(currentValue, index, array) {
             return currentValue[key];
         }, []);
     }
 
-    this.getMaxValueFromArray = function(list) {
+    getMaxValueFromArray(list) {
         return list.reduce(function(previousValue, currentValue, index, array) {
             return Math.max(previousValue, currentValue);
         }, -1);
     }
 
-    this.getMedianValueFromArrayExcludingZeroes = function(list) {
+    getMedianValueFromArrayExcludingZeroes(list) {
         var sortedList = list.slice().filter(function(currentValue, index, array) {
             return currentValue !== undefined;
-        })
-        .sort(this.numberComparator);
+        }).sort(this.numberComparator);
+
         var lastZero = sortedList.lastIndexOf(0);
         if (lastZero == -1) {
             lastZero = 0;
@@ -391,7 +397,7 @@ function ProximityGraph(identityGraph, selectedUsers, objectSelector) {
         return sortedList[lastZero + Math.floor((sortedList.length - lastZero) / 2)];
     }
 
-    this.mapConnectionsToColor = function(relativeConnectionCount, colors) {
+    mapConnectionsToColor(relativeConnectionCount, colors) {
         var colorIndex = Math.min(colors.length - 1, Math.floor(relativeConnectionCount * colors.length));
         return colors[colorIndex];
     }

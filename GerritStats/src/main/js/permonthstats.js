@@ -1,10 +1,15 @@
 /**
  * Renders a table of monthly statistics.
  */
-function PerMonthStats(parentId, userData) {
+class PerMonthStats {
 
-    this.addPerMonthStatsYearHeader = function(year) {
-        $(parentId).append('<tr><th colspan="13" class="monthlyCommitYearTitle">' + year + '</th></tr>\
+    constructor(parentId, userData) {
+        this.parentId = parentId;
+        this.addPerMonthStats(userData);
+    }
+
+    addPerMonthStatsYearHeader(year) {
+        $(this.parentId).append('<tr><th colspan="13" class="monthlyCommitYearTitle">' + year + '</th></tr>\
             <tr><th></th>\
                 <th>Jan</th>\
                 <th>Feb</th>\
@@ -46,14 +51,14 @@ function PerMonthStats(parentId, userData) {
         ');
     }
 
-    this.addPerMonthStats = function(record) {
+    addPerMonthStats(record) {
         var commitTable = record.datedCommitTable;
         var commentTable = record.datedCommentTable;
 
         var years = record.datedCommitTable.getActiveYears();
-        var perMonthStats = this;
+        var that = this;
         years.forEach(function(year) {
-            perMonthStats.addPerMonthStatsYearHeader(year);
+            that.addPerMonthStatsYearHeader(year);
             for (var month = 1; month <= 12; ++month) {
                 var commitCount = commitTable.getPrintableMonthlyItemCount(year, month);
                 var commitsMoMChange = commitTable.getDisplayableMonthOnMonthChange(year, month);
@@ -63,15 +68,13 @@ function PerMonthStats(parentId, userData) {
                 var commentsMoMChange = commentTable.getDisplayableMonthOnMonthChange(year, month);
                 var commentsQoQChange = commentTable.getDisplayableQuarterOnQuarterChange(year, month);
 
-                $(parentId + ' .commitsSection').last().append('<td>' + commitCount + '</td>');
-                $(parentId + ' .commentsSection').last().append('<td>' + commentCount + '</td>');
-                $(parentId + ' .commitsMoMSection').last().append('<td>' + commitsMoMChange + '</td>');
-                $(parentId + ' .commitsQoQSection').last().append('<td>' + commitsQoQChange + '</td>');
-                $(parentId + ' .commentsMoMSection').last().append('<td>' + commentsMoMChange + '</td>');
-                $(parentId + ' .commentsQoQSection').last().append('<td>' + commentsQoQChange + '</td>');
+                $(that.parentId + ' .commitsSection').last().append('<td>' + commitCount + '</td>');
+                $(that.parentId + ' .commentsSection').last().append('<td>' + commentCount + '</td>');
+                $(that.parentId + ' .commitsMoMSection').last().append('<td>' + commitsMoMChange + '</td>');
+                $(that.parentId + ' .commitsQoQSection').last().append('<td>' + commitsQoQChange + '</td>');
+                $(that.parentId + ' .commentsMoMSection').last().append('<td>' + commentsMoMChange + '</td>');
+                $(that.parentId + ' .commentsQoQSection').last().append('<td>' + commentsQoQChange + '</td>');
             }
         });
     }
-
-    this.addPerMonthStats(userData);
 }

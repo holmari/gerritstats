@@ -1,21 +1,24 @@
-function ReviewersAndApprovalsGraph(svgId, reviewerData) {
-    this.margin = {
-        top: 20,
-        right: 20,
-        bottom: 60,
-        left: 60
-    };
-    this.width = 480 - this.margin.left - this.margin.right;
-    this.height = 480 - this.margin.top - this.margin.bottom;
+class ReviewersAndApprovalsGraph {
 
-    this.colors = d3.scale.category10();
+    constructor(svgId, reviewerData) {
+        this.margin = {
+            top: 20,
+            right: 20,
+            bottom: 60,
+            left: 60
+        };
+        this.width = 480 - this.margin.left - this.margin.right;
+        this.height = 480 - this.margin.top - this.margin.bottom;
 
-    /** Allows listening to highlight changes caused by user interaction. */
-    this.selectionChangedListener = null;
-    /** The selected (hovered or otherwise) item, or null if nothing is selected. */
-    this.selectedReviewer = null;
+        this.colors = d3.scale.category10();
 
-    this.initialize = function() {
+        /** Allows listening to highlight changes caused by user interaction. */
+        this.selectionChangedListener = null;
+        /** The selected (hovered or otherwise) item, or null if nothing is selected. */
+        this.selectedReviewer = null;
+
+        this.reviewerData = reviewerData;
+
         // axes size: max of added reviewer count.
         var tickCount = 0;
         this.maxValue = 0;
@@ -88,12 +91,12 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
             .attr('class', 'reviewerApprovals')
     };
 
-    this.setSelectedItemByIdentifier = function(userIdentifier) {
+    setSelectedItemByIdentifier(userIdentifier) {
         this.selectedReviewer = userIdentifier;
         this.render();
     };
 
-    this.updateSelection = function(newSelection) {
+    updateSelection(newSelection) {
         var previousSelection = this.selectedReviewer;
         this.selectedReviewer = newSelection;
         if (this.selectionChangedListener) {
@@ -101,11 +104,11 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
         }
     };
 
-    this.renderPoints = function() {
+    renderPoints() {
         var g = this.svg.select('g.reviewerApprovals');
 
         var points = g.selectAll('circle.reviewerApproval')
-                      .data(reviewerData);
+                      .data(this.reviewerData);
 
         var graph = this;
         points.enter()
@@ -140,7 +143,7 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
             });
     };
 
-    this.render = function() {
+    render() {
         this.svg.select('g.x.chartAxis')
             .call(this.xAxis);
 
@@ -149,6 +152,4 @@ function ReviewersAndApprovalsGraph(svgId, reviewerData) {
 
         this.renderPoints();
     };
-
-    this.initialize();
 }

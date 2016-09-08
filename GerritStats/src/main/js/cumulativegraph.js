@@ -1,3 +1,140 @@
+/*
+ * Creates a dynamic vertical guide that appears when user moves the mouse,
+ * and the related components.
+ */
+class VerticalGuide {
+
+    constructor(graph) {
+        this.graph = graph;
+        this.svg = graph.svg;
+
+        this.legendGroupWidth = 190;
+        this.legendGroupHeight = 120;
+        this.legendGroupMargin = 10;
+
+        this.render();
+    }
+
+    render() {
+        this.guideLine = this.svg.append('line')
+            .attr('class', 'chartGuideline')
+            .attr('x1', 100)
+            .attr('y1', 0)
+            .attr('x2', 100)
+            .attr('y2', this.graph.height)
+            .style('visibility', 'hidden');
+
+        this.dynamicLegendGroup = this.svg.append('g')
+            .style('visibility', 'hidden');
+
+        this.dynamicLegendGroup.append('rect')
+            .attr('class', 'chartDynamicLegendBox')
+            .attr('width', this.legendGroupWidth)
+            .attr('height', this.legendGroupHeight)
+
+        this.legendValueTime = this.dynamicLegendGroup.append('text')
+            .attr('class', 'chartDynamicLegendTitle')
+            .attr('x', 10)
+            .attr('y', this.graph.margin.top);
+
+        var legendWrapper = this.dynamicLegendGroup.append('g')
+            .attr('transform', "translate(" + -10 + "," + 20 + ")");
+
+        this.graph.createLegend(legendWrapper);
+
+        var legendValueXPos = 145;
+        this.legendValueCommitCount = this.dynamicLegendGroup.append('text')
+            .attr('class', 'chartLegend')
+            .attr('x', legendValueXPos)
+            .attr('y', this.graph.margin.top + 34);
+
+        this.legendValueCommentsWritten = this.dynamicLegendGroup.append('text')
+            .attr('class', 'chartLegend')
+            .attr('x', legendValueXPos)
+            .attr('y', this.graph.margin.top + 58);
+
+        this.legendValueCommentsReceived = this.dynamicLegendGroup.append('text')
+            .attr('class', 'chartLegend')
+            .attr('x', legendValueXPos)
+            .attr('y', this.graph.margin.top + 83);
+
+        this.focusCircleGroup = this.svg.append('g')
+            .attr('class', 'focusCircleGroup')
+            .style('visibility', 'hidden');
+
+        this.focusCircleCommitCount = this.focusCircleGroup.append('circle')
+                .attr('class', 'focusCircleCommitCount')
+                .attr('r', 5);
+
+        this.focusCircleCommentsWritten = this.focusCircleGroup.append('circle')
+                .attr('class', 'focusCircleCommentsWritten')
+                .attr('r', 5);
+
+        this.focusCircleCommentsReceived = this.focusCircleGroup.append('circle')
+                .attr('class', 'focusCircleCommentsReceived')
+                .attr('r', 5);
+
+        this.dateBisector = d3.bisector(function(d) { return d.date; }).left;
+    }
+
+    setVisibility(isVisible) {
+        var visibility = isVisible ? 'visible' : 'hidden';
+        this.guideLine.style('visibility', visibility);
+        this.dynamicLegendGroup.style('visibility', visibility);
+        this.focusCircleGroup.style('visibility', visibility);
+
+        // Hide the legend from the graph, it can get on the way and it's visually duplicated
+        // while the guide is visible
+        this.graph.legend.style('visibility', !isVisible ? 'visible' : 'hidden')
+    }
+
+    getClosestValueToDate(dataArray, referenceDate) {
+        var index = this.dateBisector(dataArray, referenceDate, 1);
+        var value = 0;
+        if (dataArray[index].date - referenceDate > dataArray[index - 1].date - referenceDate) {
+            value = dataArray[index - 1].count;
+        } else {
+            value = dataArray[index].count;
+        }
+        return value;
+    }
+
+    updatePosition(mousePos) {
+        var xPos = mousePos[0];
+        this.guideLine.attr('x1', xPos)
+                      .attr('x2', xPos);
+
+        var legendGroupX = xPos + this.legendGroupMargin;
+        if (xPos + this.legendGroupWidth >= this.graph.width) {
+            legendGroupX = xPos - this.legendGroupMargin - this.legendGroupWidth;
+        }
+        this.dynamicLegendGroup.attr('transform', "translate(" + legendGroupX + ","
+                                                               + this.legendGroupMargin + ")");
+
+        var dateAtX = Math.max(this.graph.xDomain[0], Math.min(this.graph.x.invert(xPos), this.graph.xDomain[1]));
+        var commitCount = this.getClosestValueToDate(this.graph.cumulativeCommitData, dateAtX);
+        var commentsWrittenCount = this.getClosestValueToDate(this.graph.writtenCommentData, dateAtX);
+        var commentsReceivedCount = this.getClosestValueToDate(this.graph.receivedCommentData, dateAtX);
+
+        this.legendValueTime.text(moment(dateAtX).format('YYYY-MM-DD'));
+        this.legendValueCommitCount.text(commitCount);
+        this.legendValueCommentsWritten.text(commentsWrittenCount);
+        this.legendValueCommentsReceived.text(commentsReceivedCount);
+
+        this.focusCircleCommitCount
+            .attr('cx', xPos)
+            .attr('cy', this.graph.y(commitCount));
+
+        this.focusCircleCommentsWritten
+            .attr('cx', xPos)
+            .attr('cy', this.graph.y(commentsWrittenCount));
+
+        this.focusCircleCommentsReceived
+            .attr('cx', xPos)
+            .attr('cy', this.graph.y(commentsReceivedCount));
+    }
+}
+
 /**
  * Renders a simple 2d line chart, showing user's review statistics over time.
  *
@@ -7,172 +144,44 @@
  * doesn't have any timestamps for comments, so they're estimated based on
  * patch set creation date.
  */
-function CumulativeGraph(svgId, userRecord) {
-    this.xDomain = userRecord.getFromDate() && userRecord.getToDate()
-                 ? [userRecord.getFromDate(), userRecord.getToDate()]
-                 : [];
-    this.margin = {
-        top: 20,
-        right: 20,
-        bottom: 60,
-        left: 60
-    };
+class CumulativeGraph {
 
-    this.width = 1050 - this.margin.left - this.margin.right;
-    this.height = 500 - this.margin.top - this.margin.bottom;
+    constructor(svgId, userRecord) {
+        this.svgId = svgId;
+        this.xDomain = userRecord.getFromDate() && userRecord.getToDate()
+                     ? [userRecord.getFromDate(), userRecord.getToDate()]
+                     : [];
+        this.margin = {
+            top: 20,
+            right: 20,
+            bottom: 60,
+            left: 60
+        };
 
-    this.userRecord = userRecord;
+        this.width = 1050 - this.margin.left - this.margin.right;
+        this.height = 500 - this.margin.top - this.margin.bottom;
 
-    // The 'step-after' interpolation mode makes the most sense, as
-    // it reflect the nature of user actions; they occur on particular moments,
-    // and not in between (as in linear interpolation).
-    this.interpolationMode = 'step-after';
+        this.userRecord = userRecord;
 
-    this.cumulativeCommitsPath = null;
-    this.writtenCommentsPath = null;
-    this.receivedCommentsPath = null;
+        // The 'step-after' interpolation mode makes the most sense, as
+        // it reflect the nature of user actions; they occur on particular moments,
+        // and not in between (as in linear interpolation).
+        this.interpolationMode = 'step-after';
 
-    this.selectionGuide = null;
+        this.cumulativeCommitsPath = null;
+        this.writtenCommentsPath = null;
+        this.receivedCommentsPath = null;
 
-    /*
-     * Creates a dynamic vertical guide that appears when user moves the mouse,
-     * and the related components.
-     */
-    function VerticalGuide(graph) {
-        this.graph = graph;
-        this.svg = graph.svg;
+        this.selectionGuide = null;
 
-        this.legendGroupWidth = 190;
-        this.legendGroupHeight = 120;
-        this.legendGroupMargin = 10;
-
-        this.create = function() {
-            this.guideLine = this.svg.append('line')
-                .attr('class', 'chartGuideline')
-                .attr('x1', 100)
-                .attr('y1', 0)
-                .attr('x2', 100)
-                .attr('y2', this.graph.height)
-                .style('visibility', 'hidden');
-
-            this.dynamicLegendGroup = this.svg.append('g')
-                .style('visibility', 'hidden');
-
-            this.dynamicLegendGroup.append('rect')
-                .attr('class', 'chartDynamicLegendBox')
-                .attr('width', this.legendGroupWidth)
-                .attr('height', this.legendGroupHeight)
-
-            this.legendValueTime = this.dynamicLegendGroup.append('text')
-                .attr('class', 'chartDynamicLegendTitle')
-                .attr('x', 10)
-                .attr('y', this.graph.margin.top);
-
-            var legendWrapper = this.dynamicLegendGroup.append('g')
-                .attr('transform', "translate(" + -10 + "," + 20 + ")");
-
-            this.graph.createLegend(legendWrapper);
-
-            var legendValueXPos = 145;
-            this.legendValueCommitCount = this.dynamicLegendGroup.append('text')
-                .attr('class', 'chartLegend')
-                .attr('x', legendValueXPos)
-                .attr('y', this.graph.margin.top + 34);
-
-            this.legendValueCommentsWritten = this.dynamicLegendGroup.append('text')
-                .attr('class', 'chartLegend')
-                .attr('x', legendValueXPos)
-                .attr('y', this.graph.margin.top + 58);
-
-            this.legendValueCommentsReceived = this.dynamicLegendGroup.append('text')
-                .attr('class', 'chartLegend')
-                .attr('x', legendValueXPos)
-                .attr('y', this.graph.margin.top + 83);
-
-            this.focusCircleGroup = this.svg.append('g')
-                .attr('class', 'focusCircleGroup')
-                .style('visibility', 'hidden');
-
-            this.focusCircleCommitCount = this.focusCircleGroup.append('circle')
-                    .attr('class', 'focusCircleCommitCount')
-                    .attr('r', 5);
-
-            this.focusCircleCommentsWritten = this.focusCircleGroup.append('circle')
-                    .attr('class', 'focusCircleCommentsWritten')
-                    .attr('r', 5);
-
-            this.focusCircleCommentsReceived = this.focusCircleGroup.append('circle')
-                    .attr('class', 'focusCircleCommentsReceived')
-                    .attr('r', 5);
-
-            this.dateBisector = d3.bisector(function(d) { return d.date; }).left;
-        }
-
-        this.setVisibility = function(isVisible) {
-            var visibility = isVisible ? 'visible' : 'hidden';
-            this.guideLine.style('visibility', visibility);
-            this.dynamicLegendGroup.style('visibility', visibility);
-            this.focusCircleGroup.style('visibility', visibility);
-
-            // Hide the legend from the graph, it can get on the way and it's visually duplicated
-            // while the guide is visible
-            this.graph.legend.style('visibility', !isVisible ? 'visible' : 'hidden')
-        }
-
-        this.getClosestValueToDate = function(dataArray, referenceDate) {
-            var index = this.dateBisector(dataArray, referenceDate, 1);
-            var value = 0;
-            if (dataArray[index].date - referenceDate > dataArray[index - 1].date - referenceDate) {
-                value = dataArray[index - 1].count;
-            } else {
-                value = dataArray[index].count;
-            }
-            return value;
-        }
-
-        this.updatePosition = function(mousePos) {
-            var xPos = mousePos[0];
-            this.guideLine.attr('x1', xPos)
-                          .attr('x2', xPos);
-
-            var legendGroupX = xPos + this.legendGroupMargin;
-            if (xPos + this.legendGroupWidth >= this.graph.width) {
-                legendGroupX = xPos - this.legendGroupMargin - this.legendGroupWidth;
-            }
-            this.dynamicLegendGroup.attr('transform', "translate(" + legendGroupX + ","
-                                                                   + this.legendGroupMargin + ")");
-
-            var dateAtX = Math.max(this.graph.xDomain[0], Math.min(this.graph.x.invert(xPos), this.graph.xDomain[1]));
-            var commitCount = this.getClosestValueToDate(this.graph.cumulativeCommitData, dateAtX);
-            var commentsWrittenCount = this.getClosestValueToDate(this.graph.writtenCommentData, dateAtX);
-            var commentsReceivedCount = this.getClosestValueToDate(this.graph.receivedCommentData, dateAtX);
-
-            this.legendValueTime.text(moment(dateAtX).format('YYYY-MM-DD'));
-            this.legendValueCommitCount.text(commitCount);
-            this.legendValueCommentsWritten.text(commentsWrittenCount);
-            this.legendValueCommentsReceived.text(commentsReceivedCount);
-
-            this.focusCircleCommitCount
-                .attr('cx', xPos)
-                .attr('cy', this.graph.y(commitCount));
-
-            this.focusCircleCommentsWritten
-                .attr('cx', xPos)
-                .attr('cy', this.graph.y(commentsWrittenCount));
-
-            this.focusCircleCommentsReceived
-                .attr('cx', xPos)
-                .attr('cy', this.graph.y(commentsReceivedCount));
-        }
-
-        this.create();
+        this.initialize();
     }
 
-    this.isValid = function() {
+    isValid() {
         return (this.xDomain.length == 2);
     }
 
-    this.parseCumulativeCommitData = function() {
+    parseCumulativeCommitData() {
         var that = this;
         var cumulativeCommits = [];
         cumulativeCommits.push({
@@ -180,7 +189,7 @@ function CumulativeGraph(svgId, userRecord) {
             'count': 0
         });
 
-        var sortedCommits = userRecord.commits.slice().sort(function(l, r) {
+        var sortedCommits = this.userRecord.commits.slice().sort(function(l, r) {
             return (l.createdOnDate < r.createdOnDate) ? -1 : (r.createdOnDate < l.createdOnDate ? 1 : 0);
         });
         sortedCommits.forEach(function(commit) {
@@ -197,7 +206,7 @@ function CumulativeGraph(svgId, userRecord) {
         return cumulativeCommits;
     }
 
-    this.parseCumulativeWrittenCommentData = function() {
+    parseCumulativeWrittenCommentData() {
         var that = this;
         var cumulativeWrittenComments = [];
         cumulativeWrittenComments.push({
@@ -206,7 +215,7 @@ function CumulativeGraph(svgId, userRecord) {
         });
 
         var comments = [];
-        userRecord.commentsWritten.forEach(function(commentItem) {
+        this.userRecord.commentsWritten.forEach(function(commentItem) {
             comments = comments.concat(commentItem.commentsByUser);
         });
         comments.sort(function(l, r) {
@@ -232,7 +241,7 @@ function CumulativeGraph(svgId, userRecord) {
         return cumulativeWrittenComments;
     }
 
-    this.parseCumulativeReceivedCommentData = function() {
+    parseCumulativeReceivedCommentData() {
         var that = this;
         var cumulativeReceivedComments = [];
         cumulativeReceivedComments.push({
@@ -240,7 +249,7 @@ function CumulativeGraph(svgId, userRecord) {
             'count': 0
         });
 
-        var sortedComments = userRecord.commentsReceived.slice().sort(function(l, r) {
+        var sortedComments = this.userRecord.commentsReceived.slice().sort(function(l, r) {
             return (l.commit.createdOnDate < r.commit.createdOnDate)
                 ? -1 : (r.commit.createdOnDate < l.commit.createdOnDate ? 1 : 0);
         });
@@ -260,7 +269,7 @@ function CumulativeGraph(svgId, userRecord) {
         return cumulativeReceivedComments;
     }
 
-    this.createLegend = function(parentSvgItem) {
+    createLegend(parentSvgItem) {
         var that = this;
         var legendScale = d3.scale.ordinal()
             .domain(['Commits',
@@ -301,7 +310,7 @@ function CumulativeGraph(svgId, userRecord) {
         this.legend.call(legendColor);
     }
 
-    this.initialize = function() {
+    initialize() {
         var that = this;
 
         this.x = d3.time.scale().range([0, this.width]);
@@ -324,7 +333,7 @@ function CumulativeGraph(svgId, userRecord) {
                                   this.writtenCommentData[this.writtenCommentData.length - 1].count,
                                   this.receivedCommentData[this.receivedCommentData.length - 1].count])]);
 
-        this.svg = d3.select(svgId)
+        this.svg = d3.select(this.svgId)
             .append('svg')
                 .attr('width', this.width + this.margin.left + this.margin.right)
                 .attr('height', this.height + this.margin.top + this.margin.bottom)
@@ -400,6 +409,4 @@ function CumulativeGraph(svgId, userRecord) {
             .attr('class', 'y chartAxis')
             .call(this.yAxis);
     }
-
-    this.initialize();
 }
