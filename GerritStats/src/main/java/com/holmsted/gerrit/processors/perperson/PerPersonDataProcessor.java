@@ -1,6 +1,7 @@
 package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
+import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
 import com.holmsted.gerrit.OutputType;
@@ -81,8 +82,16 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
 
             @Override
             public void visitApproval(@Nonnull Commit.PatchSet patchSet, @Nonnull Commit.Approval approval) {
-                IdentityRecord record = getOrCreateRecord(approval.grantedBy);
-                record.addApprovalByThisIdentity(patchSet.author, approval);
+                Identity grantedBy = approval.grantedBy;
+                Identity patchSetAuthor = patchSet.author;
+                if (grantedBy == null || patchSetAuthor == null) {
+                    return;
+                }
+
+                if (!grantedBy.equals(patchSetAuthor)) {
+                    IdentityRecord record = getOrCreateRecord(grantedBy);
+                    record.addApprovalByThisIdentity(patchSetAuthor, approval);
+                }
             }
 
             @Override
