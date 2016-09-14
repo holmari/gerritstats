@@ -66,7 +66,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                             ownerRecord.addReceivedCodeReview(approval);
                             if (getCommitFilter().isIncluded(approval.grantedBy)
                                     && !ownerRecord.identity.equals(approval.grantedBy)) {
-                                ownerRecord.addApprovalForOwnCommit(approval.grantedBy);
+                                ownerRecord.addApprovalForOwnCommit(approval.grantedBy, approval);
                             }
                             break;
                         }

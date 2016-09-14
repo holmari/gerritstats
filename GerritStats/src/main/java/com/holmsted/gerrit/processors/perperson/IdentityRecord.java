@@ -28,6 +28,7 @@ public class IdentityRecord {
         int addedAsReviewerCount;
         int approvalCount;
         int commentCount;
+        final Map<Integer, Integer> approvals = new HashMap<>();
     }
 
     public static class Repository {
@@ -337,9 +338,10 @@ public class IdentityRecord {
         reviewersForOwnCommits.put(identity, reviewerData);
     }
 
-    void addApprovalForOwnCommit(@Nonnull Commit.Identity identity) {
+    void addApprovalForOwnCommit(@Nonnull Identity identity, @Nonnull Approval approval) {
         ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(identity);
         reviewerData.approvalCount++;
+        reviewerData.approvals.merge(approval.value, 1, Integer::sum);
         reviewersForOwnCommits.put(identity, reviewerData);
     }
 
