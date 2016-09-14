@@ -223,7 +223,7 @@ public class IdentityRecord {
     public int getInReviewCommitCount() {
         int newCommitCount = 0;
         for (Commit commit : commits) {
-            if (commit.status.equals("NEW")) {
+            if ("NEW".equals(commit.status)) {
                 ++newCommitCount;
             }
         }
@@ -233,7 +233,7 @@ public class IdentityRecord {
     public int getAbandonedCommitCount() {
         int abandonedCommitCount = 0;
         for (Commit commit : commits) {
-            if (commit.status.equals("ABANDONED")) {
+            if ("ABANDONED".equals(commit.status)) {
                 ++abandonedCommitCount;
             }
         }
@@ -264,7 +264,7 @@ public class IdentityRecord {
         List<Commit> result = new ArrayList<>();
 
         for (Commit commit : commits) {
-            if (!commit.status.equals("MERGED")) {
+            if (!"MERGED".equals(commit.status)) {
                 continue;
             }
 
