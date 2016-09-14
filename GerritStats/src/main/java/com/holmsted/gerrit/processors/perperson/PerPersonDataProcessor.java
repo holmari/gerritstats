@@ -63,7 +63,6 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                     }
                     switch (approval.type) {
                         case Commit.Approval.TYPE_CODE_REVIEW: {
-                            ownerRecord.addReceivedCodeReview(approval);
                             if (getCommitFilter().isIncluded(approval.grantedBy)
                                     && !ownerRecord.identity.equals(approval.grantedBy)) {
                                 ownerRecord.addApprovalForOwnCommit(approval.grantedBy, approval);
@@ -83,7 +82,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
             @Override
             public void visitApproval(@Nonnull Commit.PatchSet patchSet, @Nonnull Commit.Approval approval) {
                 IdentityRecord record = getOrCreateRecord(approval.grantedBy);
-                record.addApproval(approval);
+                record.addApprovalByThisIdentity(patchSet.author, approval);
             }
 
             @Override

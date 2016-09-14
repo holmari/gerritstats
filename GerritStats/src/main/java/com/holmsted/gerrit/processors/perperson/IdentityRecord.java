@@ -79,8 +79,6 @@ public class IdentityRecord {
     long activeDayCount;
     private transient Set<String> activeDays = new HashSet<>();
 
-    final Hashtable<Integer, Integer> receivedReviews = new Hashtable<>();
-
     final DatedCommitList commits = new DatedCommitList();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<>();
@@ -148,10 +146,6 @@ public class IdentityRecord {
         return reviewersForOwnCommits.get(identity);
     }
 
-    public ReviewerData getReviewRequestorDataFor(@Nonnull Commit.Identity identity) {
-        return reviewRequestors.get(identity);
-    }
-
     public int getReviewCountMinus1() {
         return reviewCountMinus1;
     }
@@ -180,8 +174,7 @@ public class IdentityRecord {
             repository.commitCountForUser++;
         }
 
-        List<Repository> result = new ArrayList<>(repositories.values());
-        return result;
+        return new ArrayList<>(repositories.values());
     }
 
     public float getReceivedCommentRatio() {
@@ -248,7 +241,11 @@ public class IdentityRecord {
         }
     }
 
-    public void addApproval(Commit.Approval approval) {
+    public void addApprovalByThisIdentity(@Nonnull Commit.Identity patchSetAuthor, Approval approval) {
+        ReviewerData reviewerData = reviewRequestors.computeIfAbsent(patchSetAuthor, k -> new ReviewerData());
+        reviewerData.approvalCount++;
+        reviewerData.approvals.merge(approval.value, 1, Integer::sum);
+
         if (approval.value == 2) {
             ++reviewCountPlus2;
         } else if (approval.value == 1) {
@@ -313,6 +310,7 @@ public class IdentityRecord {
         return getPrintableReviewerList(getMyReviewerList(), reviewersForOwnCommits);
     }
 
+    @Nonnull
     public List<Commit.Identity> getReviewRequestorList() {
         List<Commit.Identity> sortedIdentities = new ArrayList<>(reviewRequestors.keySet());
         Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewRequestors));
@@ -325,24 +323,18 @@ public class IdentityRecord {
 
     @Nonnull
     private ReviewerData getOrCreateReviewerForOwnCommit(@Nonnull Commit.Identity identity) {
-        ReviewerData reviewerData = reviewersForOwnCommits.get(identity);
-        if (reviewerData == null) {
-            reviewerData = new ReviewerData();
-        }
-        return reviewerData;
+        return reviewersForOwnCommits.computeIfAbsent(identity, k -> new ReviewerData());
     }
 
     public void addReviewerForOwnCommit(@Nonnull Commit.Identity identity) {
         ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(identity);
         reviewerData.addedAsReviewerCount++;
-        reviewersForOwnCommits.put(identity, reviewerData);
     }
 
-    void addApprovalForOwnCommit(@Nonnull Identity identity, @Nonnull Approval approval) {
-        ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(identity);
+    void addApprovalForOwnCommit(@Nonnull Identity approver, @Nonnull Approval approval) {
+        ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(approver);
         reviewerData.approvalCount++;
         reviewerData.approvals.merge(approval.value, 1, Integer::sum);
-        reviewersForOwnCommits.put(identity, reviewerData);
     }
 
     private String getPrintableReviewerList(@Nonnull List<Commit.Identity> sortedIdentities,
@@ -391,28 +383,18 @@ public class IdentityRecord {
         return builder.toString();
     }
 
-    public String getPrintableAllReviewComments() {
-        StringBuilder builder = new StringBuilder();
-        for (Commit.PatchSetComment comment : getAllCommentsWritten()) {
-            builder.append(comment.message).append("\n");
-        }
-
-        return builder.toString();
-    }
-
     public void addReviewedCommit(@Nonnull Commit commit) {
         addedAsReviewerTo.add(commit);
-
-        ReviewerData reviewsDoneForIdentity = reviewRequestors.get(commit.owner);
-        if (reviewsDoneForIdentity == null) {
-            reviewsDoneForIdentity = new ReviewerData();
-        }
+        ReviewerData reviewsDoneForIdentity = reviewRequestors.computeIfAbsent(commit.owner,
+                k -> new ReviewerData());
         reviewsDoneForIdentity.addedAsReviewerCount++;
-
-        reviewRequestors.put(commit.owner, reviewsDoneForIdentity);
     }
 
     public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
+        ReviewerData reviewsDoneForIdentity = reviewRequestors.computeIfAbsent(commit.owner,
+                k -> new ReviewerData());
+        reviewsDoneForIdentity.commentCount++;
+
         commentsWritten.addCommentForCommit(commit, patchSetComment);
         updateActivityTimestamps(commit.getPatchSetForComment(patchSetComment).createdOnDate);
     }
@@ -421,24 +403,8 @@ public class IdentityRecord {
         Identity reviewer = checkNotNull(patchSetComment.getReviewer());
         ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(reviewer);
         reviewerData.commentCount++;
-        reviewersForOwnCommits.put(reviewer, reviewerData);
 
         commentsReceived.addCommentForCommit(commit, patchSetComment);
-    }
-
-    public List<Commit> getCommitsWithWrittenComments() {
-        ArrayList<Commit> commits = Collections.list(commentsWritten.keys());
-        Collections.sort(commits, new CommitDateComparator());
-        return commits;
-    }
-
-    public List<Commit.PatchSetComment> getWrittenCommentsForCommit(@Nonnull Commit commit) {
-        return commentsWritten.get(commit);
-    }
-
-    public int getReceivedReviewsForScore(int score) {
-        Integer value = receivedReviews.get(score);
-        return value != null ? value : 0;
     }
 
     public void addCommit(@Nonnull Commit commit) {
@@ -461,16 +427,6 @@ public class IdentityRecord {
         int prevCount = commits.size() - 1;
         long newAverage = averageTimeInCodeReview * prevCount;
         averageTimeInCodeReview = (newAverage + commitTimeInCodeReviewMsec) / commits.size();
-    }
-
-    void addReceivedCodeReview(@Nonnull Commit.Approval approval) {
-        Integer receivedReviewCountForValue = receivedReviews.get(approval.value);
-        if (receivedReviewCountForValue == null) {
-            receivedReviewCountForValue = 1;
-        } else {
-            receivedReviewCountForValue++;
-        }
-        receivedReviews.put(approval.value, receivedReviewCountForValue);
     }
 
     private static String formatPrintableDuration(long duration) {
