@@ -1,0 +1,35 @@
+.filterBox {
+    float: right;
+    margin-right: 0.5em;
+}
+
+.filterBox th {
+    font-weight: 400;
+    padding-top: 0.3em;
+    padding-bottom: 0.3em;
+    padding-left: 0.25em;
+    padding-right: 0.25em;
+    color: #f4f4f4;
+}
+
+.filterBox td {
+    padding-left: 1em;
+}
+
+.filterBox img {
+    padding-right: 0.25em;
+    height: 1em;
+}
+.filterBox .glyphicon {
+    padding-right: 0.25em;
+}
+
+.filterBoxValue {
+    font-weight: 200;
+    color: #f4f4f4;
+}
+
+.glyphicon.white {
+    color: white;
+}
+

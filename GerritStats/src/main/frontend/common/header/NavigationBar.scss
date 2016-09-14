@@ -1,0 +1,37 @@
+nav {
+    display: block;
+    background-color: #303138;
+    padding-top: 1em;
+    margin-bottom: 22px;
+}
+
+nav .container-fluid {
+    border: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+}
+
+.active {
+    background-color: #f4f4f4;
+    color: #303138;
+}
+
+nav ul li {
+    cursor: pointer;
+    padding-top: 0.4em;
+    padding-bottom: 0.4em;
+    padding-left: 1em;
+    padding-right: 1em;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 18px;
+    font-weight: 100;
+    color: #f4f4f4;
+}
+
+nav ul li:hover {
+    background-color: #eef0f3;
+    color: #303138;
+}
+
+nav ul li a {
+    color: #f4f4f4;
+}

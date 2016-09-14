@@ -246,6 +246,8 @@ public class IdentityRecord {
         reviewerData.approvalCount++;
         reviewerData.approvals.merge(approval.value, 1, Integer::sum);
 
+        updateActivityTimestamps(approval.grantedOnDate);
+
         if (approval.value == 2) {
             ++reviewCountPlus2;
         } else if (approval.value == 1) {

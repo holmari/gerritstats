@@ -1,0 +1,27 @@
+.iterativeChartGuideline {
+    stroke: red; /* replaced at runtime */
+    stroke-width: 0.75;
+    fill-opacity: 1.0;
+    stroke-dasharray: ('10, 10');
+}
+
+.iterativeCommitChartAxis {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 12px;
+    fill: #303138;
+}
+
+.iterativeCommitChartAxis path,
+.iterativeCommitChartAxis line {
+    fill: none;
+    stroke: #cccccc;
+    shape-rendering: crispEdges;
+}
+
+.iterativeCommitBubble {
+    fill-opacity: 0.3;
+}
+
+.iterativeCommitBubble.selected {
+    fill-opacity: 1.0;
+}

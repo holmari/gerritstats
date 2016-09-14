@@ -1,0 +1,34 @@
+@import '../../style/charts';
+
+.proximityGraph {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-color: #f4f4f4;
+    border-color: #ccc;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+}
+
+.proximityGraphNode {
+    stroke-width: 1.5px;
+}
+
+.proximityGraphLink {
+    stroke: #999;
+    stroke-opacity: .6;
+}
+
+.teamGraph {
+    min-width: 538px;
+    width: 538px;
+}
+
+.proximityGraphNode {
+    stroke: #ffffff;
+}
+
+.proximityGraphNode.selected {
+    fill-opacity: 1.0;
+    stroke: #303138;
+}

@@ -1,0 +1,86 @@
+.panelBox {
+    display: block;
+    float: left;
+
+}
+
+.panel {
+    @extend .panelBox;
+
+    padding-left: 14px;
+    padding-right: 14px;
+    padding-bottom: 1em;
+    margin-left: 7px;
+    margin-right: 7px;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+.panel table {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.panel h2 {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 33px;
+    font-weight: 200;
+    margin-bottom: 0.5em;
+}
+
+.panel th {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    padding-bottom: 0.2em;
+    padding-right: 2em;
+}
+
+.panel td {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-weight: 200;
+    font-size: 15px;
+}
+
+.panel p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 16px;
+    font-weight: 200;
+    line-height: 1.4;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+}
+
+.panel.thirdWidth {
+    min-width: 354px;
+    width: 354px;
+}
+
+.panel.twoThirdsWidth {
+    min-width: 722px;
+    width: 722px;
+}
+
+.panel.halfWidth {
+    min-width: 538px;
+    width: 538px;
+}
+
+.panel.fullWidth {
+    min-width: 1090px;
+    width: 1090px;
+}
+
+.panel.flexWidth {
+    width: 100%;
+}
+
+.panel.fourthWidth {
+    min-width: 272px;
+    width: 272px;
+}
+
+.panel.threeFourthsWidth {
+    min-width: 804px;
+    width: 804px;
+}

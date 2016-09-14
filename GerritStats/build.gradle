@@ -27,51 +27,5 @@ jar {
     // Include dependencies in JAR file (see http://stackoverflow.com/a/3450409/639421).
     from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
 
-    task cleanupNpmDependenciesAndGeneratedJS(type: Delete) {
-        delete 'src/main/resources/res/node_modules'
-        delete 'src/main/resources/res/*.js'
-    }
-
-    task copyNpmDependenciesToResources(type: Copy) {
-        from('node_modules') {
-            exclude 'npm/**'
-        }
-        into 'src/main/resources/res/node_modules'
-    }
-
-    task generateResourceFileListing() << {
-        assert sourceSets.main.resources.srcDirs.size() == 1;
-
-        java.io.StringWriter filenameListWriter = new StringWriter();
-
-        File baseDir = sourceSets.main.resources.srcDirs.iterator().next();
-        String basePathName = baseDir.absolutePath;
-
-        Stack<File> fileStack = new Stack<>();
-        fileStack.add(baseDir);
-        while (!fileStack.isEmpty()) {
-            File file = fileStack.pop();
-            if (file.isDirectory()) {
-                File[] files = file.listFiles();
-                if (files.findIndexOf { f -> f.name =~ /^.*\.ignore$/ } == -1) {
-                    fileStack.addAll(files);
-                }
-            } else if (file.isFile() && !file.isHidden()) {
-                String relPath = file.absolutePath.substring(basePathName.length() + 1);
-                filenameListWriter.write(relPath + '\n');
-            }
-        }
-
-        java.io.FileWriter fileWriter = new FileWriter(basePathName + "/resList.js");
-        fileWriter.write(filenameListWriter.toString());
-        fileWriter.close();
-    }
-
-    cleanupNpmDependenciesAndGeneratedJS.dependsOn npmInstall
-    // npm_run_* is a magic command whose suffix takes the npm script name.
-    npm_run_babel.dependsOn npmInstall
-    copyNpmDependenciesToResources.dependsOn npm_run_babel
-    copyNpmDependenciesToResources.dependsOn cleanupNpmDependenciesAndGeneratedJS
-    generateResourceFileListing.dependsOn copyNpmDependenciesToResources
-    processResources.dependsOn generateResourceFileListing
+    processResources.dependsOn npmInstall
 }

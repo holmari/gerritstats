@@ -1,0 +1,52 @@
+/******************************************************************************
+ * Graphs: axes and labels
+ *****************************************************************************/
+
+.chartAxis {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 12px;
+    fill: #303138;
+}
+
+.chartAxisLabel {
+    font-size: 13px;
+}
+
+.chartAxis path,
+.chartAxis line {
+    fill: none;
+    stroke: #cccccc;
+    shape-rendering: crispEdges;
+}
+
+.chartGuideline {
+    stroke: #303138;
+    stroke-width: 0.5;
+}
+
+.chartGuidelineText {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    fill: #303138;
+}
+
+.chartLegend {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 12px;
+    fill: #303138;
+    font-weight: normal;
+    cursor: pointer;
+}
+
+.chartDynamicLegendTitle {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, sans-serif;
+    font-size: 14px;
+    fill: #303138;
+}
+
+.chartDynamicLegendBox {
+    fill-opacity: 0.9;
+    fill: #fefefe;
+    stroke: #dedede;
+    stroke-width: 0.5px;
+}

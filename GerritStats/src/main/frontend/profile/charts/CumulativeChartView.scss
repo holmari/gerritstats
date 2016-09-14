@@ -1,0 +1,31 @@
+@import '../../style/charts';
+
+.lineCommits {
+    fill: none;
+    stroke: #4A91FF;
+    stroke-width: 2px;
+}
+
+.lineWrittenComments {
+    fill: none;
+    stroke: #A3CC27;
+    stroke-width: 2px;
+}
+
+.lineReceivedComments {
+    fill: none;
+    stroke: #FF8270;
+    stroke-width: 2px;
+}
+
+.focusCircleCommitCount {
+    fill: #4A91FF;
+}
+
+.focusCircleCommentsWritten {
+    fill: #A3CC27;
+}
+
+.focusCircleCommentsReceived {
+    fill: #FF8270;
+}
