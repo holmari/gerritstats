@@ -2,6 +2,7 @@ package com.holmsted.gerrit.processors.perperson;
 
 import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.Commit.Approval;
+import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.Commit.PatchSet;
 import com.holmsted.gerrit.DatedCommitList;
 import com.holmsted.gerrit.DatedPatchSetCommentList;
@@ -19,19 +20,14 @@ import java.util.Set;
 
 import javax.annotation.Nonnull;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public class IdentityRecord {
 
     public static class ReviewerData {
         int addedAsReviewerCount;
         int approvalCount;
-
-        public int getAddedAsReviewerCount() {
-            return addedAsReviewerCount;
-        }
-
-        public int getApprovalCount() {
-            return approvalCount;
-        }
+        int commentCount;
     }
 
     public static class Repository {
@@ -326,6 +322,7 @@ public class IdentityRecord {
         return getPrintableReviewerList(getReviewRequestorList(), reviewRequestors);
     }
 
+    @Nonnull
     private ReviewerData getOrCreateReviewerForOwnCommit(@Nonnull Commit.Identity identity) {
         ReviewerData reviewerData = reviewersForOwnCommits.get(identity);
         if (reviewerData == null) {
@@ -419,6 +416,11 @@ public class IdentityRecord {
     }
 
     public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
+        Identity reviewer = checkNotNull(patchSetComment.getReviewer());
+        ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(reviewer);
+        reviewerData.commentCount++;
+        reviewersForOwnCommits.put(reviewer, reviewerData);
+
         commentsReceived.addCommentForCommit(commit, patchSetComment);
     }
 
