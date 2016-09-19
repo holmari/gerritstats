@@ -12,7 +12,7 @@ public enum OutputType {
     /**
      *
      */
-    HTML("html");
+    JSON("json");
 
     private final String formatName;
 
@@ -26,7 +26,7 @@ public enum OutputType {
         } else if (formatName.equals(PLAIN.formatName)) {
             return PLAIN;
         } else {
-            return HTML;
+            return JSON;
         }
     }
 

@@ -65,7 +65,7 @@ public class CommandLineParser {
             arity = 1,
             converter = OutputTypeConverter.class)
     @Nonnull
-    private OutputType outputType = OutputType.HTML;
+    private OutputType outputType = OutputType.JSON;
 
     @Parameter(names = "--commit-patch-set-count-threshold",
             description = "If specified, all commit URLs exceeding the given patch set count will be listed "

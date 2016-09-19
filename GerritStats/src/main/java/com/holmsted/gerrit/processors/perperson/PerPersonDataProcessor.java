@@ -126,8 +126,8 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                 return new PerPersonCsvFormatter();
             case PLAIN:
                 return new PerPersonPlaintextFormatter(getOutputRules());
-            case HTML:
-                return new PerPersonHtmlFormatter(getOutputRules());
+            case JSON:
+                return new PerPersonJsonFormatter(getOutputRules());
             default:
                 throw new UnsupportedOperationException("Unsupported format " + outputType);
         }
