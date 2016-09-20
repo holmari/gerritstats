@@ -3,7 +3,7 @@ var path = require('path');
 module.exports = {
     entry: './src/main/frontend/index.jsx',
     output: {
-        path: '../out-html',
+        path: 'out-html',
         filename: 'bundle.js',
     },
     module: {

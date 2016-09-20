@@ -12,6 +12,7 @@ GerritStats/src/main/frontend/data
 
 # Default output dir
 out/
+GerritStats/out-html/
 
 # IntelliJ IDEA
 *.iml

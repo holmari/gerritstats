@@ -30,7 +30,7 @@
     "generateData": "rm -rf src/main/frontend/data && java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o src/main/frontend/data",
     "webpack": "webpack --display-error-details --colors --progress --config webpack.config.js",
     "webpack-watch": "webpack --display-error-details --colors --progress --watch",
-    "prewebpack": "cp src/main/frontend/index.html ../out-html/"
+    "prewebpack": "mkdir -p out-html && cp src/main/frontend/index.html out-html/"
   },
   "repository": {
     "type": "git",
