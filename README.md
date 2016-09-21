@@ -1,20 +1,35 @@
 # GerritStats
 
-This project provides tools to display statistics from a Gerrit repository. It generates output in HTML, CSV and plaintext formats.
+This project provides tools to display statistics from a Gerrit repository.
+It generates output in HTML format.
 
-The tool can be useful for analysing how efficiently code reviews are implemented in an organization, and how often cross-team code reviews are conducted.
+The tool can be useful for analysing how efficiently code reviews are implemented in an organization,
+and what kind of virtual teams are formed in the review process.
 
-There are two separate tools:
+The tool will generate a set of HTML files that include graphs and charts, such as
+a proximity graph of the developers, based on how many review comments they write to each other,
+as well as a per-developer page that lists all their review comments and links back to the reviews.
+
+There are two separate command-line tools:
 
 * GerritDownloader, which downloads JSON data from the server
-* GerritStats, which parses the json output provided by GerritDownloader.
+* GerritStats, which parses the json output provided by GerritDownloader, and generates HTML output.
+
+## Demo
+
+A demo of the resulting HTML output is available at:
+
+http://gerritstats-demo.firebaseapp.com
 
 ## How to build
 
+The tool should work fine on OS X and Linux. Windows is not supported; if it works, it's not intended.
 
 ```
-# Prerequisite: install brew from http://brew.sh
-brew install npm
+# Prerequisite: if using OS X, install brew from http://brew.sh
+
+brew install npm # or, if not using OS X, install npm some other way
+
 ./gradlew assemble
 ```
 
@@ -50,79 +65,22 @@ access to:
 ./gerrit_downloader.sh --server gerrit.instance.on.inter.nets --output-dir gerrit_out/
 ```
 
-## How to execute: plaintext output
+## How to execute
 
-Once you have the data, you can start to play around with the output. You can e.g. include only a particular set of developers, which can be useful
-when looking at e.g. team-level review practices.
-
-```
-./gerrit_stats.sh --file ./GerritStats/gerrit-json-out.txt --branches master --include joe.developer@inter.nets,jeff@buckley.org,deep@purple.com,beastie@boys.com --output-type plain
-```
-
-The above command will give you output as illustrated below:
+Once you have the data, generate HTML output like so:
 
 ```
-joe.developer@inter.nets
-  Commits: 1072
-  Comments written: 748
-  Comments received: 444
-  Commit/comment ratio: 0.41417912
-  Added as reviewer: 1939
-  Review comment ratio: 0.38576585
-  Avg. patch set count: 1.4906716
-  Max patch set count: 11
-  +2 reviews given: 944
-  +1 reviews given: 1115
-  -1 reviews given: 285
-  -2 reviews given: 111
-  # of people added as reviewers: 26
-  Adds them as reviewers: jeff@buckley.org (900), deep@purple.com (875), beastie@boys.com (1)
-  They add this person as reviewer: jeff@buckley.org (300), rolling@stones.com (217), beastie@boys.com (1)
+./gerrit_stats.sh -f gerrit_out/
 ```
 
-## How to execute: CSV output
-
-If you want to do some processing on the data with Excel or similar tools, a CSV format might be convenient for import.
-
-```
-./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --output-type csv
-```
-
-The output of the command looks like this:
-
-```
-Project: all data from file /Users/holmsted/dev/GerritStats/out.txt
-Branches: master
-From: 2014-10-23
-To: 2015-08-21
-
-Identity	            Commits	Comments written	Comments received	Commit/comment ratio	Added as reviewer	Review comment ratio	Avg. patch set count	Max patch set count	+2 reviews given	+1 reviews given	-1 reviews given	-2 reviews given	# of people added as reviewers
-developer1@domain.com	     80	               1	               14	            0.175000	              335	            0.002985	            1.487500	                 8	             35	             100	             5	             1	                                   18
-developer2@domain.com	      8	               4	                2	            0.250000	              167	            0.023952	            1.250000	                 3	             23	              23	             6	             0	                                    6
-developer3@domain.com	     50	               8	                7	            0.140000	              366	            0.021858	            1.760000	                 5	            101	              77	             7	             9	                                   11
-developer4@domain.com	    276	              19	               57	            0.206522	             1377	            0.013798	            2.246377	                13	             174	         225	            17	             8	                                   27
-developer5@domain.com	   1293	             328	              257	            0.198763	             2537	            0.129287	            1.486466	                11	            1231	        1330	           384	           136	                                   26
-```
-
-## How to execute: HTML output
-
-The default output of the tool is HTML. A demo of the HTML output is available at http://gerritstats-demo.firebaseapp.com
-
-This will generate a set of HTML files that include graphs and charts, such as a proximity graph of the developers,
-based on how many review comments they write to each other, as well as a per-developer page that lists all their review
-comments and links back to the reviews.
+You can also pass several other arguments, like pointing to a specific file, or including only a subset of
+developers.
 
 ```
 ./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
-However, you don't need all the arguments to generate output. Just pass the directory with downloaded json data to -f, and you're ready to go:
-
-```
-./gerrit_stats.sh --f gerrit_out/
-```
-
-The index page will provide you with a sortable overview table of some of the core statistics, similar to the plaintext CSV output.
+The index page will provide you with a sortable overview table of some of the core statistics:
 
 ![Overview table of all developers](doc/overview_table.png)
 
@@ -130,6 +88,7 @@ The index page also contais a graph that illustrates how developers are connecte
 
 ![Proximity graph for the given branch and given set of identities](doc/proximity_graph.png)
 
-And on the per-person page, you'll see a chart of review comments per day, a configurable list of commits that have a high number of patch sets, et cetera:
+And on the per-person page, you'll see a chart of review comments per day, a configurable
+list of commits that have a high number of patch sets, and many graphs:
 
 ![Review comment statistic written by a developer](doc/review_comments.png)
