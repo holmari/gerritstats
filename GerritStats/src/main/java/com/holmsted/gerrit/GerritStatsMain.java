@@ -3,7 +3,6 @@ package com.holmsted.gerrit;
 import com.holmsted.file.FileReader;
 import com.holmsted.gerrit.GerritStatParser.GerritData;
 import com.holmsted.gerrit.processors.perperson.PerPersonDataProcessor;
-import com.holmsted.gerrit.processors.reviewers.ReviewerProcessor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -62,17 +61,8 @@ public class GerritStatsMain {
             queryData = queryData.anonymize();
         }
 
-        switch (commandLine.getOutput()) {
-            case REVIEW_COMMENT_CSV:
-                ReviewerProcessor reviewerFormatter = new ReviewerProcessor(filter, outputRules);
-                reviewerFormatter.invoke(queryData);
-                break;
-            case PER_PERSON_DATA:
-            default:
-                PerPersonDataProcessor perPersonFormatter = new PerPersonDataProcessor(filter, outputRules);
-                perPersonFormatter.invoke(queryData);
-                break;
-        }
+        PerPersonDataProcessor perPersonFormatter = new PerPersonDataProcessor(filter, outputRules);
+        perPersonFormatter.invoke(queryData);
     }
 
     @Nonnull

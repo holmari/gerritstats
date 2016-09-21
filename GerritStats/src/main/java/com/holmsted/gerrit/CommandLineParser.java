@@ -21,13 +21,6 @@ public class CommandLineParser {
 
     private static final String DEFAULT_OUTPUT_DIR = "out";
 
-    public static class OutputTypeConverter implements IStringConverter<OutputType> {
-        @Override
-        public OutputType convert(String value) {
-            return OutputType.fromTypeString(value);
-        }
-    }
-
     public static class OutputConverter implements IStringConverter<Output> {
         @Override
         public Output convert(String value) {
@@ -60,24 +53,10 @@ public class CommandLineParser {
     @Nonnull
     private final List<String> includedEmails = new ArrayList<>();
 
-    @Parameter(names = "--output-type",
-            description = "If specified, the output will be provided in the specified format.",
-            arity = 1,
-            converter = OutputTypeConverter.class)
-    @Nonnull
-    private OutputType outputType = OutputType.JSON;
-
     @Parameter(names = "--commit-patch-set-count-threshold",
             description = "If specified, all commit URLs exceeding the given patch set count will be listed "
             + "in the per-person data. If -1 is set, no listing is provided.")
     private int commitPatchSetCountThreshold = 5;
-
-    @Parameter(names = "--output",
-            description = "If specified, the output will be either a list of all review comments in CSV format, "
-            + "or a per-person data set.",
-            arity = 1,
-            converter = OutputConverter.class)
-    private Output output = Output.PER_PERSON_DATA;
 
     @Parameter(names = {"-o", "--output-dir"},
             description = "The output will be generated into the given directory.")
@@ -89,7 +68,6 @@ public class CommandLineParser {
                     + "and replace all other identifiable data with similarly generated names. "
                     + "Lorem ipsumizes all review comments. The statistic numbers are kept intact. "
                     + "Useful for demonstration purposes outside an organization.")
-    @Nonnull
     private boolean anonymizeData;
 
     @Nonnull
@@ -144,16 +122,6 @@ public class CommandLineParser {
     @Nonnull
     public List<String> getIncludeBranches() {
         return includedBranches;
-    }
-
-    @Nonnull
-    public OutputType getOutputType() {
-        return outputType;
-    }
-
-    @Nonnull
-    public Output getOutput() {
-        return output;
     }
 
     @Nonnull

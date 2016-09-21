@@ -16,10 +16,6 @@ public class OutputRules {
         return commandLine.getCommitPatchSetCountThreshold();
     }
 
-    public OutputType getOutputType() {
-        return commandLine.getOutputType();
-    }
-
     public String getOutputDir() {
         return commandLine.getOutputDir();
     }

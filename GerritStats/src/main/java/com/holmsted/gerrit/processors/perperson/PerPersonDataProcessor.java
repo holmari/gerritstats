@@ -4,7 +4,6 @@ import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.CommitFilter;
 import com.holmsted.gerrit.OutputRules;
-import com.holmsted.gerrit.OutputType;
 import com.holmsted.gerrit.QueryData;
 import com.holmsted.gerrit.processors.CommitDataProcessor;
 import com.holmsted.gerrit.processors.CommitVisitor;
@@ -120,17 +119,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
     @Nonnull
     @Override
     protected OutputFormatter<PerPersonData> createOutputFormatter() {
-        OutputType outputType = getOutputRules().getOutputType();
-        switch (outputType) {
-            case CSV:
-                return new PerPersonCsvFormatter();
-            case PLAIN:
-                return new PerPersonPlaintextFormatter(getOutputRules());
-            case JSON:
-                return new PerPersonJsonFormatter(getOutputRules());
-            default:
-                throw new UnsupportedOperationException("Unsupported format " + outputType);
-        }
+        return new PerPersonJsonFormatter(getOutputRules());
     }
 
     @Nonnull
