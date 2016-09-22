@@ -29,7 +29,7 @@ export default class TableCellHighlighter {
         if (this.ignoreFunction && this.ignoreFunction(element, key)) {
             return true;
         }
-        if (!this.selectedUsers.isUserSelected(element.identity.get('identifier'))) {
+        if (!this.selectedUsers.isUserSelected(element.identity['identifier'])) {
             return true;
         }
         return false;

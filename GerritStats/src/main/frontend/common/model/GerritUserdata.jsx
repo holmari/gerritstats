@@ -8,7 +8,7 @@ export const PERCENTAGE_FORMAT = '0.0%';
 export const HIGH_PATCH_SET_COUNT_THRESHOLD = 5;
 
 export function getShortPrintableName(identity) {
-    var name = identity.get('name');
+    var name = identity['name'];
     if (name.length == 0) {
         name = 'Anonymous Coward';
     }
@@ -16,12 +16,12 @@ export function getShortPrintableName(identity) {
 }
 
 export function getPrintableName(identity) {
-    if (identity.get('name').length == 0 && identity.get('username').length > 0) {
-        return identity.get('username');
+    if (identity['name'].length == 0 && identity['username'].length > 0) {
+        return identity['username'];
     } else {
         var name = getShortPrintableName(identity);
-        if (identity.get('username').length > 0) {
-            name += ` (${identity.get('username')})`;
+        if (identity['username'].length > 0) {
+            name += ` (${identity['username']})`;
         }
         return name;
     }
@@ -42,14 +42,14 @@ export function getPatchSetCountForKind(commit, kind) {
 
 export function getProfilePageLinkForIdentity(identityOrIdentifier) {
     const identifier = (typeof identityOrIdentifier === 'string')
-        ? identityOrIdentifier : identityOrIdentifier.get('identifier');
+        ? identityOrIdentifier : identityOrIdentifier['identifier'];
     return `/profile/${identifier}`;
 }
 
 function filterReviewerData(reviewerData, selectedUsers) {
     var result = [];
     reviewerData.forEach(function(item) {
-        if (selectedUsers.isUserSelected(item.identity.get('identifier'))) {
+        if (selectedUsers.isUserSelected(item.identity['identifier'])) {
             result.push(item);
         }
     });
@@ -60,8 +60,8 @@ function filterReviewerData(reviewerData, selectedUsers) {
  * Compares two identities and returns 0, 1 or -1.
  */
 function identityCompare(l, r) {
-    var lValue = l.get('email');
-    var rValue = r.get('email');
+    var lValue = l['email'];
+    var rValue = r['email'];
     return lValue.localeCompare(rValue);
 }
 
@@ -74,7 +74,7 @@ function getFirstPatchSetIndexWithNonAuthorReview(commit) {
         var patchSet = commit.patchSets[i];
         for (var j = 0; j < patchSet.comments.length; ++j) {
             var comment = patchSet.comments[j];
-            if (commit.owner.get('email') != comment.reviewer.get('email')) {
+            if (commit.owner['email'] != comment.reviewer['email']) {
                 return i;
             }
         }
@@ -159,19 +159,19 @@ export default class GerritUserdata {
 
     getPrintableEmailAndIdentity() {
         const identity = this.record.identity;
-        const email = identity.get('email');
+        const email = identity['email'];
         var mailAndIdentity = email ? email : '';
         if (mailAndIdentity.length && this.hasUsername()) {
-            mailAndIdentity += ' (' + identity.get('username') + ')'
+            mailAndIdentity += ' (' + identity['username'] + ')'
         } else if (!mailAndIdentity.length) {
-            mailAndIdentity = identity.get('username');
+            mailAndIdentity = identity['username'];
         }
         return mailAndIdentity;
     }
 
     getPrintableUsername() {
         if (this.hasUsername()) {
-            return this.record.identity.get('username');
+            return this.record.identity['username'];
         } else {
             return '\u2013';
         }
@@ -187,7 +187,7 @@ export default class GerritUserdata {
     }
 
     getEmail() {
-        return this.record.identity.get('email');
+        return this.record.identity['email'];
     }
 
     getReceivedCommentRatio(selectedUsers) {
@@ -251,15 +251,15 @@ export default class GerritUserdata {
         var identities = new Set();
         var reviewerData = this.getReviewerDataForOwnCommits();
         reviewerData.forEach(function(item) {
-            identities.add(item.identity.get('identifier'));
+            identities.add(item.identity['identifier']);
         });
         reviewerData = this.getReviewRequestors(selectedUsers);
         reviewerData.forEach(function(item) {
-            identities.add(item.identity.get('identifier'));
+            identities.add(item.identity['identifier']);
         });
 
         // add the user themselves to the team, too
-        identities.add(this.record.identity.get('identifier'));
+        identities.add(this.record.identity['identifier']);
 
         return identities;
     }
@@ -323,11 +323,11 @@ export default class GerritUserdata {
             var commit = commitAndComments.commit;
             commit.patchSets.forEach(function(patchSet) {
                 // skip self-reviews
-                if (patchSet.author.get('email') == record.identity.get('email')) {
+                if (patchSet.author['email'] == record.identity['email']) {
                     return;
                 }
                 patchSet.comments.forEach(function(comment) {
-                    if (comment.reviewer.get('email') == record.identity.get('email')) {
+                    if (comment.reviewer['email'] == record.identity['email']) {
                         commentDates.push({
                             'date': moment(patchSet.createdOnDate).format('YYYY-MM-DD')
                         });
@@ -383,7 +383,7 @@ export default class GerritUserdata {
     getAddedAsReviewedToWithFilter(selectedUsers) {
         var filteredCommits = [];
         this.record.addedAsReviewerTo.forEach(function(commit) {
-            if (selectedUsers.isUserSelected(commit.owner.get('identifier'))) {
+            if (selectedUsers.isUserSelected(commit.owner['identifier'])) {
                 filteredCommits.push(commit);
             }
         });
@@ -393,14 +393,14 @@ export default class GerritUserdata {
     // TODO this can't be fast. Is there a better way to store how many comments
     // per user were written, against each repo?
     getUserReviewCountsPerRepository(selectedUsers) {
-        const userIdentifier = this.record.identity.get('identifier');
+        const userIdentifier = this.record.identity['identifier'];
         var filteredCommits = this.getAddedAsReviewedToWithFilter(selectedUsers);
 
         var results = {};
         filteredCommits.forEach(function(commit) {
             commit.patchSets.forEach(function(patchSet) {
                 patchSet.comments.forEach(function(comment) {
-                    if (comment.reviewer.get('identifier') != userIdentifier) {
+                    if (comment.reviewer['identifier'] != userIdentifier) {
                         return;
                     }
 
@@ -438,7 +438,7 @@ export default class GerritUserdata {
     }
 
     getIdentifier() {
-        return this.record.identity.get('identifier');
+        return this.record.identity['identifier'];
     }
 
     getDatedCommitTable() {
@@ -466,7 +466,7 @@ export default class GerritUserdata {
     }
 
     hasUsername() {
-        return this.record.identity.get('username') &&
-            this.record.identity.get('username').length;
+        return this.record.identity['username'] &&
+            this.record.identity['username'].length;
     }
 }

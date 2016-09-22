@@ -66,15 +66,15 @@ export default class ReviewCommentsPanel extends React.Component {
             const renderedComments = [];
             commit.patchSets.forEach(function(patchSet) {
                 // ignore self-reviews and replies
-                if (patchSet.author.get('email') == userdata.getEmail()
-                || !this.state.selectedUsers.isUserSelected(patchSet.author.get('identifier'))) {
+                if (patchSet.author['email'] == userdata.getEmail()
+                || !this.state.selectedUsers.isUserSelected(patchSet.author['identifier'])) {
                     return;
                 }
 
                 const comments = patchSet.comments;
                 var j = 0;
                 comments.forEach(function(comment) {
-                    if (comment.reviewer.get('email') != userdata.getEmail()) {
+                    if (comment.reviewer['email'] != userdata.getEmail()) {
                         return;
                     }
                     renderedComments.push(this.renderComment(commit, patchSet, comment, j));

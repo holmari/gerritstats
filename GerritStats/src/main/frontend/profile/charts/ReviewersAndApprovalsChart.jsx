@@ -120,10 +120,10 @@ export default class ReviewersAndApprovalsChart {
                 .attr('cx', function(d) { return graph.xScale(d.approvalData.addedAsReviewerCount); })
                 .attr('cy', function(d) { return graph.yScale(d.approvalData.approvalCount); })
                 .attr('r', function(d) { return 5 + (d.approvalData.addedAsReviewerCount / graph.maxValue) * 30; })
-                .attr('fill', function(d) { return graph.colors(d.identity.get('email')); })
+                .attr('fill', function(d) { return graph.colors(d.identity['email']); })
                 .attr('stroke', 'rgba(0,0,0, .05)')
                 .on('mouseover', function(d) {
-                    graph.updateSelection(d.identity.get('identifier'));
+                    graph.updateSelection(d.identity['identifier']);
                     graph.render();
                 })
                 .on('mouseout', function(d) {
@@ -131,15 +131,15 @@ export default class ReviewersAndApprovalsChart {
                     graph.render();
                 })
             .append('svg:title')
-                .text(function(d) { return d.identity.get('name'); });
+                .text(function(d) { return d.identity['name']; });
 
         points
             .classed('selected', function(d) {
-                return graph.selectedReviewer && d.identity.get('identifier') === graph.selectedReviewer;
+                return graph.selectedReviewer && d.identity['identifier'] === graph.selectedReviewer;
             })
             .attr('fill-opacity', function(d) {
                 if (graph.selectedReviewer) {
-                    return d.identity.get('identifier') === graph.selectedReviewer ? 1 : 0.3;
+                    return d.identity['identifier'] === graph.selectedReviewer ? 1 : 0.3;
                 } else {
                     return 0.3;
                 }

@@ -18,7 +18,7 @@ import SelectedUsers from '../common/model/SelectedUsers';
 
 function hasIdentifier(reviewerData, identifierToSearch) {
     for (let i = 0; i < reviewerData.length; ++i) {
-        if (reviewerData[i].identity.get('identifier') === identifierToSearch) {
+        if (reviewerData[i].identity['identifier'] === identifierToSearch) {
             return true;
         }
     }
@@ -62,7 +62,7 @@ export default class TeamGraphView extends React.Component {
         // append all users in 'team' who did not request reviews
         for (let i = 0; i < reviewerData.length; ++i) {
             var reviewerItem = reviewerData[i];
-            var identifier = reviewerItem.identity.get('identifier');
+            var identifier = reviewerItem.identity['identifier'];
             if (!hasIdentifier(this._reviewRequestorData, identifier)) {
                 this._nonRespondingUserData.push({
                     'approvalData': {
@@ -130,7 +130,7 @@ export default class TeamGraphView extends React.Component {
     }
 
     getIdentifierForRowIndex(table, index) {
-        return (index != -1 && index < table.length) ? table[index].identity.get('identifier') : null;
+        return (index != -1 && index < table.length) ? table[index].identity['identifier'] : null;
     }
 
     onHighlightedRowChangedForReviewRequestorTable(highlightedIndex) {
@@ -150,7 +150,7 @@ export default class TeamGraphView extends React.Component {
     }
 
     getRowIndexForIdentifier(table, identifierToSeek) {
-        return table.findIndex((item) => item.identity.get('identifier') == identifierToSeek);
+        return table.findIndex((item) => item.identity['identifier'] == identifierToSeek);
     }
 
     render() {

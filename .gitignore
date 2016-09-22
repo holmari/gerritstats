@@ -11,7 +11,7 @@ resList.js
 GerritStats/src/main/frontend/data
 
 # Default output dir
-out/
+out-html/
 GerritStats/out-html/
 
 # IntelliJ IDEA

@@ -72,7 +72,7 @@ export default class ReviewersAndApprovalsView extends React.Component {
     }
 
     onHighlightedRowIndexChanged(rowIndex) {
-        const identifier = rowIndex != -1 ? this._reviewerData[rowIndex].identity.get('identifier') : null;
+        const identifier = rowIndex != -1 ? this._reviewerData[rowIndex].identity['identifier'] : null;
         this.onSelectedIdentifierChanged(identifier);
     }
 
@@ -85,7 +85,7 @@ export default class ReviewersAndApprovalsView extends React.Component {
     getHighlightedRowIndex() {
         if (this.state.highlightedIdentifier) {
             return this._reviewerData.findIndex((item) =>
-                item.identity.get('identifier') == this.state.highlightedIdentifier);
+                item.identity['identifier'] == this.state.highlightedIdentifier);
         } else {
             return -1;
         }

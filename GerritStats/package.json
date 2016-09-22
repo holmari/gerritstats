@@ -26,11 +26,14 @@
     "cleanJava": "../gradlew clean",
     "buildJava": "../gradlew build",
     "testJava": "../gradlew test",
-    "//": "If called inpendently, invoke like this with args: npm run generateData -- -f project.json",
-    "generateData": "rm -rf src/main/frontend/data && java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o src/main/frontend/data",
+    "//": "Use generateData when developing the web UI, or copy the data dir into out-html.",
+    "//": "Also, for speeding up development, run webpack-watch.",
+    "//": "To use generateData, invoke like this with args: npm run generateData -- -f project.json",
+    "generateData": "rm -rf out-html/data && java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o out-html/data",
     "webpack": "webpack --display-error-details --colors --progress --config webpack.config.js",
     "webpack-watch": "webpack --display-error-details --colors --progress --watch",
-    "prewebpack": "mkdir -p out-html && cp src/main/frontend/index.html out-html/"
+    "prewebpack": "mkdir -p out-html && cp src/main/frontend/index.html out-html/",
+    "prewebpack-watch": "mkdir -p out-html && cp src/main/frontend/index.html out-html/"
   },
   "repository": {
     "type": "git",

@@ -9,12 +9,23 @@ import GlobalJavascriptLoader from './common/loader/GlobalJavascriptLoader';
 import PageFooter from './common/PageFooter';
 import SelectedUsers from './common/model/SelectedUsers';
 
-import ids from './data/ids';
 import OverviewPage from './overview/OverviewPage';
 import ProfilePage from './profile/ProfilePage';
 
+var jsLoader = new GlobalJavascriptLoader();
+
+function onDatasetOverviewLoaded() {
+    const storageKey = window.datasetOverview.hashCode;
+    currentSelection.selectedUsers = SelectedUsers.fromLocalStorage(storageKey, ids);
+    renderPage();
+}
+
+function onIdsLoaded() {
+    jsLoader.loadJavascriptFile('./data/datasetOverview.js', onDatasetOverviewLoaded);
+}
+
 // Ids are stored globally, since they're so frequently used and repeated.
-window.ids = ids;
+jsLoader.loadJavascriptFile('./data/ids.js', onIdsLoaded);
 
 // The dataset overview is also globally stored
 window.datasetOverview = {};
@@ -22,14 +33,6 @@ window.datasetOverview = {};
 var currentSelection = {
     selectedUsers: {}
 };
-
-var jsLoader = new GlobalJavascriptLoader();
-function onDatasetOverviewLoaded() {
-    const storageKey = window.datasetOverview.hashCode;
-    currentSelection.selectedUsers = SelectedUsers.fromLocalStorage(storageKey, ids);
-    renderPage();
-}
-jsLoader.loadJavascriptFile('./data/datasetOverview.js', onDatasetOverviewLoaded);
 
 function onCurrentSelectionChanged(newSelection) {
     currentSelection.selectedUsers = newSelection.selectedUsers;

@@ -39,7 +39,10 @@ export default class ProfilePage extends React.Component {
             userdata: {},
         };
 
-        this.updateOnIdentifierChange(this.props.params.identifier);
+        const identifier = this.props.params.identifier;
+        if (identifier && identifier.length) {
+            this.loadDataForIdentifier(identifier);
+        }
     }
 
     componentWillReceiveProps(nextProps) {

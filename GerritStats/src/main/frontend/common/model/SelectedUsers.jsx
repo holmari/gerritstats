@@ -12,9 +12,9 @@ export default class SelectedUsers {
     // Create a users set with all users selected.
     static _selectAllUsers(ids) {
         var users = Set();
-        ids.forEach(function(item) {
-            users = users.add(item.get('identifier'));
-        });
+        for (let key in ids) {
+            users = users.add(ids[key].identifier);
+        }
         return users;
     }
 
@@ -42,12 +42,12 @@ export default class SelectedUsers {
     isUserSelected(userDataOrIdentifier) {
         var identifier = typeof(userDataOrIdentifier) == 'string'
             ? userDataOrIdentifier
-            : userDataOrIdentifier.get('identifier');
+            : userDataOrIdentifier['identifier'];
         return this.users.has(identifier);
     }
 
     isAllUsersSelected() {
-        return this.users.size == this.ids.size;
+        return this.getSelectedUserCount() == this.getTotalUserCount();
     }
 
     toggleSelection(userIdentifier) {
@@ -84,6 +84,6 @@ export default class SelectedUsers {
     }
 
     getTotalUserCount() {
-        return this.ids.size;
+        return Object.keys(this.ids).length;
     }
 }

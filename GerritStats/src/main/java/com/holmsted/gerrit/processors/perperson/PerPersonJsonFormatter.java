@@ -72,7 +72,7 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
                 .registerTypeAdapter(Identity.class, new IdentitySerializer())
                 .create();
 
-        new ImmutableJsonFileBuilder(outputDir)
+        new JsonFileBuilder(outputDir)
                 .setOutputFilename("ids.js")
                 .setMemberName("ids")
                 .setSerializedJs(gson.toJson(identities))
@@ -306,7 +306,7 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
          * with actual array references.
          */
         public static String postprocess(String serializedJson) {
-            return serializedJson.replaceAll("\"__\\$\\$ids\\[(.+)\\]\"", "ids.get(\"$1\")");
+            return serializedJson.replaceAll("\"__\\$\\$ids\\[(.+)\\]\"", "ids[\"$1\"]");
         }
     }
 
@@ -345,29 +345,6 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
             writer.write(String.format("var %s = %s;",
                     memberVariableName,
                     serializedJs));
-
-            FileWriter.writeFile(outputDir.getPath()
-                    + File.separator + DATA_PATH
-                    + File.separator + outputFilename, writer.toString());
-        }
-    }
-
-    private static class ImmutableJsonFileBuilder extends JsonFileBuilder {
-
-        public ImmutableJsonFileBuilder(@Nonnull File outputDir) {
-            super(outputDir);
-        }
-
-        @Override
-        public void build() {
-            StringWriter writer = new StringWriter();
-
-            writer.write(String.format("import {fromJS} from 'immutable';\n" +
-                            "var %s = fromJS(%s);\n" +
-                            "export default %s;",
-                    memberVariableName,
-                    serializedJs,
-                    memberVariableName));
 
             FileWriter.writeFile(outputDir.getPath()
                     + File.separator + DATA_PATH

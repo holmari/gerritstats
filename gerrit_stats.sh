@@ -23,12 +23,12 @@ for arg in "$@"; do
 done
 
 cd "$script_path/GerritStats" || exit 1
-rm -rf src/main/frontend/data && \
-	java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o src/main/frontend/data "${new_args[@]}" || exit 1
+rm -rf out-html/data && \
+	java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o out-html/data "${new_args[@]}" || exit 1
 
 npm run webpack && \
 	mkdir -p "$output_dir/data" && \
-    cp -r "$script_path/GerritStats/src/main/frontend/data" "$output_dir/" && \
+    cp -r "$script_path/GerritStats/out-html/data" "$output_dir/" && \
     cp -r "$script_path/GerritStats/out-html/"* "$output_dir/"
 
 echo "Output generated to '$output_dir'."
