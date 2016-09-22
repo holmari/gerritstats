@@ -24,6 +24,7 @@ http://gerritstats-demo.firebaseapp.com
 ## How to build
 
 The tool should work fine on OS X and Linux. Windows is not supported; if it works, it's not intended.
+Java 8 is required.
 
 ```
 # Prerequisite: if using OS X, install brew from http://brew.sh
