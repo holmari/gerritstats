@@ -206,7 +206,7 @@ export default class GerritUserdata {
         return this.record.reviewRequestors.reduce(function(prev, value) {
             const isSelected = selectedUsers.isUserSelected(value.identity);
             return prev + (isSelected ? value.approvalData.approvals[scoreKey] || 0 : 0);
-        }, 0);
+        }.bind(this), 0);
     }
 
     getReviewsReceivedForScore(score, selectedUsers) {
@@ -214,7 +214,7 @@ export default class GerritUserdata {
         return this.record.reviewersForOwnCommits.reduce(function(prev, value) {
             const isSelected = selectedUsers.isUserSelected(value.identity);
             return prev + (isSelected ? value.approvalData.approvals[scoreKey] || 0 : 0);
-        }, 0);
+        }.bind(this), 0);
     }
 
     getCommentsWrittenCount(selectedUsers) {
