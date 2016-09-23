@@ -31,4 +31,4 @@ npm run webpack && \
     cp -r "$script_path/GerritStats/out-html/data" "$output_dir/" && \
     cp -r "$script_path/GerritStats/out-html/"* "$output_dir/"
 
-echo "Output generated to '$output_dir'."
+echo "Output generated to $output_dir"

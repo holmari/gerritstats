@@ -24,6 +24,7 @@ http://gerritstats-demo.firebaseapp.com
 ## How to build
 
 The tool should work fine on OS X and Linux. Windows is not supported; if it works, it's not intended.
+
 Java 8 is required.
 
 ```
@@ -38,7 +39,6 @@ brew install npm # or, if not using OS X, install npm some other way
 
 ```
 ./gerrit_downloader.sh
-
 ```
 
 Lists all command line options for the data download tool.
@@ -81,15 +81,39 @@ developers.
 ./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
+
+## Screenshots
+
+A fully functional demo can be found at http://gerritstats-demo.firebaseapp.com but there are some screenshots below that illustrate what this tool provides.
+
 The index page will provide you with a sortable overview table of some of the core statistics:
 
 ![Overview table of all developers](doc/overview_table.png)
 
-The index page also contais a graph that illustrates how developers are connected to each other:
+In the overview page, you can also uncheck some users, like bots, so that they're excluded from the analysis.
 
-![Proximity graph for the given branch and given set of identities](doc/proximity_graph.png)
+The index page also contains a graph that illustrates how developers are connected to each other:
 
-And on the per-person page, you'll see a chart of review comments per day, a configurable
-list of commits that have a high number of patch sets, and many graphs:
+![Proximity graph for the given branch and given set of identities](doc/overview_team_graph.png)
 
-![Review comment statistic written by a developer](doc/review_comments.png)
+The Profile page contains detailed information about the selected user. Apart from some basic numbers also visible on the overview, there's several charts and graphs, illustrating how reviews are done by and for this person.
+
+There's a chart and a table showing who this user adds as a reviewer, and how often they approve the changes:
+
+![A chart and table showing who this user adds as a reviewer, and how often they approve the changes](doc/profile_reviewers_and_approvals.png)
+
+A team graph, centered around this user, shows with whom the reviews are done with, and how strong the relations between others in the team are:
+
+![Proximity graph around this user that displays only the users this person does reviews with](doc/profile_team_graph.png)
+
+![A per-day chart of the number of reviews done by this user.](doc/profile_review_comments_per_day.png)
+
+There's a chart showing cumulative statistics of commits, and how many comments were written or received over time:
+
+![Cumulative statistics chart of commits, and comments written/received](doc/profile_cumulative_stats.png)
+
+There's also a chart that shows commits in which the user iterated, got reviews, and iterated some more - a highly time-consuming activity for all parties:
+
+![A timeline illustrating highly iterative commits where reviewers were involved](doc/profile_iteration.png)
+
+Apart from these, there's many other bits of data being shown, so take a look at the demo app linked above!
