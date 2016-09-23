@@ -58,6 +58,7 @@ public class GerritStatsMain {
                 minVersion);
 
         if (outputRules.getAnonymizeData()) {
+            System.out.println("Anonymizing data...");
             queryData = queryData.anonymize();
         }
 
