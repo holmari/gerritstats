@@ -257,7 +257,7 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
                     IdentityRecord record = (IdentityRecord) value;
                     JsonObject object = (JsonObject) tree;
                     object.add("abandonedCommitCount", new JsonPrimitive(record.getAbandonedCommitCount()));
-                    object.add("repositories", gson.toJsonTree(record.getRepositories()));
+                    object.add("projects", gson.toJsonTree(record.getGerritProjects()));
                     object.add("selfReviewedCommitCount", gson.toJsonTree(record.getSelfReviewedCommits().size()));
                     object.add("inReviewCommitCount", new JsonPrimitive(record.getInReviewCommitCount()));
 

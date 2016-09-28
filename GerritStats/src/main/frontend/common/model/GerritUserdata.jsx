@@ -96,6 +96,20 @@ function sortReviewDataByAddedAsReviewerCount(reviewTableData) {
     return reviewerData;
 }
 
+/**
+ * Returns the number of comments written by the user, given the passed project and
+ * the set of selected users.
+ */
+function getUserCommentCountsInProject(project, selectedUsers) {
+    return project.reviewRequestors.reduce(function(prevValue, reviewerData) {
+        if (selectedUsers.isUserSelected(reviewerData.identity)) {
+            return prevValue + reviewerData.approvalData.commentCount;
+        } else {
+            return prevValue;
+        }
+    }, 0);
+}
+
 export default class GerritUserdata {
 
     constructor(userdataRecord) {
@@ -390,49 +404,14 @@ export default class GerritUserdata {
         return filteredCommits;
     }
 
-    // TODO this can't be fast. Is there a better way to store how many comments
-    // per user were written, against each repo?
-    getUserReviewCountsPerRepository(selectedUsers) {
-        const userIdentifier = this.record.identity['identifier'];
-        var filteredCommits = this.getAddedAsReviewedToWithFilter(selectedUsers);
-
-        var results = {};
-        filteredCommits.forEach(function(commit) {
-            commit.patchSets.forEach(function(patchSet) {
-                patchSet.comments.forEach(function(comment) {
-                    if (comment.reviewer['identifier'] != userIdentifier) {
-                        return;
-                    }
-
-                    var result = results[commit.project];
-                    if (!result) {
-                        result = {
-                            'commentsWrittenByUser': 0
-                        };
-                    }
-
-                    result['commentsWrittenByUser'] += 1;
-                    results[commit.project] = result;
-                });
-            });
-        });
-        return results;
-    }
-
     getPerProjectData(selectedUsers) {
-        const reviewCountsPerRepo = this.getUserReviewCountsPerRepository(selectedUsers);
-        const getCommentsWrittenCount = function(project) {
-            const statsObject = reviewCountsPerRepo[project.name];
-            return statsObject ? statsObject.commentsWrittenByUser : 0;
-        };
-
-        const projects = this.record.repositories;
+        const projects = this.record.projects;
         return projects.map(function(project) {
             return {
                 url: project.url,
                 name: project.name,
                 commitCount: project.commitCountForUser,
-                commentsWritten: getCommentsWrittenCount(project),
+                commentsWritten: getUserCommentCountsInProject(project, selectedUsers),
             }
         });
     }

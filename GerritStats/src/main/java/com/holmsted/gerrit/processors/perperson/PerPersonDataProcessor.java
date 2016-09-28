@@ -99,12 +99,12 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
                                              @Nonnull Commit.PatchSetComment patchSetComment) {
                 IdentityRecord reviewerRecord = getOrCreateRecord(patchSetComment.reviewer);
                 if (!patchSet.author.equals(patchSetComment.reviewer)) {
-                    reviewerRecord.addWrittenComment(commit, patchSetComment);
+                    reviewerRecord.addWrittenComment(commit, patchSet, patchSetComment);
                 }
 
                 IdentityRecord authorRecord = getOrCreateRecord(patchSet.author);
                 if (!patchSet.author.equals(patchSetComment.reviewer)) {
-                    authorRecord.addReceivedComment(commit, patchSetComment);
+                    authorRecord.addReceivedComment(commit, patchSet, patchSetComment);
                 }
             }
         };

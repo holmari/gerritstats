@@ -52,7 +52,7 @@ export default class ProjectsContributedToPanel extends React.Component {
             <Table className='table table-striped' sortable={this.makeTableSortRules()}>
                 <Thead>
                     <Th column='name' title='Project'>Project</Th>
-                    <Th column='commits' title='# of commits'>Name</Th>
+                    <Th column='commits' title='# of commits'>Commits</Th>
                     <Th column='commentsWritten' title='# of comments written'># of comments<br/>written</Th>
                 </Thead>
                 {this.renderData(perProjectData)}

@@ -31,13 +31,14 @@ public class IdentityRecord {
         final Map<Integer, Integer> approvals = new HashMap<>();
     }
 
-    public static class Repository {
+    public static class GerritProject {
         final String name;
         final String url;
+        final ReviewerDataTable reviewRequestors = new ReviewerDataTable();
 
         int commitCountForUser;
 
-        private Repository(String project, String url) {
+        private GerritProject(String project, String url) {
             this.name = project;
             this.url = url;
         }
@@ -49,20 +50,30 @@ public class IdentityRecord {
 
         @Override
         public boolean equals(Object other) {
-            if (other instanceof Repository) {
-                Repository otherRepo = (Repository) other;
+            if (other instanceof GerritProject) {
+                GerritProject otherRepo = (GerritProject) other;
                 return name.equals(otherRepo.name);
             } else {
                 return false;
             }
         }
 
-        public static Repository fromCommit(Commit commit) {
+        public static GerritProject fromCommit(Commit commit) {
             String url = String.format("%s/#/q/project:%s",
                     commit.url.substring(0, commit.url.lastIndexOf('/')),
                     commit.project);
-            return new Repository(commit.project, url);
+            return new GerritProject(commit.project, url);
         }
+
+      public void addWrittenComment(@Nonnull Commit commit,
+                                    @Nonnull PatchSet patchSet,
+                                    @Nonnull Commit.PatchSetComment patchSetComment) {
+        if (patchSet.author == null) {
+          return;
+        }
+        ReviewerData data = reviewRequestors.computeIfAbsent(patchSet.author, k -> new ReviewerData());
+        data.commentCount++;
+      }
     }
 
     final Commit.Identity identity;
@@ -87,6 +98,8 @@ public class IdentityRecord {
     final PatchSetCommentTable commentsWritten = new PatchSetCommentTable();
     final PatchSetCommentTable commentsReceived = new PatchSetCommentTable();
     final ReviewerDataTable reviewersForOwnCommits = new ReviewerDataTable();
+
+    final Map<String, GerritProject> repositories = new HashMap<>();
 
     private long averageTimeInCodeReview;
 
@@ -162,18 +175,7 @@ public class IdentityRecord {
         return reviewCountPlus2;
     }
 
-    public List<Repository> getRepositories() {
-        Map<String, Repository> repositories = new HashMap<>();
-
-        for (Commit commit : commits) {
-            Repository repository = repositories.get(commit.project);
-            if (repository == null) {
-                repository = Repository.fromCommit(commit);
-                repositories.put(commit.project, repository);
-            }
-            repository.commitCountForUser++;
-        }
-
+    public List<GerritProject> getGerritProjects() {
         return new ArrayList<>(repositories.values());
     }
 
@@ -392,16 +394,24 @@ public class IdentityRecord {
         reviewsDoneForIdentity.addedAsReviewerCount++;
     }
 
-    public void addWrittenComment(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {
+    public void addWrittenComment(@Nonnull Commit commit,
+                                  @Nonnull  PatchSet patchSet,
+                                  @Nonnull Commit.PatchSetComment patchSetComment) {
         ReviewerData reviewsDoneForIdentity = reviewRequestors.computeIfAbsent(commit.owner,
                 k -> new ReviewerData());
         reviewsDoneForIdentity.commentCount++;
+
+        GerritProject project = repositories.computeIfAbsent(commit.project,
+            projectName -> GerritProject.fromCommit(commit));
+        project.addWrittenComment(commit, patchSet, patchSetComment);
 
         commentsWritten.addCommentForCommit(commit, patchSetComment);
         updateActivityTimestamps(commit.getPatchSetForComment(patchSetComment).createdOnDate);
     }
 
-    public void addReceivedComment(@Nonnull Commit commit, Commit.PatchSetComment patchSetComment) {
+    public void addReceivedComment(@Nonnull Commit commit,
+                                   @Nonnull PatchSet patchSet,
+                                   Commit.PatchSetComment patchSetComment) {
         Identity reviewer = checkNotNull(patchSetComment.getReviewer());
         ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(reviewer);
         reviewerData.commentCount++;
@@ -410,6 +420,9 @@ public class IdentityRecord {
     }
 
     public void addCommit(@Nonnull Commit commit) {
+        GerritProject project = repositories.computeIfAbsent(commit.project,
+            projectName -> GerritProject.fromCommit(commit));
+        project.commitCountForUser++;
         commits.add(commit);
         updateActivityTimestamps(commit.lastUpdatedDate);
         updateActivityTimestamps(commit.createdOnDate);
