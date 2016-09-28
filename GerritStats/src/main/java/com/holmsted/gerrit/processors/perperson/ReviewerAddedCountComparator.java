@@ -10,6 +10,7 @@ import java.util.Hashtable;
  */
 class ReviewerAddedCountComparator implements Comparator<Commit.Identity> {
     private Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
+
     public ReviewerAddedCountComparator(Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity) {
         this.reviewsForIdentity = reviewsForIdentity;
     }

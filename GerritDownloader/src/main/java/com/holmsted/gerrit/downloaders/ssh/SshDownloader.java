@@ -85,7 +85,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
     }
 
-    static abstract class DataReader {
+    abstract static class DataReader {
         private int overallCommitLimit;
         private String projectNameList;
 
@@ -130,7 +130,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
     /**
      * Data reader with Gerrit pre-2.9 support. The following problems are being worked around:
-     *
+     * <p>
      * 1) if no status query is passed, only open commits are listed. So this reader manually
      *    queries for open, merged and abandoned commits.
      * 2) the resume/limit behavior is not implemented in pre-2.9, so resume_sortKey is used instead.
@@ -161,7 +161,8 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             List<JSONObject> items = new ArrayList<>();
 
             boolean hasMoreChanges = true;
-            while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
+            while (hasMoreChanges
+                    && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
                 GerritOutput gerritOutput = readOutputWithStatusQuery(statusQuery);
                 items.addAll(gerritOutput.getOutput());
 
@@ -184,9 +185,9 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
                     + "--all-approvals "
                     + "--comments "
                     + "%s ",
-                projectNameList,
-                statusQuery,
-                resumeSortkeyArg
+                    projectNameList,
+                    statusQuery,
+                    resumeSortkeyArg
             ));
 
             return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
@@ -226,7 +227,8 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             boolean hasMoreChanges = true;
             int rowCount = 0;
 
-            while (hasMoreChanges && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
+            while (hasMoreChanges
+                    && (rowCount < getOverallCommitLimit() || getOverallCommitLimit() == NO_COMMIT_LIMIT)) {
                 GerritOutput gerritOutput = readData();
                 items.addAll(gerritOutput.getOutput());
 
@@ -254,7 +256,8 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     @Nonnull
     public List<JSONObject> readData() {
         if (getOverallCommitLimit() != NO_COMMIT_LIMIT) {
-            System.out.println("Reading data from " + getGerritServer() + " for last " + getOverallCommitLimit() + " commits");
+            System.out.println(String.format("Reading data from %s for last %d commits",
+                    getGerritServer(), getOverallCommitLimit()));
         } else {
             System.out.println("Reading all commit data from " + getGerritServer());
         }

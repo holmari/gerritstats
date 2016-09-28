@@ -65,15 +65,15 @@ public class IdentityRecord {
             return new GerritProject(commit.project, url);
         }
 
-      public void addWrittenComment(@Nonnull Commit commit,
-                                    @Nonnull PatchSet patchSet,
-                                    @Nonnull Commit.PatchSetComment patchSetComment) {
-        if (patchSet.author == null) {
-          return;
+        public void addWrittenComment(@Nonnull Commit commit,
+                                      @Nonnull PatchSet patchSet,
+                                      @Nonnull Commit.PatchSetComment patchSetComment) {
+            if (patchSet.author == null) {
+                return;
+            }
+            ReviewerData data = reviewRequestors.computeIfAbsent(patchSet.author, k -> new ReviewerData());
+            data.commentCount++;
         }
-        ReviewerData data = reviewRequestors.computeIfAbsent(patchSet.author, k -> new ReviewerData());
-        data.commentCount++;
-      }
     }
 
     final Commit.Identity identity;
@@ -402,7 +402,7 @@ public class IdentityRecord {
         reviewsDoneForIdentity.commentCount++;
 
         GerritProject project = repositories.computeIfAbsent(commit.project,
-            projectName -> GerritProject.fromCommit(commit));
+                projectName -> GerritProject.fromCommit(commit));
         project.addWrittenComment(commit, patchSet, patchSetComment);
 
         commentsWritten.addCommentForCommit(commit, patchSetComment);
@@ -421,7 +421,7 @@ public class IdentityRecord {
 
     public void addCommit(@Nonnull Commit commit) {
         GerritProject project = repositories.computeIfAbsent(commit.project,
-            projectName -> GerritProject.fromCommit(commit));
+                projectName -> GerritProject.fromCommit(commit));
         project.commitCountForUser++;
         commits.add(commit);
         updateActivityTimestamps(commit.lastUpdatedDate);

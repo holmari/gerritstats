@@ -220,6 +220,7 @@ public class Commit {
             this.patchSetTimestamp = patchSetTimestamp;
         }
 
+        @Nonnull
         public static PatchSetComment fromJson(JSONObject commentJson, long createdOnDate) {
             return new PatchSetComment(
                     commentJson.optString("file"),
@@ -228,6 +229,17 @@ public class Commit {
                     commentJson.optString("message"),
                     createdOnDate
             );
+        }
+
+        @Nonnull
+        public static List<PatchSetComment> fromJson(@Nullable JSONArray comments, long createdOnDate) {
+            List<PatchSetComment> result = new ArrayList<>();
+            if (comments != null) {
+                for (int i = 0; i < comments.length(); ++i) {
+                    result.add(PatchSetComment.fromJson(comments.getJSONObject(i), createdOnDate));
+                }
+            }
+            return result;
         }
 
         @Nullable
@@ -247,17 +259,6 @@ public class Commit {
         @Nullable
         public String getMessage() {
             return message;
-        }
-
-        @Nonnull
-        public static List<PatchSetComment> fromJson(@Nullable JSONArray comments, long createdOnDate) {
-            List<PatchSetComment> result = new ArrayList<>();
-            if (comments != null) {
-                for (int i = 0; i < comments.length(); ++i) {
-                    result.add(PatchSetComment.fromJson(comments.getJSONObject(i), createdOnDate));
-                }
-            }
-            return result;
         }
     }
 

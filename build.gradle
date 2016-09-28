@@ -1,9 +1,16 @@
-subprojects {
+allprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
+    apply plugin: 'checkstyle'
+
     group = 'com.holmsted.gerrit'
 
     repositories {
         mavenCentral()
+    }
+
+    checkstyle {
+        toolVersion = '7.1.1'
+        configFile = file("${rootDir}/config/checkstyle.xml")
     }
 }

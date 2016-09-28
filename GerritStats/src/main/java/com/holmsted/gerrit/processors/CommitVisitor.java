@@ -56,8 +56,11 @@ public abstract class CommitVisitor {
     }
 
     public abstract void visitCommit(@Nonnull Commit commit);
+
     public abstract void visitPatchSet(@Nonnull Commit commit, @Nonnull Commit.PatchSet patchSet);
+
     public abstract void visitApproval(@Nonnull Commit.PatchSet patchSet, @Nonnull Commit.Approval approval);
+
     public abstract void visitPatchSetComment(@Nonnull Commit commit,
                                               @Nonnull Commit.PatchSet patchSet,
                                               @Nonnull Commit.PatchSetComment patchSetComment);

@@ -11,7 +11,7 @@ import javax.annotation.Nonnull;
 
 public class IdentityGenerator {
 
-    private final static String[] DOMAIN_SUFFIXES = {
+    private static final String[] DOMAIN_SUFFIXES = {
             "com",
             "org",
             "net",

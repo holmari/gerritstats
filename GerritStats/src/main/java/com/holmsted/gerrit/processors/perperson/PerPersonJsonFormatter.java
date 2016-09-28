@@ -132,9 +132,9 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
         for (IdentityRecord record : orderedList) {
             // add any potentially missing ids to the table
             record.getMyReviewerList().stream().forEach(identity ->
-                identities.put(identity.getIdentifier(), identity));
+                    identities.put(identity.getIdentifier(), identity));
             record.getReviewRequestorList().stream().forEach(identity ->
-                identities.put(identity.getIdentifier(), identity));
+                    identities.put(identity.getIdentifier(), identity));
 
             String json = gson.toJson(record);
             json = IdentityMappingSerializer.postprocess(json);

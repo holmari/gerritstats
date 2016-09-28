@@ -24,8 +24,6 @@ public class GerritStatsMain {
             return;
         }
 
-        OutputRules outputRules = new OutputRules(commandLine);
-
         CommitFilter filter = new CommitFilter();
         filter.setIncludeEmptyEmails(false);
         filter.setIncludedEmails(commandLine.getIncludedEmails());
@@ -57,6 +55,7 @@ public class GerritStatsMain {
                 commits,
                 minVersion);
 
+        OutputRules outputRules = new OutputRules(commandLine);
         if (outputRules.getAnonymizeData()) {
             System.out.println("Anonymizing data...");
             queryData = queryData.anonymize();

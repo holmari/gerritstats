@@ -44,7 +44,7 @@ public class GerritStatParser {
             } else {
                 data = parseJsonObject(object);
             }
-        } catch(JSONException e) {
+        } catch (JSONException e) {
             // the earlier versions of GerritDownloader output were not valid json, but
             // instead files with line-by-line json.
             data = parseLegacyFormatData(jsonFileData);
