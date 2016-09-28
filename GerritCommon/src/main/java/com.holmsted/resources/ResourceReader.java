@@ -9,13 +9,13 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class ResourceReader {
+public final class ResourceReader {
 
     public static List<String> readResourceFile(@Nonnull String resourceFilename) {
-        ClassLoader classLoader = ResourceReader.class.getClassLoader();
+        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         InputStream resourceStream = classLoader.getResourceAsStream(resourceFilename);
         if (resourceStream == null) {
-            throw new NullPointerException("No such resource: " + resourceFilename);
+            throw new IllegalArgumentException("No such resource: " + resourceFilename);
         }
         BufferedReader reader = new BufferedReader(new InputStreamReader(resourceStream));
         List<String> lines = new ArrayList<>();
@@ -29,5 +29,8 @@ public class ResourceReader {
             e.printStackTrace();
         }
         return lines;
+    }
+
+    private ResourceReader() {
     }
 }

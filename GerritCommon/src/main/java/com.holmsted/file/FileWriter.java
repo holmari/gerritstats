@@ -10,7 +10,7 @@ import java.io.Writer;
 
 import javax.annotation.Nonnull;
 
-public class FileWriter {
+public final class FileWriter {
 
     public static void writeFile(@Nonnull String filename, @Nonnull String contents) {
         File dataFile = new File(filename);
@@ -51,5 +51,8 @@ public class FileWriter {
             throw new IllegalArgumentException(
                     "Path did not exist and could not be created: '" + path.getAbsolutePath() + "'");
         }
+    }
+
+    private FileWriter() {
     }
 }

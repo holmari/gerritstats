@@ -3,7 +3,7 @@ package com.holmsted.gerrit;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class GerritVersion {
+public final class GerritVersion {
     public final int major;
     public final int minor;
     public final int patch;

@@ -47,7 +47,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
     static class GerritOutput {
         private final List<JSONObject> output = new ArrayList<>();
-        private QueryMetadata metadata;
+        private final QueryMetadata metadata;
 
         @Nonnull
         private final GerritVersion gerritVersion;
@@ -241,7 +241,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         private String createStartOffsetArg() {
-            return startOffset != 0 ? "--start " + String.valueOf(startOffset) + " " : "";
+            return startOffset != 0 ? "--start " + startOffset + " " : "";
         }
     }
 
@@ -284,11 +284,9 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
     @Nonnull
     private String createProjectNameList() {
-        StringBuilder builder = new StringBuilder("project:^");
         if (getProjectName().isEmpty()) {
             throw new IllegalStateException("No project name defined!");
         }
-        builder.append(getProjectName());
-        return builder.toString();
+        return String.format("project:^%s", getProjectName());
     }
 }

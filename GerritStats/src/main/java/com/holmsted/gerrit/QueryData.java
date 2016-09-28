@@ -19,8 +19,6 @@ public class QueryData {
     @Nonnull
     private final List<String> filenames;
     @Nonnull
-    private final List<String> includeBranches;
-    @Nonnull
     private final GerritVersion minVersion;
 
     @Nonnull
@@ -29,12 +27,10 @@ public class QueryData {
     private String datasetKey;
 
     QueryData(@Nonnull List<String> filenames,
-              @Nonnull List<String> includeBranches,
               @Nonnull List<Commit> commits,
               @Nonnull GerritVersion minVersion) {
 
         this.filenames = ImmutableList.copyOf(filenames);
-        this.includeBranches = ImmutableList.copyOf(includeBranches);
         this.commits = ImmutableList.copyOf(commits);
         this.minVersion = minVersion;
         this.branches = this.commits.stream().map(commit -> commit.branch)
@@ -82,7 +78,7 @@ public class QueryData {
     public QueryData anonymize() {
         CommitAnonymizer anonymizer = new CommitAnonymizer();
         List<Commit> anonymizedCommits = anonymizer.process(commits);
-        return new QueryData(ImmutableList.of(), ImmutableList.of(), anonymizedCommits, minVersion);
+        return new QueryData(ImmutableList.of(), anonymizedCommits, minVersion);
     }
 
     public GerritVersion getMinGerritVersion() {

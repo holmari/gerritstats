@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class JsonUtils {
+public final class JsonUtils {
 
     @Nonnull
     public static JSONObject readJsonString(String jsonString) {
@@ -23,5 +23,8 @@ public class JsonUtils {
             list.add(array.getString(i));
         }
         return list;
+    }
+
+    private JsonUtils() {
     }
 }

@@ -11,7 +11,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 public class FakeFilenameGenerator {
 
-    private static String[] DOMAIN_NAME_PARTS = {
+    private static final String[] DOMAIN_NAME_PARTS = {
             "models",
             "widget",
             "output",
@@ -28,7 +28,7 @@ public class FakeFilenameGenerator {
             "resources"
     };
 
-    private static String[] PROJECT_BEGIN_PARTS = {
+    private static final String[] PROJECT_BEGIN_PARTS = {
             "moustache",
             "stackoverflow",
             "copypaste",
@@ -55,7 +55,7 @@ public class FakeFilenameGenerator {
             "sid_meiers",
     };
 
-    private static String[] PROJECT_END_PARTS = {
+    private static final String[] PROJECT_END_PARTS = {
             "3d_modeler",
             "copypaster",
             "incubator",
@@ -87,7 +87,7 @@ public class FakeFilenameGenerator {
             "fascinator"
     };
 
-    private static String[] FILENAME_BEGIN_PARTS = {
+    private static final String[] FILENAME_BEGIN_PARTS = {
             "Factory",
             "Generator",
             "Data",
@@ -117,7 +117,7 @@ public class FakeFilenameGenerator {
             "Network"
     };
 
-    private static String[] FILENAME_END_PARTS = {
+    private static final String[] FILENAME_END_PARTS = {
             "Handler",
             "Helper",
             "Utils",
@@ -150,28 +150,28 @@ public class FakeFilenameGenerator {
             "Predicate"
     };
 
-    private Set<String> usedProjectNames = new HashSet<>();
+    private final Set<String> usedProjectNames = new HashSet<>();
 
     private String generateFileBasename() {
         StringBuilder builder = new StringBuilder();
-        builder.append(RandomLists.randomItemFrom(FILENAME_BEGIN_PARTS));
-        builder.append(RandomLists.randomItemFrom(FILENAME_END_PARTS));
-        builder.append(".java");
+        builder.append(RandomLists.randomItemFrom(FILENAME_BEGIN_PARTS))
+                .append(RandomLists.randomItemFrom(FILENAME_END_PARTS))
+                .append(".java");
 
         return builder.toString();
     }
 
     public String generateFilenameFromProjectName(@Nullable String projectName) {
-        StringBuilder builder = new StringBuilder();
-        projectName = projectName != null
+        StringBuilder builder = new StringBuilder(20);
+        String randomProjectName = projectName != null
                 ? projectName
                 : RandomLists.randomItemFrom(PROJECT_BEGIN_PARTS)
                 + '/' + RandomLists.randomItemFrom(PROJECT_END_PARTS);
 
-        builder.append("src/main/java/com/");
-        builder.append(projectName).append('/');
-        builder.append(RandomLists.randomItemFrom(DOMAIN_NAME_PARTS)).append('/');
-        builder.append(generateFileBasename());
+        builder.append("src/main/java/com/")
+                .append(randomProjectName).append('/')
+                .append(RandomLists.randomItemFrom(DOMAIN_NAME_PARTS)).append('/')
+                .append(generateFileBasename());
 
         return builder.toString();
     }
@@ -190,7 +190,7 @@ public class FakeFilenameGenerator {
 
         // this is very unlikely; you need to have a lot of projects for the
         // above loop to fail max out; but, it is possible.
-        candidate = candidate + "_" + String.valueOf(System.currentTimeMillis());
+        candidate = String.format("%s_%d", candidate, System.currentTimeMillis());
         return "acme/" + candidate;
     }
 }

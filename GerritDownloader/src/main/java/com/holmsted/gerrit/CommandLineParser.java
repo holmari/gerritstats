@@ -23,6 +23,40 @@ public class CommandLineParser {
 
     private static final String DEFAULT_OUTPUT_DIR = "out";
 
+    @Parameter(names = {"-s", "--server"},
+            description = "Read output from Gerrit server URL and given port, in format server:port. "
+                    + "If port is omitted, defaults to 29418.",
+            arity = 1,
+            required = true,
+            converter = ServerAndPort.Converter.class)
+    private ServerAndPort serverAndPort;
+
+    @Parameter(names = {"-i", "--private-key"},
+            description = "The SSH private key to access the server. Defaults to ~/.ssh/id_rsa.",
+            required = false)
+    private String privateKey;
+
+    @Parameter(names = {"-p", "--project"},
+            description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
+                    + "If omitted, stats will be retrieved from all projects.")
+    private final List<String> projectNames = new ArrayList<>();
+
+    @Parameter(names = {"-o", "--output-dir"},
+            description = "The directory into which the json output will be written into. "
+                    + "If multiple projects are specified, each is downloaded into its own file.",
+            required = true)
+    private String outputDir;
+
+    @Parameter(names = {"-l", "--limit"},
+            description = "The number of commits which to retrieve from the server. "
+            + "If omitted, stats will be retrieved until no further records are available. "
+            + "This value is an approximation; the actual number of downloaded commit data "
+            + "will be a multiple of the limit set on the Gerrit server.")
+    private int limit = SshDownloader.NO_COMMIT_LIMIT; // NOPMD
+
+    @Nonnull
+    private final JCommander jCommander = new JCommander(this);
+
     public static class ServerAndPort {
         private String serverName;
         private int serverPort;
@@ -55,40 +89,6 @@ public class CommandLineParser {
         }
     }
 
-    @Parameter(names = {"-s", "--server"},
-            description = "Read output from Gerrit server URL and given port, in format server:port. "
-                    + "If port is omitted, defaults to 29418.",
-            arity = 1,
-            required = true,
-            converter = ServerAndPort.Converter.class)
-    private ServerAndPort serverAndPort;
-
-    @Parameter(names = {"-i", "--private-key"},
-            description = "The SSH private key to access the server. Defaults to ~/.ssh/id_rsa.",
-            required = false)
-    private String privateKey;
-
-    @Parameter(names = {"-p", "--project"},
-            description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
-                    + "If omitted, stats will be retrieved from all projects.")
-    private List<String> projectNames = new ArrayList<>();
-
-    @Parameter(names = {"-o", "--output-dir"},
-            description = "The directory into which the json output will be written into. "
-                    + "If multiple projects are specified, each is downloaded into its own file.",
-            required = true)
-    private String outputDir;
-
-    @Parameter(names = {"-l", "--limit"},
-            description = "The number of commits which to retrieve from the server. "
-            + "If omitted, stats will be retrieved until no further records are available. "
-            + "This value is an approximation; the actual number of downloaded commit data "
-            + "will be a multiple of the limit set on the Gerrit server.")
-    private int limit = SshDownloader.NO_COMMIT_LIMIT;
-
-    @Nonnull
-    private final JCommander jCommander = new JCommander(this);
-
     public CommandLineParser() {
         URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
         URL url = loader.findResource("META-INF/MANIFEST.MF");
@@ -116,10 +116,11 @@ public class CommandLineParser {
 
     @Nonnull
     private static String resolveOutputDir(@Nonnull String path) {
+        String resolvedDir = path;
         if (path.startsWith("~" + File.separator)) {
-            path = System.getProperty("user.home") + path.substring(1);
+            resolvedDir = System.getProperty("user.home") + path.substring(1);
         }
-        return path;
+        return resolvedDir;
     }
 
     @Nullable

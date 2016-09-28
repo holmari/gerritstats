@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class GerritStatsMain {
+public final class GerritStatsMain {
 
     public static void main(String[] args) {
         CommandLineParser commandLine = new CommandLineParser();
@@ -51,12 +51,11 @@ public class GerritStatsMain {
         }
 
         QueryData queryData = new QueryData(commandLine.getFilenames(),
-                commandLine.getIncludeBranches(),
                 commits,
                 minVersion);
 
         OutputRules outputRules = new OutputRules(commandLine);
-        if (outputRules.getAnonymizeData()) {
+        if (outputRules.isAnonymizeDataEnabled()) {
             System.out.println("Anonymizing data...");
             queryData = queryData.anonymize();
         }
@@ -87,5 +86,8 @@ public class GerritStatsMain {
         }
 
         return result;
+    }
+
+    private GerritStatsMain() {
     }
 }

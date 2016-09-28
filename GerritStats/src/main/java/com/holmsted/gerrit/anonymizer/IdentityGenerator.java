@@ -26,6 +26,10 @@ public class IdentityGenerator {
             "tv"
     };
 
+    private final List<String> domainBasenames = new ArrayList<>();
+    private final List<String> firstNames = new ArrayList<>();
+    private final List<String> lastNames = new ArrayList<>();
+
     private static class Name {
         @Nonnull
         public final String firstName;
@@ -40,7 +44,7 @@ public class IdentityGenerator {
 
             username = (firstName.substring(0, 1)
                      + lastName.substring(0, Math.min(6, lastName.length()))
-                     + ((Math.random() > 0.75) ? String.format("%d", (int) (100 * Math.random())) : ""))
+                     + (Math.random() > 0.75 ? String.format("%d", (int) (100 * Math.random())) : ""))
                     .toLowerCase();
         }
 
@@ -52,10 +56,6 @@ public class IdentityGenerator {
             return String.format("%s.%s@%s", firstName, lastName, domainName);
         }
     }
-
-    private final List<String> domainBasenames = new ArrayList<>();
-    private final List<String> firstNames = new ArrayList<>();
-    private final List<String> lastNames = new ArrayList<>();
 
     @Nonnull
     public Commit.Identity generateIdentity() {

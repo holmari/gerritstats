@@ -10,7 +10,7 @@ import java.io.Reader;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class FileReader {
+public final class FileReader {
 
     @Nullable
     public static String readFile(@Nonnull String filename) {
@@ -32,5 +32,8 @@ public class FileReader {
             e.printStackTrace();
         }
         return null;
+    }
+
+    private FileReader() {
     }
 }

@@ -11,7 +11,9 @@ import javax.annotation.Nonnull;
 public abstract class AbstractGerritStatsDownloader {
     public static final int NO_COMMIT_LIMIT = -1;
 
-    private GerritServer gerritServer;
+    @Nonnull
+    private final GerritServer gerritServer;
+
     private String projectName;
 
     private int overallCommitLimit = NO_COMMIT_LIMIT;

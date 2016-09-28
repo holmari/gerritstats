@@ -29,17 +29,19 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("PMD.ExcessiveImports")
 class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerPersonData> {
     private static final String RES_OUTPUT_DIR = ".";
     private static final String DATA_PATH = ".";
 
-    private File outputDir;
-    private File resOutputDir;
+    private final File outputDir;
+    private final File resOutputDir;
 
-    private final HashMap<String, Identity> identities = new HashMap<>();
+    private final Map<String, Identity> identities = new HashMap<>();
 
     public PerPersonJsonFormatter(@Nonnull OutputRules outputRules) {
         outputDir = new File(outputRules.getOutputDir());
@@ -251,7 +253,7 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
             final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
             return new TypeAdapter<T>() {
                 @Override
-                public void write(JsonWriter out, T value) throws IOException {
+                public void write(JsonWriter writer, T value) throws IOException {
                     JsonElement tree = delegate.toJsonTree(value);
 
                     IdentityRecord record = (IdentityRecord) value;
@@ -261,12 +263,12 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
                     object.add("selfReviewedCommitCount", gson.toJsonTree(record.getSelfReviewedCommits().size()));
                     object.add("inReviewCommitCount", new JsonPrimitive(record.getInReviewCommitCount()));
 
-                    elementAdapter.write(out, tree);
+                    elementAdapter.write(writer, tree);
                 }
 
                 @Override
-                public T read(JsonReader in) throws IOException {
-                    JsonElement tree = elementAdapter.read(in);
+                public T read(JsonReader reader) throws IOException {
+                    JsonElement tree = elementAdapter.read(reader);
                     return delegate.fromJsonTree(tree);
                 }
             };

@@ -3,15 +3,15 @@ package com.holmsted.gerrit.processors.perperson;
 import com.holmsted.gerrit.Commit;
 
 import java.util.Comparator;
-import java.util.Hashtable;
+import java.util.Map;
 
 /**
  * Sorts reviewers in order of addition.
  */
 class ReviewerAddedCountComparator implements Comparator<Commit.Identity> {
-    private Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
+    private final Map<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
 
-    public ReviewerAddedCountComparator(Hashtable<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity) {
+    public ReviewerAddedCountComparator(Map<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity) {
         this.reviewsForIdentity = reviewsForIdentity;
     }
 

@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class RandomLists {
+public final class RandomLists {
 
     public static int randomInt(int maxValue) {
         return (int) (Math.random() * maxValue);
@@ -16,5 +16,8 @@ public class RandomLists {
 
     public static <T> T randomItemFrom(@Nonnull T[] list) {
         return list[randomInt(list.length)];
+    }
+
+    private RandomLists() {
     }
 }

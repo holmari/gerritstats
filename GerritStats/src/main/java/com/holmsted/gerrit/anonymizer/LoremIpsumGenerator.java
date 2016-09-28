@@ -3,7 +3,7 @@ package com.holmsted.gerrit.anonymizer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class LoremIpsumGenerator {
+public final class LoremIpsumGenerator {
 
     private static final String[] IPSUM_SENTENCES = {
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
@@ -76,5 +76,8 @@ public class LoremIpsumGenerator {
         } else {
             return null;
         }
+    }
+
+    private LoremIpsumGenerator() {
     }
 }

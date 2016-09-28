@@ -2,9 +2,9 @@ package com.holmsted.gerrit.anonymizer;
 
 import com.holmsted.RandomLists;
 
-public class FakeCommitTitleGenerator {
+public final class FakeCommitTitleGenerator {
 
-    public static String[] ACTIONS = {
+    public static final String[] ACTIONS = {
             "Add",
             "Implement",
             "Create",
@@ -27,7 +27,7 @@ public class FakeCommitTitleGenerator {
             "Fix review comments on"
     };
 
-    public static String[] NEGATIVE_ADJECTIVES = {
+    public static final String[] NEGATIVE_ADJECTIVES = {
             "terrible",
             "horrible",
             "awful",
@@ -39,7 +39,7 @@ public class FakeCommitTitleGenerator {
             "depressing",
     };
 
-    public static String[] POSITIVE_ADJECTIVES = {
+    public static final String[] POSITIVE_ADJECTIVES = {
             "awesome",
             "robust",
             "wonderful",
@@ -61,7 +61,7 @@ public class FakeCommitTitleGenerator {
             "defiant"
     };
 
-    public static String[] NOUNS = {
+    public static final String[] NOUNS = {
             "menu",
             "context menu",
             "generator",
@@ -105,9 +105,12 @@ public class FakeCommitTitleGenerator {
         } else {
             builder.append(RandomLists.randomItemFrom(NEGATIVE_ADJECTIVES));
         }
-        builder.append(' ');
-        builder.append(RandomLists.randomItemFrom(NOUNS));
+        builder.append(' ')
+            .append(RandomLists.randomItemFrom(NOUNS));
 
         return builder.toString();
+    }
+
+    private FakeCommitTitleGenerator() {
     }
 }

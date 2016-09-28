@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,7 +21,35 @@ import javax.annotation.Nonnull;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@SuppressWarnings("PMD.TooManyFields")
 public class IdentityRecord {
+
+    final Commit.Identity identity;
+
+    int reviewCountPlus2;
+    int reviewCountPlus1;
+    int reviewCountMinus1;
+    int reviewCountMinus2;
+
+    // updated when commit or comments written by this user are added
+    long firstActiveDate = Long.MAX_VALUE;
+    long lastActiveDate;
+
+    long activeDayCount;
+    private final transient Set<String> activeDays = new HashSet<>();
+
+    final DatedCommitList commits = new DatedCommitList();
+
+    final List<Commit> addedAsReviewerTo = new ArrayList<>();
+    final ReviewerDataTable reviewRequestors = new ReviewerDataTable();
+
+    final PatchSetCommentTable commentsWritten = new PatchSetCommentTable();
+    final PatchSetCommentTable commentsReceived = new PatchSetCommentTable();
+    final ReviewerDataTable reviewersForOwnCommits = new ReviewerDataTable();
+
+    final Map<String, GerritProject> repositories = new HashMap<>();
+
+    private long averageTimeInCodeReview;
 
     public static class ReviewerData {
         int addedAsReviewerCount;
@@ -76,33 +103,6 @@ public class IdentityRecord {
         }
     }
 
-    final Commit.Identity identity;
-
-    int reviewCountPlus2;
-    int reviewCountPlus1;
-    int reviewCountMinus1;
-    int reviewCountMinus2;
-
-    // updated when commit or comments written by this user are added
-    long firstActiveDate = Long.MAX_VALUE;
-    long lastActiveDate;
-
-    long activeDayCount;
-    private transient Set<String> activeDays = new HashSet<>();
-
-    final DatedCommitList commits = new DatedCommitList();
-
-    final List<Commit> addedAsReviewerTo = new ArrayList<>();
-    final ReviewerDataTable reviewRequestors = new ReviewerDataTable();
-
-    final PatchSetCommentTable commentsWritten = new PatchSetCommentTable();
-    final PatchSetCommentTable commentsReceived = new PatchSetCommentTable();
-    final ReviewerDataTable reviewersForOwnCommits = new ReviewerDataTable();
-
-    final Map<String, GerritProject> repositories = new HashMap<>();
-
-    private long averageTimeInCodeReview;
-
     public IdentityRecord(Commit.Identity identity) {
         this.identity = identity;
     }
@@ -151,7 +151,7 @@ public class IdentityRecord {
         return allComments;
     }
 
-    public Hashtable<Commit.Identity, ReviewerData> getReviewersForOwnCommits() {
+    public Map<Commit.Identity, ReviewerData> getReviewersForOwnCommits() {
         return reviewersForOwnCommits;
     }
 
@@ -236,7 +236,7 @@ public class IdentityRecord {
     }
 
     public float getReviewCommentRatio() {
-        if (addedAsReviewerTo.size() == 0) {
+        if (addedAsReviewerTo.isEmpty()) {
             return 0;
         } else {
             return (float) commentsWritten.size() / addedAsReviewerTo.size();
@@ -310,19 +310,11 @@ public class IdentityRecord {
         return sortedIdentities;
     }
 
-    public String getDisplayableMyReviewerList() {
-        return getPrintableReviewerList(getMyReviewerList(), reviewersForOwnCommits);
-    }
-
     @Nonnull
     public List<Commit.Identity> getReviewRequestorList() {
         List<Commit.Identity> sortedIdentities = new ArrayList<>(reviewRequestors.keySet());
         Collections.sort(sortedIdentities, new ReviewerAddedCountComparator(reviewRequestors));
         return sortedIdentities;
-    }
-
-    public String getDisplayableAddedReviewerList() {
-        return getPrintableReviewerList(getReviewRequestorList(), reviewRequestors);
     }
 
     @Nonnull
@@ -339,52 +331,6 @@ public class IdentityRecord {
         ReviewerData reviewerData = getOrCreateReviewerForOwnCommit(approver);
         reviewerData.approvalCount++;
         reviewerData.approvals.merge(approval.value, 1, Integer::sum);
-    }
-
-    private String getPrintableReviewerList(@Nonnull List<Commit.Identity> sortedIdentities,
-                                            @Nonnull Hashtable<Commit.Identity, ReviewerData> reviewsForIdentity) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < sortedIdentities.size(); ++i) {
-            Commit.Identity identity = sortedIdentities.get(i);
-            builder.append(String.format("%s (%d)",
-                    identity.toString(), reviewsForIdentity.get(identity).addedAsReviewerCount));
-            if (i < sortedIdentities.size() - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.toString();
-    }
-
-    public List<Commit> getCommitsWithNPatchSets(int patchSetCountThreshold) {
-        List<Commit> exceedingCommits = new ArrayList<>();
-        for (Commit commit : commits) {
-            int patchSetCount = commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK);
-            if (patchSetCount <= patchSetCountThreshold) {
-                continue;
-            }
-            int firstNonAuthorCommentPatchSetIndex = commit.getFirstPatchSetIndexWithNonAuthorReview();
-            if (firstNonAuthorCommentPatchSetIndex != -1
-                    && commit.getPatchSets().size() - firstNonAuthorCommentPatchSetIndex > patchSetCountThreshold) {
-                exceedingCommits.add(commit);
-            }
-        }
-        Collections.sort(exceedingCommits, new PatchSetCountComparator());
-        return exceedingCommits;
-    }
-
-    public String getPrintableCommitsWithNPatchSets(int patchSetCountThreshold) {
-        List<Commit> exceedingCommits = getCommitsWithNPatchSets(patchSetCountThreshold);
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < exceedingCommits.size(); ++i) {
-            Commit commit = exceedingCommits.get(i);
-            builder.append(String.format("%s (%d)",
-                    commit.url,
-                    commit.getPatchSetCountForKind(Commit.PatchSetKind.REWORK)));
-            if (i < exceedingCommits.size() - 1) {
-                builder.append(", ");
-            }
-        }
-        return builder.toString();
     }
 
     public void addReviewedCommit(@Nonnull Commit commit) {

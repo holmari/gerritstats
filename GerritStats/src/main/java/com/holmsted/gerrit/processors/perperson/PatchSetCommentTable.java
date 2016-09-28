@@ -7,6 +7,7 @@ import com.holmsted.gerrit.DatedPatchSetCommentList;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nonnull;
 
@@ -21,7 +22,7 @@ public class PatchSetCommentTable extends Hashtable<Commit, List<Commit.PatchSet
         }
     };
 
-    private final Hashtable<Commit.PatchSetComment, Commit> commentToCommit = new Hashtable<>();
+    private final Map<Commit.PatchSetComment, Commit> commentToCommit = new Hashtable<>();
     private final DatedPatchSetCommentList allComments = new DatedPatchSetCommentList(dateTimeProvider);
 
     public void addCommentForCommit(@Nonnull Commit commit, @Nonnull Commit.PatchSetComment patchSetComment) {

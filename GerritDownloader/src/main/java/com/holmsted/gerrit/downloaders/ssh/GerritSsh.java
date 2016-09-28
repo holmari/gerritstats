@@ -9,7 +9,7 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class GerritSsh {
+public final class GerritSsh {
 
     public static List<String> listProjects(@Nonnull GerritServer gerritServer) {
         GerritSshCommand sshCommand = new GerritSshCommand(gerritServer);
@@ -30,4 +30,6 @@ public class GerritSsh {
         }
     }
 
+    private GerritSsh() {
+    }
 }

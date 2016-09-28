@@ -2,6 +2,7 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
 
     group = 'com.holmsted.gerrit'
 
@@ -12,5 +13,11 @@ allprojects {
     checkstyle {
         toolVersion = '7.1.1'
         configFile = file("${rootDir}/config/checkstyle.xml")
+    }
+
+    pmd {
+        toolVersion = '5.5.1'
+        consoleOutput = true
+        ruleSetConfig = resources.text.fromFile("${rootDir}/config/pmd.xml")
     }
 }

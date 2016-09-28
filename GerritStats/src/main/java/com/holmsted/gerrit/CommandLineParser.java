@@ -22,13 +22,6 @@ public class CommandLineParser {
 
     private static final String DEFAULT_OUTPUT_DIR = "out";
 
-    public static class OutputConverter implements IStringConverter<Output> {
-        @Override
-        public Output convert(String value) {
-            return Output.fromString(value);
-        }
-    }
-
     @Parameter(names = {"-f", "--file", "--files"},
             description = "Read output from comma-separated list of files or directories. "
                     + "The files must be in json format, created by GerritStatsDownloader.",
@@ -54,15 +47,10 @@ public class CommandLineParser {
     @Nonnull
     private final List<String> includedEmails = new ArrayList<>();
 
-    @Parameter(names = "--commit-patch-set-count-threshold",
-            description = "If specified, all commit URLs exceeding the given patch set count will be listed "
-            + "in the per-person data. If -1 is set, no listing is provided.")
-    private int commitPatchSetCountThreshold = 5;
-
     @Parameter(names = {"-o", "--output-dir"},
             description = "The output will be generated into the given directory.")
     @Nonnull
-    private String outputDir = DEFAULT_OUTPUT_DIR;
+    private String outputDir = DEFAULT_OUTPUT_DIR; // NOPMD
 
     @Parameter(names = {"-a", "--anonymize"},
             description = "Replace real data, like user name and email, with generated identities, "
@@ -73,6 +61,13 @@ public class CommandLineParser {
 
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
+
+    public static class OutputConverter implements IStringConverter<Output> {
+        @Override
+        public Output convert(String value) {
+            return Output.fromString(value);
+        }
+    }
 
     public CommandLineParser() {
         URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
@@ -101,10 +96,11 @@ public class CommandLineParser {
 
     @Nonnull
     private static String resolveHomeDir(@Nonnull String path) {
+        String resolvedPath = path;
         if (path.startsWith("~" + File.separator)) {
-            path = System.getProperty("user.home") + path.substring(1);
+            resolvedPath = System.getProperty("user.home") + path.substring(1);
         }
-        return path;
+        return resolvedPath;
     }
 
     @Nonnull
@@ -132,11 +128,7 @@ public class CommandLineParser {
         return outputDir;
     }
 
-    public int getCommitPatchSetCountThreshold() {
-        return commitPatchSetCountThreshold;
-    }
-
-    public boolean getAnonymizeData() {
+    public boolean isAnonymizeDataEnabled() {
         return anonymizeData;
     }
 

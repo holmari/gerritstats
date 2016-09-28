@@ -23,18 +23,6 @@ public class CommitAnonymizer {
     private static final String URL_ACME_HOST = "acme.corp";
     private static final int URL_ACME_PORT = 29418;
 
-    private static class ProjectAndBranch {
-        @Nonnull
-        final String projectName;
-        @Nonnull
-        final String branchName;
-
-        public ProjectAndBranch(@Nonnull String projectName, @Nonnull String branchName) {
-            this.projectName = projectName;
-            this.branchName = branchName;
-        }
-    }
-
     private final IdentityGenerator generator = new IdentityGenerator();
     private final FakeFilenameGenerator filenameGenerator = new FakeFilenameGenerator();
 
@@ -46,6 +34,18 @@ public class CommitAnonymizer {
 
     private int nextCommitNumber = 1;
     private int devBranchNameSuffix = 1;
+
+    private static class ProjectAndBranch {
+        @Nonnull
+        final String projectName;
+        @Nonnull
+        final String branchName;
+
+        public ProjectAndBranch(@Nonnull String projectName, @Nonnull String branchName) {
+            this.projectName = projectName;
+            this.branchName = branchName;
+        }
+    }
 
     public List<Commit> process(@Nonnull List<Commit> commits) {
         return commits.stream().map(this::anonymizeCommit).collect(Collectors.toList());
@@ -66,7 +66,7 @@ public class CommitAnonymizer {
             if (commitToAnonymize.url != null) {
                 URL url = new URL(commitToAnonymize.url);
                 URL newUrl = new URL(url.getProtocol(), URL_ACME_HOST, URL_ACME_PORT,
-                        "/c/acme/" + String.valueOf(commitToAnonymize.commitNumber));
+                        "/c/acme/" + commitToAnonymize.commitNumber);
                 return newUrl.toString();
             } else {
                 return null;
@@ -84,12 +84,12 @@ public class CommitAnonymizer {
     @Nullable
     private String getBranchForProject(@Nullable String projectName, @Nullable String branchName) {
         if (projectName != null && branchName != null) {
-            if (branchName.equals("master")) {
+            if ("master".equals(branchName)) {
                 return "master";
             } else {
                 ProjectAndBranch key = new ProjectAndBranch(projectName, branchName);
                 return branchNameMapping.computeIfAbsent(key,
-                        projectAndBranch -> "dev-" + String.valueOf(devBranchNameSuffix++));
+                        projectAndBranch -> "dev-" + (devBranchNameSuffix++));
             }
         } else {
             return null;

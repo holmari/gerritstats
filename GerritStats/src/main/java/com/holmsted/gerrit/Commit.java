@@ -19,6 +19,23 @@ import javax.annotation.Nullable;
 public class Commit {
     private static final long SEC_TO_MSEC = 1000;
 
+    public final String project;
+    public final String branch;
+    public final String id;
+    public final int commitNumber;
+    public final String subject;
+    public final Identity owner;
+    public final String url;
+    public final String commitMessage;
+    public final long createdOnDate;
+    public final long lastUpdatedDate;
+    public final boolean isOpen;
+    public final String status;
+
+    public final ImmutableList<Identity> reviewers;
+    public final ImmutableList<ChangeComment> comments;
+    public final ImmutableList<PatchSet> patchSets;
+
     public enum PatchSetKind {
         REWORK,
         TRIVIAL_REBASE,
@@ -277,6 +294,7 @@ public class Commit {
         public final int sizeInsertions;
         public final int sizeDeletions;
 
+        @SuppressWarnings("PMD")
         public PatchSet(int number,
                         @Nullable String revision,
                         @Nonnull List<String> parents,
@@ -380,23 +398,7 @@ public class Commit {
         }
     }
 
-    public final String project;
-    public final String branch;
-    public final String id;
-    public final int commitNumber;
-    public final String subject;
-    public final Identity owner;
-    public final String url;
-    public final String commitMessage;
-    public final long createdOnDate;
-    public final long lastUpdatedDate;
-    public final boolean isOpen;
-    public final String status;
-
-    public final ImmutableList<Identity> reviewers;
-    public final ImmutableList<ChangeComment> comments;
-    public final ImmutableList<PatchSet> patchSets;
-
+    @SuppressWarnings("PMD")
     public Commit(@Nullable String project,
                   @Nullable String branch,
                   @Nullable String id,
