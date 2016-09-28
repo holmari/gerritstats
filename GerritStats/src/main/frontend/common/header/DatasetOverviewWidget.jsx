@@ -23,7 +23,7 @@ export default class DatasetOverviewWidget extends React.Component {
     renderBranches(branchList) {
         if (typeof branchList == 'string') {
             return branchList;
-        } else if (!branchList || branchList.length) {
+        } else if (!branchList || !branchList.length) {
             return '\u2013';
         } else if (branchList.length == 1) {
             return branchList[0];

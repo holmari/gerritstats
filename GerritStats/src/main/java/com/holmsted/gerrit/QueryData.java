@@ -9,6 +9,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -22,6 +23,9 @@ public class QueryData {
     @Nonnull
     private final GerritVersion minVersion;
 
+    @Nonnull
+    private final List<String> branches;
+
     private String datasetKey;
 
     QueryData(@Nonnull List<String> filenames,
@@ -33,6 +37,8 @@ public class QueryData {
         this.includeBranches = ImmutableList.copyOf(includeBranches);
         this.commits = ImmutableList.copyOf(commits);
         this.minVersion = minVersion;
+        this.branches = this.commits.stream().map(commit -> commit.branch)
+                .distinct().collect(Collectors.toList());
     }
 
     public String getDisplayableProjectName() {
@@ -44,12 +50,8 @@ public class QueryData {
         return this.filenames;
     }
 
-    public String getDisplayableBranchList() {
-        if (includeBranches.isEmpty()) {
-            return "(all branches)";
-        }
-
-        return Joiner.on(", ").join(includeBranches);
+    public List<String> getBranches() {
+        return this.branches;
     }
 
     @Nonnull

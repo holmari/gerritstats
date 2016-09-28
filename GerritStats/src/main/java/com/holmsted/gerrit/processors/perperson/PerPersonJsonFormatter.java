@@ -106,7 +106,7 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
         JsonObject datasetOverview = new JsonObject();
         datasetOverview.add("projectName", gson.toJsonTree(perPersonData.getQueryData().getDisplayableProjectName()));
         datasetOverview.add("filenames", gson.toJsonTree(perPersonData.getQueryData().getFilenames()));
-        datasetOverview.add("branchList", gson.toJsonTree(perPersonData.getQueryData().getDisplayableBranchList()));
+        datasetOverview.add("branchList", gson.toJsonTree(perPersonData.getQueryData().getBranches()));
         datasetOverview.add("fromDate", gson.toJsonTree(perPersonData.getFromDate()));
         datasetOverview.add("toDate", gson.toJsonTree(perPersonData.getToDate()));
         datasetOverview.add("generatedDate", gson.toJsonTree(new Date().getTime()));
