@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Attributes;
 import java.util.jar.Manifest;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 
@@ -92,12 +93,14 @@ public class CommandLineParser {
         } catch (ParameterException e) {
             return false;
         }
+        filenames = filenames.stream().map(CommandLineParser::resolveHomeDir)
+            .collect(Collectors.toList());
 
         return !filenames.isEmpty();
     }
 
     @Nonnull
-    private static String resolveOutputDir(@Nonnull String path) {
+    private static String resolveHomeDir(@Nonnull String path) {
         if (path.startsWith("~" + File.separator)) {
             path = System.getProperty("user.home") + path.substring(1);
         }
