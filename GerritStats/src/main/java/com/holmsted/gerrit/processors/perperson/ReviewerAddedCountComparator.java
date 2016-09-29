@@ -4,12 +4,19 @@ import com.holmsted.gerrit.Commit;
 
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
+
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * Sorts reviewers in order of addition.
+ * <p>
+ * This comparator is not serializable and only intended for sorting things,
+ * not for e.g. creating trees.
  */
+@SuppressFBWarnings("SE_COMPARATOR_SHOULD_BE_SERIALIZABLE")
 class ReviewerAddedCountComparator implements Comparator<Commit.Identity> {
-    private final Map<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
+    private final transient Map<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity;
 
     public ReviewerAddedCountComparator(Map<Commit.Identity, IdentityRecord.ReviewerData> reviewsForIdentity) {
         this.reviewsForIdentity = reviewsForIdentity;
@@ -24,7 +31,7 @@ class ReviewerAddedCountComparator implements Comparator<Commit.Identity> {
         } else if (reviewCountLeft > reviewCountRight) {
             return -1;
         } else {
-            return left.email.compareTo(right.email);
+            return Objects.compare(left.email, right.email, String::compareTo);
         }
     }
 }

@@ -6,18 +6,23 @@ import com.holmsted.gerrit.QueryData;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Hashtable;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Nonnull;
 
-public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
+public class PerPersonData {
+
+    private final Map<Commit.Identity, IdentityRecord> records = new Hashtable<>();
 
     private QueryData queryData;
     private long fromDate;
     private long toDate;
 
+    @Nonnull
     public IdentityRecordList toOrderedList(@Nonnull Comparator<? super IdentityRecord> comparator) {
         IdentityRecordList orderedList = new IdentityRecordList();
-        orderedList.addAll(values());
+        orderedList.addAll(records.values());
         Collections.sort(orderedList, comparator);
         return orderedList;
     }
@@ -45,5 +50,21 @@ public class PerPersonData extends Hashtable<Commit.Identity, IdentityRecord> {
 
     public long getToDate() {
         return toDate;
+    }
+
+    public IdentityRecord get(@Nonnull Commit.Identity identity) {
+        return records.get(identity);
+    }
+
+    public void clear() {
+        records.clear();
+    }
+
+    public void put(@Nonnull Commit.Identity identity, IdentityRecord identityRecord) {
+        records.put(identity, identityRecord);
+    }
+
+    public Set<Commit.Identity> keySet() {
+        return records.keySet();
     }
 }

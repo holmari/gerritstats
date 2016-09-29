@@ -31,9 +31,7 @@ public final class FileWriter {
         File dataFile = new File(filename);
         mkdirsForFile(dataFile);
 
-        FileOutputStream outputStream;
-        try {
-            outputStream = new FileOutputStream(dataFile);
+        try (FileOutputStream outputStream = new FileOutputStream(dataFile)) {
             byte[] buffer = new byte[4096];
             int readBytes;
             while ((readBytes = inputStream.read(buffer)) > 0) {

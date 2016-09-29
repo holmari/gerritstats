@@ -193,10 +193,10 @@ class PerPersonJsonFormatter implements CommitDataProcessor.OutputFormatter<PerP
                                      Type typeOfSrc,
                                      JsonSerializationContext context) {
             JsonArray tableJson = new JsonArray();
-            for (Commit.Identity key : table.keySet()) {
+            for (Map.Entry<Identity, ReviewerData> entry : table.entrySet()) {
                 JsonObject pair = new JsonObject();
-                pair.add("identity", context.serialize(key));
-                pair.add("approvalData", context.serialize(table.get(key)));
+                pair.add("identity", context.serialize(entry.getKey()));
+                pair.add("approvalData", context.serialize(entry.getValue()));
                 tableJson.add(pair);
             }
             return tableJson;

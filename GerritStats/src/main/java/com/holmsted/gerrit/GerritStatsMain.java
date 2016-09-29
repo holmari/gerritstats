@@ -79,8 +79,10 @@ public final class GerritStatsMain {
                 File[] subdirFiles = file.listFiles((dir, name) -> {
                     return name.endsWith(".json");
                 });
-                for (File subdirFile : subdirFiles) {
-                    result.add(subdirFile.getAbsolutePath());
+                if (subdirFiles != null) {
+                    for (File subdirFile : subdirFiles) {
+                        result.add(subdirFile.getAbsolutePath());
+                    }
                 }
             }
         }

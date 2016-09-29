@@ -60,7 +60,6 @@ public class CommandLineParser {
     public static class ServerAndPort {
         private String serverName;
         private int serverPort;
-        private String protocol;
 
         public static class Converter implements IStringConverter<ServerAndPort> {
             @Override
@@ -71,7 +70,7 @@ public class CommandLineParser {
                 int portSeparator = value.lastIndexOf(':');
                 int serverNameEnd = value.length();
                 if (portSeparator != -1 && portSeparator != protocolSeparator) {
-                    result.serverPort = Integer.valueOf(value.substring(portSeparator + 1));
+                    result.serverPort = Integer.parseInt(value.substring(portSeparator + 1));
                     serverNameEnd = portSeparator;
                 }
 
@@ -81,9 +80,6 @@ public class CommandLineParser {
                     result.serverName = result.serverName.substring(0, result.serverName.length() - 1);
                 }
 
-                if (protocolSeparator != -1) {
-                    result.protocol = value.substring(0, protocolSeparator);
-                }
                 return result;
             }
         }

@@ -11,7 +11,7 @@ public final class GerritVersion {
     public static GerritVersion fromString(String versionString) {
         // output format for new Gerrit versions: "gerrit version X.YY.ZZ"
         String[] versionParts = versionString.trim().split("\\.");
-        int major = Integer.valueOf(versionParts[0]);
+        int major = Integer.parseInt(versionParts[0]);
         int minor;
         int patch;
 
@@ -45,7 +45,7 @@ public final class GerritVersion {
     private static int safeValueOf(@Nullable String numberAsString) {
         try {
             if (numberAsString != null) {
-                return Integer.valueOf(numberAsString);
+                return Integer.parseInt(numberAsString);
             } else {
                 return -1;
             }

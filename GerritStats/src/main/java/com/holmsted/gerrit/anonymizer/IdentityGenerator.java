@@ -6,6 +6,7 @@ import com.holmsted.resources.ResourceReader;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.annotation.Nonnull;
 
@@ -26,6 +27,8 @@ public class IdentityGenerator {
             "tv"
     };
 
+    private static final Random RANDOM_GENERATOR = new Random();
+
     private final List<String> domainBasenames = new ArrayList<>();
     private final List<String> firstNames = new ArrayList<>();
     private final List<String> lastNames = new ArrayList<>();
@@ -44,7 +47,8 @@ public class IdentityGenerator {
 
             username = (firstName.substring(0, 1)
                      + lastName.substring(0, Math.min(6, lastName.length()))
-                     + (Math.random() > 0.75 ? String.format("%d", (int) (100 * Math.random())) : ""))
+                     + (RANDOM_GENERATOR.nextInt(100) > 75
+                    ? String.format("%d", (int) (RANDOM_GENERATOR.nextInt(100))) : ""))
                     .toLowerCase();
         }
 

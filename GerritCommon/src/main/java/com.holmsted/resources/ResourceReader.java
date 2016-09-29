@@ -17,11 +17,10 @@ public final class ResourceReader {
         if (resourceStream == null) {
             throw new IllegalArgumentException("No such resource: " + resourceFilename);
         }
-        BufferedReader reader = new BufferedReader(new InputStreamReader(resourceStream));
         List<String> lines = new ArrayList<>();
 
         String line;
-        try {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resourceStream, "UTF-8"))) {
             while ((line = reader.readLine()) != null) {
                 lines.add(line);
             }

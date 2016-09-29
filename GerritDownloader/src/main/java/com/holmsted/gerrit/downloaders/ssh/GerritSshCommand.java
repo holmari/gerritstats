@@ -32,14 +32,14 @@ public class GerritSshCommand {
             char[] buffer = new char[1024];
             int readChars;
 
-            BufferedReader readerOut = new BufferedReader(new InputStreamReader(exec.getInputStream()));
+            BufferedReader readerOut = new BufferedReader(new InputStreamReader(exec.getInputStream(), "UTF-8"));
             StringBuilder output = new StringBuilder();
             while ((readChars = readerOut.read(buffer)) != -1) {
                 output.append(String.copyValueOf(buffer, 0, readChars));
             }
             readerOut.close();
 
-            BufferedReader readerErr = new BufferedReader(new InputStreamReader(exec.getErrorStream()));
+            BufferedReader readerErr = new BufferedReader(new InputStreamReader(exec.getErrorStream(), "UTF-8"));
             StringBuilder error = new StringBuilder();
             while ((readChars = readerErr.read(buffer)) != -1) {
                 error.append(String.copyValueOf(buffer, 0, readChars));

@@ -4,7 +4,7 @@ import com.holmsted.RandomLists;
 
 public final class FakeCommitTitleGenerator {
 
-    public static final String[] ACTIONS = {
+    private static final String[] ACTIONS = {
             "Add",
             "Implement",
             "Create",
@@ -27,7 +27,7 @@ public final class FakeCommitTitleGenerator {
             "Fix review comments on"
     };
 
-    public static final String[] NEGATIVE_ADJECTIVES = {
+    private static final String[] NEGATIVE_ADJECTIVES = {
             "terrible",
             "horrible",
             "awful",
@@ -39,7 +39,7 @@ public final class FakeCommitTitleGenerator {
             "depressing",
     };
 
-    public static final String[] POSITIVE_ADJECTIVES = {
+    private static final String[] POSITIVE_ADJECTIVES = {
             "awesome",
             "robust",
             "wonderful",
@@ -61,7 +61,7 @@ public final class FakeCommitTitleGenerator {
             "defiant"
     };
 
-    public static final String[] NOUNS = {
+    private static final String[] NOUNS = {
             "menu",
             "context menu",
             "generator",

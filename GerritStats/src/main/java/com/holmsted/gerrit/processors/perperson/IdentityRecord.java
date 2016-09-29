@@ -4,8 +4,6 @@ import com.holmsted.gerrit.Commit;
 import com.holmsted.gerrit.Commit.Approval;
 import com.holmsted.gerrit.Commit.Identity;
 import com.holmsted.gerrit.Commit.PatchSet;
-import com.holmsted.gerrit.DatedCommitList;
-import com.holmsted.gerrit.DatedPatchSetCommentList;
 
 import org.joda.time.DateTime;
 
@@ -38,7 +36,7 @@ public class IdentityRecord {
     long activeDayCount;
     private final transient Set<String> activeDays = new HashSet<>();
 
-    final DatedCommitList commits = new DatedCommitList();
+    final List<Commit> commits = new ArrayList<>();
 
     final List<Commit> addedAsReviewerTo = new ArrayList<>();
     final ReviewerDataTable reviewRequestors = new ReviewerDataTable();
@@ -131,7 +129,7 @@ public class IdentityRecord {
         return identity.getIdentifier();
     }
 
-    public DatedCommitList getCommits() {
+    public List<Commit> getCommits() {
         return commits;
     }
 
@@ -139,7 +137,7 @@ public class IdentityRecord {
         return addedAsReviewerTo;
     }
 
-    public DatedPatchSetCommentList getAllCommentsWritten() {
+    public List<Commit.PatchSetComment> getAllCommentsWritten() {
         return commentsWritten.getAllComments();
     }
 

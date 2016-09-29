@@ -2,9 +2,14 @@ allprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'checkstyle'
+    apply plugin: 'findbugs'
     apply plugin: 'pmd'
 
     group = 'com.holmsted.gerrit'
+
+    dependencies {
+        compile 'com.google.code.findbugs:annotations:3.0.1'
+    }
 
     repositories {
         mavenCentral()
@@ -13,6 +18,13 @@ allprojects {
     checkstyle {
         toolVersion = '7.1.1'
         configFile = file("${rootDir}/config/checkstyle.xml")
+    }
+
+    findbugsMain {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
     }
 
     pmd {
