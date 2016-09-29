@@ -1,11 +1,9 @@
 import '../style/tables.scss';
 
 import React from 'react';
-import {Table, Th, Td, Tr} from 'reactable';
+import {Td} from 'reactable';
+import Reactable from 'reactable';
 
-import ClearFloat from '../common/ClearFloat';
-import Panel from '../common/Panel';
-import PanelContainer from '../common/PanelContainer';
 import SimpleSortableTable from '../common/SimpleSortableTable';
 import {getShortPrintableName} from '../common/model/GerritUserdata';
 import SelectedUsers from '../common/model/SelectedUsers';
@@ -25,7 +23,7 @@ export default class TeamGraphUserPickerTable extends React.Component {
             selectedUsers: this.props.selectedUsers,
             highlightedIdentifier: null,
             columnMetadata: this.getDefaultColumnMetadata(),
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -73,7 +71,7 @@ export default class TeamGraphUserPickerTable extends React.Component {
                     </Td>
                 ),
             }
-        }
+        };
     }
 
     emitUserSelectionUpdate() {
@@ -90,7 +88,7 @@ export default class TeamGraphUserPickerTable extends React.Component {
         }, this.emitUserSelectionUpdate);
     }
 
-    onSelectAllCheckboxValueChanged(event) {
+    onSelectAllCheckboxValueChanged() {
         const selectedUsers = this.state.selectedUsers;
         const isAllSelected = selectedUsers.isAllUsersSelected();
 

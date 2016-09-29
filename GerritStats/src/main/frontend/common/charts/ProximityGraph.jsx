@@ -1,4 +1,4 @@
-import './ProximityGraph.scss'
+import './ProximityGraph.scss';
 
 import * as d3 from 'd3';
 import {fromJS} from 'immutable';
@@ -75,19 +75,19 @@ function numberComparator(left, right) {
 }
 
 function filterObjectArray(objectList, key) {
-    return objectList.map(function(currentValue, index, array) {
+    return objectList.map(function(currentValue) {
         return currentValue[key];
     }, []);
 }
 
 function getMaxValueFromArray(list) {
-    return list.reduce(function(previousValue, currentValue, index, array) {
+    return list.reduce(function(previousValue, currentValue) {
         return Math.max(previousValue, currentValue);
     }, -1);
 }
 
 function getMedianValueFromArrayExcludingZeroes(list) {
-    var sortedList = list.slice().filter(function(currentValue, index, array) {
+    var sortedList = list.slice().filter(function(currentValue) {
         return currentValue !== undefined;
     }).sort(numberComparator);
 
@@ -171,9 +171,9 @@ export class ProximityGraph {
             this.svg
                 .selectAll('circle.proximityGraphNode').classed('selected', false);
 
-            var matchingItems = this.svg
+            this.svg
                 .selectAll('circle.proximityGraphNode')
-                .filter(function(d, i) {
+                .filter(function(d) {
                     return d.identity.identifier === userIdentifier;
                 }).classed('selected', true);
         } else {
@@ -198,12 +198,12 @@ export class ProximityGraph {
             });
         };
 
-        var links = filteredLinks.map(function(currentLink, index, array) {
+        var links = filteredLinks.map(function(currentLink) {
             return {
                 source: this.findFromNodeData(currentLink.source.identifier),
                 target: this.findFromNodeData(currentLink.target.identifier),
                 value: currentLink.value
-            }
+            };
         }, this);
 
         const connectionsPerIdentifier = this._createConnectionsPerIdentifierTable(links);
@@ -214,7 +214,6 @@ export class ProximityGraph {
 
         var commitList = filterObjectArray(nodeData, 'commitCount').sort(numberComparator);
         var medianCommitCount = getMedianValueFromArrayExcludingZeroes(commitList);
-        var maxCommitCount = getMaxValueFromArray(commitList);
 
         var centeredNodeData = null;
         if (this.centeredIdentifier) {
@@ -289,7 +288,7 @@ export class ProximityGraph {
                         d3.select(this).classed('selected', true);
                     }
                 })
-                .on('mouseout', function(d) {
+                .on('mouseout', function() {
                     that._updateSelection(null);
                     d3.select(this).classed('selected', false);
                 })
@@ -315,7 +314,7 @@ export class ProximityGraph {
             link.attr('x1', function(d) { return d.source.x; })
                 .attr('y1', function(d) { return d.source.y; })
                 .attr('x2', function(d) { return d.target.x; })
-                .attr('y2', function(d) { return d.target.y; })
+                .attr('y2', function(d) { return d.target.y; });
 
             nodes.attr('cx', function(d) { return d.x; })
                  .attr('cy', function(d) { return d.y; });
@@ -331,16 +330,15 @@ export class ProximityGraph {
     }
 
     _updateSelection(newSelection) {
-        var previousSelection = this.selectedIdentifier;
         this.selectedIdentifier = newSelection;
         if (this.selectionChangedListener) {
-            this.selectionChangedListener(this.selectedIdentifier, previousSelection);
+            this.selectionChangedListener(this.selectedIdentifier);
         }
     }
 
     _getMaxLinkValue(graph) {
         var that = this;
-        return graph.links.reduce(function(previousValue, currentLink, index, links) {
+        return graph.links.reduce(function(previousValue, currentLink) {
             if (that.isLinkSelected(graph.nodes, currentLink)) {
                 return Math.max(previousValue, currentLink.value);
             } else {
@@ -351,7 +349,7 @@ export class ProximityGraph {
 
     _filterNodes(nodeData) {
         var that = this;
-        return nodeData.filter(function(node, index, array) {
+        return nodeData.filter(function(node) {
             return that.isNodeSelected(node.identifier);
         }, []);
     }
@@ -373,7 +371,7 @@ export class ProximityGraph {
     _filterLinks(nodes, links, maxLinkValue, relativeThreshold) {
         var that = this;
         var sourceLinks = fromJS(links).toJS();
-        return sourceLinks.filter(function(currentLink, index, array) {
+        return sourceLinks.filter(function(currentLink) {
             return (currentLink.value / maxLinkValue) >= relativeThreshold
                 && that.isLinkSelected(nodes, currentLink);
         }, []);

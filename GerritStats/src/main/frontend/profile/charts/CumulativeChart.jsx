@@ -36,7 +36,7 @@ class VerticalGuide {
         this.dynamicLegendGroup.append('rect')
             .attr('class', 'chartDynamicLegendBox')
             .attr('width', this.legendGroupWidth)
-            .attr('height', this.legendGroupHeight)
+            .attr('height', this.legendGroupHeight);
 
         this.legendValueTime = this.dynamicLegendGroup.append('text')
             .attr('class', 'chartDynamicLegendTitle')
@@ -44,7 +44,7 @@ class VerticalGuide {
             .attr('y', this.graph.margin.top);
 
         var legendWrapper = this.dynamicLegendGroup.append('g')
-            .attr('transform', "translate(" + -10 + "," + 20 + ")");
+            .attr('transform', 'translate(' + -10 + ',' + 20 + ')');
 
         this.graph.createLegend(legendWrapper);
 
@@ -91,7 +91,7 @@ class VerticalGuide {
 
         // Hide the legend from the graph, it can get on the way and it's visually duplicated
         // while the guide is visible
-        this.graph.legend.style('visibility', !isVisible ? 'visible' : 'hidden')
+        this.graph.legend.style('visibility', !isVisible ? 'visible' : 'hidden');
     }
 
     getClosestValueToDate(dataArray, referenceDate) {
@@ -114,8 +114,8 @@ class VerticalGuide {
         if (xPos + this.legendGroupWidth >= this.graph.width) {
             legendGroupX = xPos - this.legendGroupMargin - this.legendGroupWidth;
         }
-        this.dynamicLegendGroup.attr('transform', "translate(" + legendGroupX + ","
-                                                               + this.legendGroupMargin + ")");
+        this.dynamicLegendGroup.attr('transform', 'translate(' + legendGroupX + ','
+                                                               + this.legendGroupMargin + ')');
 
         var dateAtX = Math.max(this.graph.xDomain[0], Math.min(this.graph.x.invert(xPos), this.graph.xDomain[1]));
         var commitCount = this.getClosestValueToDate(this.graph.cumulativeCommitData, dateAtX);

@@ -62,13 +62,13 @@ export default class TableCellHighlighter {
     _indexFinder(value) {
         return function(element) {
             return element == value;
-        }
+        };
     }
 
     highlightDescending(value) {
         var topRangeCutoffIndex = Math.min(this.colorsTopEntries.length - 1, this.sortedData.length - 1);
         if (this.highlightPositiveEntries && value >= this.sortedData[topRangeCutoffIndex]) {
-            var colorIndex = this.sortedData.findIndex(this._indexFinder(value));
+            let colorIndex = this.sortedData.findIndex(this._indexFinder(value));
             return this.colorsTopEntries[colorIndex];
         }
 
@@ -78,7 +78,7 @@ export default class TableCellHighlighter {
         var leastBottomItemValue = this.sortedData[leastBottomItemIndex];
         if (this.highlightNegativeEntries && value <= leastBottomItemValue) {
             var idx = this.sortedData.findIndex(this._indexFinder(value));
-            var colorIndex = this.sortedData.length - 1 - idx;
+            let colorIndex = this.sortedData.length - 1 - idx;
             return this.colorsBottomEntries[colorIndex];
         }
 
@@ -89,7 +89,7 @@ export default class TableCellHighlighter {
         var topRangeCutoffIndex = Math.min(this.colorsTopEntries.length - 1, this.sortedData.length - 1);
         var leastTopItemValue = this.sortedData[topRangeCutoffIndex];
         if (this.highlightPositiveEntries && value <= leastTopItemValue) {
-            var colorIndex = this.sortedData.findIndex(this._indexFinder(value));
+            let colorIndex = this.sortedData.findIndex(this._indexFinder(value));
             return this.colorsTopEntries[colorIndex];
         }
 
@@ -98,8 +98,8 @@ export default class TableCellHighlighter {
                                  : this.sortedData.length - 1;
         var leastBottomItemValue = this.sortedData[leastBottomItemIndex];
         if (this.highlightNegativeEntries && value >= leastBottomItemValue) {
-            var idx = this.sortedData.findIndex(this._indexFinder(value));
-            var colorIndex = this.sortedData.length - 1 - idx;
+            let idx = this.sortedData.findIndex(this._indexFinder(value));
+            let colorIndex = this.sortedData.length - 1 - idx;
             return this.colorsBottomEntries[colorIndex];
         }
 

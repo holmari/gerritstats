@@ -1,4 +1,4 @@
-import './DatasetOverviewWidget.scss'
+import './DatasetOverviewWidget.scss';
 
 import moment from 'moment';
 import React from 'react';

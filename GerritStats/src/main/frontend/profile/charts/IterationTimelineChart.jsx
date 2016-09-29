@@ -1,3 +1,4 @@
+import * as d3 from 'd3';
 import moment from 'moment';
 
 import {getDefaultXAxisTimeFormat} from '../../common/charts/D3Utils';
@@ -77,7 +78,7 @@ export default class IterationTimelineChart {
              .attr('y1', this.height / 2)
              .attr('x2', 100)
              .attr('y2', this.height)
-             .style("stroke-dasharray", ("7, 7"))
+             .style('stroke-dasharray', ('7, 7'))
              .style('visibility', 'hidden');
 
         this.helpTextLabel = this.svg.append('text')
@@ -91,8 +92,8 @@ export default class IterationTimelineChart {
              .attr('transform', 'translate(0, ' + this.height + ')');
 
         this.svg.append('g')
-            .attr('class', 'iterativeCommits')
-    };
+            .attr('class', 'iterativeCommits');
+    }
 
     setSelectedCommitIndex(commitIndex) {
         if (commitIndex == this.selectedCommitIndex) {
@@ -106,10 +107,9 @@ export default class IterationTimelineChart {
                     .selectAll('circle.iterativeCommitBubble').classed('selected', false);
             this.updateTooltip(null);
 
-            var that = this;
             var matchingItems = this.svg.select('g.iterativeCommits')
                 .selectAll('circle.iterativeCommitBubble')
-                .filter(function(d, i) {
+                .filter(function(d) {
                     return d.index === commitIndex;
                 }).classed('selected', true);
             this.updateTooltip(matchingItems[0][0]);
@@ -118,14 +118,14 @@ export default class IterationTimelineChart {
                     .selectAll('circle.iterativeCommitBubble').classed('selected', false);
             this.updateTooltip(null);
         }
-    };
+    }
 
     updateSelection(newSelectionIndex) {
         this.selectedCommitIndex = newSelectionIndex;
         if (this.selectionChangedListener) {
             this.selectionChangedListener(this.selectedCommitIndex);
         }
-    };
+    }
 
     updateTooltip(selectedObject) {
         if (this.selectedCommitIndex != -1 && selectedObject) {
@@ -159,7 +159,7 @@ export default class IterationTimelineChart {
             .append('circle')
                 .attr('class', 'iterativeCommitBubble')
                 .attr('cx', function(d) { return graph.xScale(d.createdOnDate); })
-                .attr('cy', function(d) { return graph.height / 2 })
+                .attr('cy', function() { return graph.height / 2; })
                 .attr('r', function(d) { return graph.highPatchSetCountThreshold + 1.5 * d.iterationCount; })
                 .attr('fill', function(d) { return graph.colors(d.iterationCount); })
                 .attr('stroke', 'rgba(0,0,0, .05)')
@@ -168,7 +168,7 @@ export default class IterationTimelineChart {
                     graph.updateTooltip(this);
                     d3.select(this).classed('selected', true);
                 })
-                .on('mouseout', function(d) {
+                .on('mouseout', function() {
                     graph.updateSelection(-1);
                     graph.updateTooltip(this);
                     d3.select(this).classed('selected', false);
@@ -187,12 +187,12 @@ export default class IterationTimelineChart {
                     return graph.defaultItemOpacity;
                 }
             });
-    };
+    }
 
     render() {
         this.svg.select('g.x.iterativeCommitChartAxis')
             .call(this.xAxis);
 
         this.renderPoints();
-    };
+    }
 }

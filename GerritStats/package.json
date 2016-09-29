@@ -26,14 +26,13 @@
     "cleanJava": "../gradlew clean",
     "buildJava": "../gradlew build",
     "testJava": "../gradlew test",
-    "//": "Use generateData when developing the web UI, or copy the data dir into out-html.",
-    "//": "Also, for speeding up development, run webpack-watch.",
     "//": "To use generateData, invoke like this with args: npm run generateData -- -f project.json",
     "generateData": "rm -rf out-html/data && java -Xmx4096m -Xms256m -jar build/libs/GerritStats.jar -o out-html/data",
     "webpack": "webpack --display-error-details --colors --progress --config webpack.config.js",
     "webpack-watch": "webpack --display-error-details --colors --progress --watch",
     "prewebpack": "mkdir -p out-html && cp src/main/frontend/index.html out-html/",
-    "prewebpack-watch": "mkdir -p out-html && cp src/main/frontend/index.html out-html/"
+    "prewebpack-watch": "mkdir -p out-html && cp src/main/frontend/index.html out-html/",
+    "eslint": "node node_modules/eslint/bin/eslint.js  --ext .js --ext .jsx src/main/frontend/"
   },
   "repository": {
     "type": "git",
@@ -46,6 +45,8 @@
     "babel-preset-es2015": "^6.14.0",
     "babel-preset-react": "^6.11.1",
     "css-loader": "^0.25.0",
+    "eslint": "^3.6.1",
+    "eslint-plugin-react": "^6.3.0",
     "file-loader": "^0.9.0",
     "react-hot-loader": "^3.0.0-beta.3",
     "sass-loader": "^4.0.2",

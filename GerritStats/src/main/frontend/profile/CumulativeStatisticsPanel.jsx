@@ -13,7 +13,7 @@ export default class CumulativeStatisticsPanel extends React.Component {
         super(props);
         this.state = {
             selectedUsers: this.props.selectedUsers,
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {

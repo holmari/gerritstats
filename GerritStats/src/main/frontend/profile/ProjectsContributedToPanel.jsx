@@ -1,13 +1,12 @@
 import '../style/tables.scss';
 
+import React from 'react';
+import {Table, Thead, Th, Td, Tr} from 'reactable';
+import Reactable from 'reactable';
+
 import Panel from '../common/Panel';
 import GerritUserdata from '../common/model/GerritUserdata';
 import SelectedUsers from '../common/model/SelectedUsers';
-
-import React from 'react';
-import {Table, Thead, Th, Td, Tr} from 'reactable';
-
-import {Well} from 'react-bootstrap';
 
 export default class ProjectsContributedToPanel extends React.Component {
     constructor(props) {
@@ -15,7 +14,7 @@ export default class ProjectsContributedToPanel extends React.Component {
         this.state = {
             selectedUsers: this.props.selectedUsers,
             highlightedIdentifier: null,
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {

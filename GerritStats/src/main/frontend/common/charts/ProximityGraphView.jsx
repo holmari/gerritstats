@@ -1,10 +1,7 @@
 import './ProximityGraphView.scss';
 
-import classnames from 'classnames';
-import * as d3 from 'd3';
 import React from 'react';
 
-import Panel from '../Panel';
 import SelectedUsers from '../model/SelectedUsers';
 
 import D3BaseComponent from './D3BaseComponent';
@@ -61,7 +58,7 @@ export default class ProximityGraphView extends D3BaseComponent {
         });
     }
 
-    onGraphSelectionChanged(selectedIdentifier, previousSelection) {
+    onGraphSelectionChanged(selectedIdentifier) {
         if (this.props.onHighlightedIdentifierChanged) {
             this.props.onHighlightedIdentifierChanged(selectedIdentifier);
         }

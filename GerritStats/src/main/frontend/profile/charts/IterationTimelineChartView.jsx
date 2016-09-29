@@ -3,8 +3,6 @@ import './IterationTimelineChartView.scss';
 import React from 'react';
 
 import D3BaseComponent from '../../common/charts/D3BaseComponent';
-import GerritUserdata from '../../common/model/GerritUserdata';
-import SelectedUsers from '../../common/model/SelectedUsers';
 
 import IterationTimelineChart from './IterationTimelineChart';
 

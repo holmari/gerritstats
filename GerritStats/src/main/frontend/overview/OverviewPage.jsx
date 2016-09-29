@@ -3,7 +3,6 @@ import React from 'react';
 
 import ClearFloat from '../common/ClearFloat';
 import GerritVersionAlerts from '../common/GerritVersionAlerts';
-import PageFooter from '../common/PageFooter';
 import PageHeader from '../common/header/PageHeader';
 import Panel from '../common/Panel';
 import NavigationBar from '../common/header/NavigationBar';
@@ -19,7 +18,7 @@ export default class OverviewPage extends React.Component {
         this.state = {
             overviewUserdata: [],
             currentSelection: this.props.route.currentSelection
-        }
+        };
     }
 
     componentDidMount() {
@@ -53,8 +52,8 @@ export default class OverviewPage extends React.Component {
         if (filenames && filenames.length > 20) {
             var firstFilename = filenames[0];
             var lastFilename = filenames[datasetOverview.filenames.length - 1];
-            dataSetName = filenames.length + " files, from "
-                        + firstFilename + " to " + lastFilename
+            dataSetName = filenames.length + ' files, from '
+                        + firstFilename + ' to ' + lastFilename;
         }
         return dataSetName;
     }
@@ -124,4 +123,4 @@ OverviewPage.propTypes = {
         }),
         onCurrentSelectionChanged: React.PropTypes.func
     })
-}
+};

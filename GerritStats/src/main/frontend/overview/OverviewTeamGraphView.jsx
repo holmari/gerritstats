@@ -1,15 +1,12 @@
 import './OverviewTeamGraphView.scss';
 
-import classnames from 'classnames';
 import React from 'react';
 
-import ClearFloat from '../common/ClearFloat';
 import Panel from '../common/Panel';
 import ProximityGraphView from '../common/charts/ProximityGraphView';
 
 import SelectedUsers from '../common/model/SelectedUsers';
 
-import TeamGraphUserPickerTable from './TeamGraphUserPickerTable';
 import UserPickerPanel from './UserPickerPanel';
 
 export default class OverviewTeamGraphView extends React.Component {
@@ -18,7 +15,7 @@ export default class OverviewTeamGraphView extends React.Component {
         this.state = {
             selectedUsers: this.props.selectedUsers,
             highlightedIdentifier: null,
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {

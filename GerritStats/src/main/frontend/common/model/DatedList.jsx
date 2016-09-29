@@ -52,7 +52,7 @@ class YearlyItemList {
         var unixEpoch = this.epochFunction(item);
         var month = moment(unixEpoch).month() + 1;
         if (month < 1 || month > 12) {
-            throw new Error("Month must be in [1..12] range");
+            throw new Error('Month must be in [1..12] range');
         }
         this.itemsPerMonth[month].push(item);
         this.items.push(item);
@@ -63,13 +63,13 @@ class YearlyItemList {
     }
 
     getMonthOnMonthChange(month) {
-         if (month > 1) {
-             var itemsInThisMonth = this.itemsPerMonth[month].size();
-             var itemsInPrevMonth = this.itemsPerMonth[month - 1].size();
-             return MonthlyTimeFormat.getSafeRateOfChange(itemsInPrevMonth, itemsInThisMonth);
-         } else {
-             return Number.NaN;
-         }
+        if (month > 1) {
+            var itemsInThisMonth = this.itemsPerMonth[month].length;
+            var itemsInPrevMonth = this.itemsPerMonth[month - 1].length;
+            return MonthlyTimeFormat.getSafeRateOfChange(itemsInPrevMonth, itemsInThisMonth);
+        } else {
+            return Number.NaN;
+        }
     }
 
     getQuarterOnQuarterChange(month) {
@@ -95,16 +95,6 @@ class YearlyItemList {
 
     getDisplayableMonthOnMonthChange(month) {
         return MonthlyTimeFormat.formatFloat(this.getMonthOnMonthChange(month));
-    }
-
-    getMonthOnMonthChange(month) {
-        if (month > 1) {
-            var itemsInThisMonth = this.itemsPerMonth[month].length;
-            var itemsInPrevMonth = this.itemsPerMonth[month - 1].length;
-            return MonthlyTimeFormat.getSafeRateOfChange(itemsInPrevMonth, itemsInThisMonth);
-        } else {
-            return Number.NaN;
-        }
     }
 
     getQuarterlyItemCount(quarter) {
@@ -149,9 +139,9 @@ export default class DatedList {
     }
 
     getActiveYears() {
-        var years = Object.keys(this.itemsPerYear)
+        var years = Object.keys(this.itemsPerYear);
         years.sort(function(l, r) {
-            return (l > r) ? -1 : ((l < r) ? 1 : 0)
+            return (l > r) ? -1 : ((l < r) ? 1 : 0);
         });
         return years;
     }
@@ -168,7 +158,7 @@ export default class DatedList {
 
         return !this.isInFuture(year, month)
             && startMoment.isBefore(dateAtEndOfMonth)
-            && endMoment.isAfter(dateAtStartOfMonth)
+            && endMoment.isAfter(dateAtStartOfMonth);
     }
 
     isInFuture(year, month) {
@@ -179,12 +169,12 @@ export default class DatedList {
 
     getDisplayableMonthOnMonthChange(year, month) {
         if (!this.isDateWithinRange(year, month)) {
-            return "";
+            return '';
         }
 
         var items = this.itemsPerYear[year];
         if (!items) {
-            return MonthlyTimeFormat.formatFloat(Float.NaN);
+            return MonthlyTimeFormat.formatFloat(Number.NaN);
         }
 
         if (month > 1) {
@@ -203,7 +193,7 @@ export default class DatedList {
 
     getDisplayableQuarterOnQuarterChange(year, month) {
         if (!this.isDateWithinRange(year, month)) {
-            return "";
+            return '';
         }
         var items = this.itemsPerYear[year];
         if (!items) {

@@ -1,7 +1,6 @@
 import './Panel.scss';
 
 import classnames from 'classnames';
-import {List} from 'immutable';
 import React from 'react';
 
 export default class Panel extends React.Component {
@@ -18,7 +17,7 @@ export default class Panel extends React.Component {
             {'fullWidth': this.props.size == 'full'},
             {'flexWidth': this.props.size == 'flex'},
             {'fourthWidth': this.props.size == 'fourth'},
-            {'threeFourthsWidth': this.props.size == 'threeFourths'},
+            {'threeFourthsWidth': this.props.size == 'threeFourths'}
         );
     }
 

@@ -21,7 +21,6 @@ export default class TimelinePanel extends React.Component {
 
     render() {
         const userdata = this.props.userdata;
-        const selectedUsers = this.props.selectedUsers;
 
         const firstActiveDate = userdata.getFirstActiveDate();
         const lastActiveDate = userdata.getLastActiveDate();

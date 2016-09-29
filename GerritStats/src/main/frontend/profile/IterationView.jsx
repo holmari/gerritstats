@@ -2,6 +2,7 @@ import './IterationView.scss';
 
 import React from 'react';
 import {Td} from 'reactable';
+import Reactable from 'reactable';
 
 import Panel from '../common/Panel';
 import SimpleSortableTable from '../common/SimpleSortableTable';
@@ -18,7 +19,7 @@ export default class IterationView extends React.Component {
         this.state = {
             selectedUsers: this.props.selectedUsers,
             highlightedIdentifier: null,
-        }
+        };
     }
 
     getColumnMetadata() {
@@ -54,7 +55,7 @@ export default class IterationView extends React.Component {
                 iterationCount: getPatchSetCountForKind(commit, 'REWORK'),
                 createdOnDate: commit.createdOnDate,
                 index: index,
-            }
+            };
         }.bind(this));
     }
 
@@ -76,7 +77,7 @@ export default class IterationView extends React.Component {
             exceedingCommitData: exceedingCommitData,
             onGraphSelectionChanged: this.onHighlightedRowIndexChanged.bind(this),
             highlightedRowIndex: this.state.highlightedRowIndex,
-        }
+        };
 
         return (
             <div>

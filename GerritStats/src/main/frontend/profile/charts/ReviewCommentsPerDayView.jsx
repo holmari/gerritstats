@@ -18,7 +18,7 @@ import FrequencyTable from './FrequencyTable';
   * ];
 */
 function groupReviewCommentsByDate(comments) {
-    var frequencies = comments.reduce(function (previousValue, currentValue, index, array) {
+    var frequencies = comments.reduce(function (previousValue, currentValue) {
         var date = currentValue.date;
         if (typeof previousValue[date] == 'undefined') {
             previousValue[date] = 1;
@@ -28,7 +28,7 @@ function groupReviewCommentsByDate(comments) {
         return previousValue;
     }, {});
 
-    var data = Object.keys(frequencies).map(function(date, index) {
+    var data = Object.keys(frequencies).map(function(date) {
         return {
             date: new Date(date),
             count: frequencies[date]

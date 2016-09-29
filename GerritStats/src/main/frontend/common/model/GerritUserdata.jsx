@@ -176,7 +176,7 @@ export default class GerritUserdata {
         const email = identity['email'];
         var mailAndIdentity = email ? email : '';
         if (mailAndIdentity.length && this.hasUsername()) {
-            mailAndIdentity += ' (' + identity['username'] + ')'
+            mailAndIdentity += ' (' + identity['username'] + ')';
         } else if (!mailAndIdentity.length) {
             mailAndIdentity = identity['username'];
         }
@@ -205,7 +205,6 @@ export default class GerritUserdata {
     }
 
     getReceivedCommentRatio(selectedUsers) {
-        const commitCount = this.getCommitCount();
         return this.getAllCommentsReceived(selectedUsers) / this.getCommitCount();
     }
 
@@ -245,9 +244,9 @@ export default class GerritUserdata {
     getReviewerApprovalDataForOwnCommits() {
         var reviewerData = this.record.reviewersForOwnCommits;
         reviewerData.sort(function(l, r) {
-            var lValue = l.approvalData.approvalCount
-            var rValue = r.approvalData.approvalCount
-            return (lValue > rValue) ? -1 : ((lValue < rValue) ? 1 : 0)
+            var lValue = l.approvalData.approvalCount;
+            var rValue = r.approvalData.approvalCount;
+            return (lValue > rValue) ? -1 : ((lValue < rValue) ? 1 : 0);
         });
         return reviewerData;
     }
@@ -325,7 +324,7 @@ export default class GerritUserdata {
         orderedCommitsAndComments.sort(function(l, r) {
             var lValue = l.commit.createdOnDate;
             var rValue = r.commit.createdOnDate;
-            return (lValue > rValue) ? 1 : ((lValue < rValue) ? -1 : 0)
+            return (lValue > rValue) ? 1 : ((lValue < rValue) ? -1 : 0);
         });
         return orderedCommitsAndComments;
     }
@@ -378,7 +377,7 @@ export default class GerritUserdata {
         exceedingCommits.sort(function(l, r) {
             var lValue = getPatchSetCountForKind(l, 'REWORK');
             var rValue = getPatchSetCountForKind(r, 'REWORK');
-            return (lValue > rValue) ? -1 : ((lValue < rValue) ? 1 : 0)
+            return (lValue > rValue) ? -1 : ((lValue < rValue) ? 1 : 0);
         });
         return exceedingCommits;
     }
@@ -412,7 +411,7 @@ export default class GerritUserdata {
                 name: project.name,
                 commitCount: project.commitCountForUser,
                 commentsWritten: getUserCommentCountsInProject(project, selectedUsers),
-            }
+            };
         });
     }
 

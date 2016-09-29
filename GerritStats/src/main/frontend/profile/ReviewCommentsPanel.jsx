@@ -17,7 +17,7 @@ import SelectedUsers from '../common/model/SelectedUsers';
 function getGerritUrlForComment(commit, patchSet, comment) {
     var url = commit.url;
     var baseUrl = url.substring(0, url.lastIndexOf('/'));
-    return baseUrl + "/#/c/" + commit.commitNumber + "/" + patchSet.number + "/" + comment.file;
+    return baseUrl + '/#/c/' + commit.commitNumber + '/' + patchSet.number + '/' + comment.file;
 }
 
 function escapeHtml(text) {
@@ -34,7 +34,7 @@ export default class ReviewCommentsPanel extends React.Component {
         super(props);
         this.state = {
             selectedUsers: this.props.selectedUsers,
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -46,7 +46,7 @@ export default class ReviewCommentsPanel extends React.Component {
     }
 
     renderComment(commit, patchSet, comment, index) {
-        const urlForComment = getGerritUrlForComment(commit, patchSet, comment)
+        const urlForComment = getGerritUrlForComment(commit, patchSet, comment);
         const altText = comment.file + ':' + comment.line;
         const key = urlForComment + '_' + index;
         return (

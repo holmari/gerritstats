@@ -1,8 +1,8 @@
-import {fromJS} from 'immutable';
 import numeral from 'numeral';
 import React from 'react';
-import {Table, Thead, Th, Td, Tr} from 'reactable';
+import {Td, Tr} from 'reactable';
 import {Link} from 'react-router';
+import Reactable from 'reactable';
 
 import SimpleSortableTable from '../common/SimpleSortableTable';
 import {getPrintableName, getProfilePageLinkForIdentity} from '../common/model/GerritUserdata';
@@ -115,7 +115,7 @@ export default class OverviewTable extends React.Component {
             'allCommentsWritten': {
                 sortFunction: Reactable.Sort.NumericInteger,
                 highlighter: new TableCellHighlighter(overviewUserdata, selectedUsers, 'allCommentsWritten'),
-                description: "Number of review comments written to other people's commits by this user.",
+                description: 'Number of review comments written to other people\'s commits by this user.',
                 header: (<span>Comments<br/>written</span>),
                 cell: (record, index) => (
                     <Td key={'allCommentsWritten' + index}
@@ -128,7 +128,7 @@ export default class OverviewTable extends React.Component {
                 sortFunction: Reactable.Sort.NumericInteger,
                 highlighter: new TableCellHighlighter(overviewUserdata, selectedUsers, 'allCommentsReceived')
                                  .setIsAscending(true)
-                                 .setIgnoreFunction((element, key) => element.commitCount == 0),
+                                 .setIgnoreFunction((element) => element.commitCount == 0),
                 description: 'Number of review comments received by this user.',
                 header: (<span>Comments<br/>received</span>),
                 cell: (record, index) => (
@@ -155,7 +155,7 @@ export default class OverviewTable extends React.Component {
                 sortFunction: decimalComparator,
                 highlighter: new TableCellHighlighter(overviewUserdata, selectedUsers, 'receivedCommentRatio')
                                  .setIsAscending(true)
-                                 .setIgnoreFunction((element, key) => element.commitCount == 0),
+                                 .setIgnoreFunction((element) => element.commitCount == 0),
                 description: 'The ratio of comments received by user per commit.',
                 header: (<span>Comments<br/>/ commit</span>),
                 cell: (record, index) => (
@@ -211,7 +211,7 @@ export default class OverviewTable extends React.Component {
                 highlighter: new TableCellHighlighter(overviewUserdata, selectedUsers, 'averageTimeInCodeReview')
                                  .setIsAscending(true)
                                  .setIgnoreZeroes(true),
-                description: "Average time the user's commits spent in review.",
+                description: 'Average time the user\'s commits spent in review.',
                 header: (<span>Average time<br/>in review</span>),
                 cell: (record, index) => (
                     <Td key={'averageTimeInCodeReview' + index}
@@ -239,7 +239,7 @@ export default class OverviewTable extends React.Component {
         }
     }
 
-    onSelectAllCheckboxValueChanged(event) {
+    onSelectAllCheckboxValueChanged() {
         const selectedUsers = this.state.selectedUsers;
         const isAllSelected = selectedUsers.isAllUsersSelected();
         const newSelectedUsers = isAllSelected ? selectedUsers.selectNone() : selectedUsers.selectAll();

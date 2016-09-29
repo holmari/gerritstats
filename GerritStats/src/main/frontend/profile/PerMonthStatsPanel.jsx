@@ -12,7 +12,7 @@ export default class PerMonthStatsPanel extends React.Component {
         this.state = {
             selectedUsers: this.props.selectedUsers,
             highlightedIdentifier: null,
-        }
+        };
     }
 
     componentWillReceiveProps(nextProps) {
@@ -60,11 +60,10 @@ export default class PerMonthStatsPanel extends React.Component {
 
     renderPerYearStats() {
         const commitTable = this.props.userdata.datedCommitTable;
-        const commentTable = this.props.userdata.datedCommentTable;
         const years = this.props.userdata.datedCommitTable.getActiveYears();
 
         const elements = [];
-        years.forEach(function(year, index) {
+        years.forEach(function(year) {
             const keyPrefix = 'yr_' + year;
             elements.push(
                 <tr key={keyPrefix + '_0'}>

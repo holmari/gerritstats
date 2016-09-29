@@ -1,4 +1,4 @@
-import './PageFooter.scss'
+import './PageFooter.scss';
 
 import ClearFloat from './ClearFloat';
 
@@ -14,7 +14,7 @@ export default class PageFooter extends React.Component {
         if (!timestamp) {
             return '\u2013';
         } else {
-            return moment(timestamp).format('YYYY-MM-DD hh:mm:ss')
+            return moment(timestamp).format('YYYY-MM-DD hh:mm:ss');
         }
     }
 

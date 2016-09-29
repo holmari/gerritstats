@@ -1,9 +1,9 @@
 import 'bootstrap/dist/css/bootstrap.css';
 import './style/base.scss';
 
-import React from 'react';
+import React from 'react'; // eslint-disable-line no-unused-vars
 import ReactDOM from 'react-dom';
-import {Router, Route, hashHistory} from 'react-router'
+import {Router, Route, hashHistory} from 'react-router';
 
 import GlobalJavascriptLoader from './common/loader/GlobalJavascriptLoader';
 import PageFooter from './common/PageFooter';
@@ -16,7 +16,7 @@ var jsLoader = new GlobalJavascriptLoader();
 
 function onDatasetOverviewLoaded() {
     const storageKey = window.datasetOverview.hashCode;
-    currentSelection.selectedUsers = SelectedUsers.fromLocalStorage(storageKey, ids);
+    currentSelection.selectedUsers = SelectedUsers.fromLocalStorage(storageKey, window.ids);
     renderPage();
 }
 
@@ -45,16 +45,16 @@ function renderPage() {
         <div>
             <Router history={hashHistory}>
                 <Route path='/' component={OverviewPage}
-                    datasetOverview={datasetOverview}
+                    datasetOverview={window.datasetOverview}
                     currentSelection={currentSelection}
                     onCurrentSelectionChanged={onCurrentSelectionChanged}
                 />
                 <Route path='/profile/:identifier' component={ProfilePage}
-                    datasetOverview={datasetOverview}
+                    datasetOverview={window.datasetOverview}
                     currentSelection={currentSelection}
                 />
             </Router>
-            <PageFooter datasetOverview={datasetOverview} />
+            <PageFooter datasetOverview={window.datasetOverview} />
         </div>,
         document.getElementById('app')
     );

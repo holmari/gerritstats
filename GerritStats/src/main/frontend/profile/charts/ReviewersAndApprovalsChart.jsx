@@ -1,5 +1,7 @@
 import '../../style/charts.scss';
 
+import * as d3 from 'd3';
+
 export default class ReviewersAndApprovalsChart {
 
     constructor(svgId, reviewerData, config) {
@@ -26,11 +28,11 @@ export default class ReviewersAndApprovalsChart {
         this.maxValue = 0;
         if (reviewerData.length > 0) {
             tickCount = this.maxValue = reviewerData.reduce(
-                function(previousValue, currentReviewerData, index, array) {
+                function(previousValue, currentReviewerData) {
                     return Math.max(previousValue,
                                     Math.max(currentReviewerData.approvalData.addedAsReviewerCount,
                                              currentReviewerData.approvalData.approvalCount));
-            }, 0);
+                }, 0);
         }
 
         // both axes share same domain
@@ -90,14 +92,14 @@ export default class ReviewersAndApprovalsChart {
                 .text('Number of approvals');
 
         this.svg.append('g')
-            .attr('class', 'reviewerApprovals')
-    };
+            .attr('class', 'reviewerApprovals');
+    }
 
     // FIXME: this re-renders the entire thing!
     setSelectedItemByIdentifier(userIdentifier) {
         this.selectedReviewer = userIdentifier;
         this.render();
-    };
+    }
 
     updateSelection(newSelection) {
         var previousSelection = this.selectedReviewer;
@@ -105,7 +107,7 @@ export default class ReviewersAndApprovalsChart {
         if (this.onSelectionChangedListener) {
             this.onSelectionChangedListener(this.selectedReviewer, previousSelection);
         }
-    };
+    }
 
     renderPoints() {
         var g = this.svg.select('g.reviewerApprovals');
@@ -126,7 +128,7 @@ export default class ReviewersAndApprovalsChart {
                     graph.updateSelection(d.identity['identifier']);
                     graph.render();
                 })
-                .on('mouseout', function(d) {
+                .on('mouseout', function() {
                     graph.updateSelection(null);
                     graph.render();
                 })
@@ -144,7 +146,7 @@ export default class ReviewersAndApprovalsChart {
                     return 0.3;
                 }
             });
-    };
+    }
 
     render() {
         this.svg.select('g.x.chartAxis')
@@ -154,5 +156,5 @@ export default class ReviewersAndApprovalsChart {
             .call(this.yAxis);
 
         this.renderPoints();
-    };
+    }
 }

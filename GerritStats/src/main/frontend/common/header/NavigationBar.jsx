@@ -9,7 +9,7 @@ export default class NavigationBar extends React.Component {
         super(props);
     }
 
-    renderElement(element, index) {
+    renderElement(element) {
         const key = element.get('key');
         const displayName = element.get('displayName');
 
@@ -24,9 +24,8 @@ export default class NavigationBar extends React.Component {
         }
 
         var renderedElements = [];
-        var i = 0;
         this.props.elements.forEach(element =>
-            renderedElements.push(this.renderElement(element, i++))
+            renderedElements.push(this.renderElement(element))
         );
         return renderedElements;
     }

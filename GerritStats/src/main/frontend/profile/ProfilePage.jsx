@@ -6,14 +6,11 @@ import {ProgressBar} from 'react-bootstrap';
 
 import ClearFloat from '../common/ClearFloat';
 import GerritVersionAlerts from '../common/GerritVersionAlerts';
-import PageFooter from '../common/PageFooter';
 import NavigationBar from '../common/header/NavigationBar';
 import PageHeader from '../common/header/PageHeader';
 import UserdataLoader from '../common/loader/UserdataLoader';
 import GerritUserdata from '../common/model/GerritUserdata';
 import SelectedUsers from '../common/model/SelectedUsers';
-
-import NumberPanel from './components/NumberPanel';
 
 import CommitsPanel from './CommitsPanel';
 import CumulativeStatisticsPanel from './CumulativeStatisticsPanel';
@@ -57,10 +54,10 @@ export default class ProfilePage extends React.Component {
             this.setState({
                 dataLoaded: false,
                 userdata: {},
-            })
+            });
             this.loadDataForIdentifier(identifier);
         } else {
-            console.error("ProfilePage opened without an identifier!");
+            throw new Error('ProfilePage opened without an identifier!');
         }
     }
 

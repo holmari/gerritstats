@@ -34,7 +34,7 @@ export default class GerritVersionAlerts extends React.Component {
              + gerritVersion['patch'];
     }
 
-    handleAlertDismiss(event) {
+    handleAlertDismiss() {
         alertShown = true;
         this.setState({
             alertVisible: false

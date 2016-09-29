@@ -1,3 +1,5 @@
+import * as d3 from 'd3';
+
 import {getDefaultXAxisTimeFormat} from '../../common/charts/D3Utils';
 
 /**
@@ -102,7 +104,7 @@ export default class FrequencyTable {
                   .attr('height', function(d) { return that.height - that.y(d.count); })
                   .attr('fill', function(d) { return that.colors(d.count); })
                .append('svg:title')
-                  .text(function(d) { return d.date });
+                  .text(function(d) { return d.date; });
 
             this.averageGuide = this.svg.append('line')
                 .attr('class', 'verticalGuideline')
@@ -111,9 +113,9 @@ export default class FrequencyTable {
                 .attr('x2', this.width)
                 .attr('y2', this.y(this.averageReviewsPerDay))
                 .style('stroke', this.averageLineColors(this.averageReviewsPerDay))
-                .style("stroke-dasharray", ("7, 7"));
+                .style('stroke-dasharray', ('7, 7'));
 
-           this.helpTextLabel = this.svg.append('text')
+            this.helpTextLabel = this.svg.append('text')
                 .attr('class', 'chartGuidelineText')
                 .attr('x', this.width)
                 .attr('y', this.y(this.averageReviewsPerDay) - 7)

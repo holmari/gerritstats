@@ -1,7 +1,6 @@
 import './NumberPanel.scss';
 
 import classnames from 'classnames';
-import {List} from 'immutable';
 import React from 'react';
 import {OverlayTrigger, Tooltip} from 'react-bootstrap';
 
@@ -37,7 +36,7 @@ export default class NumberPanel extends React.Component {
         const className = classnames(
             'numberPanel',
             {'wide': this.props.size == 'wide'},
-            {'xWide': this.props.size == 'xWide'},
+            {'xWide': this.props.size == 'xWide'}
         );
         return (
             <OverlayTrigger placement='bottom' overlay={tooltip}>

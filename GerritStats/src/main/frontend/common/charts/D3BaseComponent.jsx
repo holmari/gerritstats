@@ -21,4 +21,4 @@ export default class D3BaseComponent extends React.Component {
 
 D3BaseComponent.defaultProps = {
     className: 'graphPanelContent'
-}
+};

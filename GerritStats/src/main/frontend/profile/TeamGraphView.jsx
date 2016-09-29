@@ -4,11 +4,11 @@ import React from 'react';
 import {ProgressBar} from 'react-bootstrap';
 import {Link} from 'react-router';
 import {Td} from 'reactable';
+import Reactable from 'reactable';
 
 import SimpleSortableTable from '../common/SimpleSortableTable';
 import ClearFloat from '../common/ClearFloat';
 import Panel from '../common/Panel';
-import PanelContainer from '../common/PanelContainer';
 import ProximityGraphView from '../common/charts/ProximityGraphView';
 import {createIdentityGraph} from '../common/charts/ProximityGraph';
 import GlobalJavascriptLoader from '../common/loader/GlobalJavascriptLoader';
@@ -109,7 +109,7 @@ export default class TeamGraphView extends React.Component {
                     <Td key={index} column='approvalsReceived'>{data.approvalData.approvalCount}</Td>
                 ),
             }
-        }
+        };
     }
 
     getColumnMetadataForNoResponses() {
@@ -126,7 +126,7 @@ export default class TeamGraphView extends React.Component {
                     </Td>
                 ),
             }
-        }
+        };
     }
 
     getIdentifierForRowIndex(table, index) {
@@ -194,7 +194,7 @@ export default class TeamGraphView extends React.Component {
 
             teamGraph = (
                 <ProximityGraphView {...teamGraphProps} />
-            )
+            );
         } else {
             teamGraph = (
                 <ProgressBar active now={100} />

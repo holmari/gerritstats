@@ -85,7 +85,6 @@ export default class SimpleSortableTable extends React.Component {
     }
 
     renderRows() {
-        const rowData = this.props.rowData;
         const rowRenderer = this.props.rowRenderer || this.renderRow.bind(this);
         return this.props.rowData.map((row, i) => rowRenderer(i, row));
     }
@@ -121,7 +120,7 @@ export default class SimpleSortableTable extends React.Component {
 SimpleSortableTable.defaultProps = {
     highlightedRowIndex: -1,
     rowData: [],
-}
+};
 
 SimpleSortableTable.propTypes = {
     columnMetadata: React.PropTypes.object.isRequired,

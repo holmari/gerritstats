@@ -1,4 +1,4 @@
-import './HorizontalCenterDiv.scss'
+import './HorizontalCenterDiv.scss';
 
 import React from 'react';
 

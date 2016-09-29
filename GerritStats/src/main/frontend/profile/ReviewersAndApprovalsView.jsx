@@ -1,6 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router';
 import {Td} from 'reactable';
+import Reactable from 'reactable';
 
 import Panel from '../common/Panel';
 import SimpleSortableTable from '../common/SimpleSortableTable';
