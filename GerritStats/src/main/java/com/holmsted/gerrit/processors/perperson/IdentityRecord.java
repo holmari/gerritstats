@@ -237,7 +237,7 @@ public class IdentityRecord {
         if (addedAsReviewerTo.isEmpty()) {
             return 0;
         } else {
-            return (float) commentsWritten.size() / addedAsReviewerTo.size();
+            return (float) getAllCommentsWritten().size() / addedAsReviewerTo.size();
         }
     }
 
