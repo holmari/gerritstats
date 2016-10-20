@@ -92,7 +92,7 @@ export default class OverviewTable extends React.Component {
                 sortFunction: Reactable.Sort.NumericInteger,
                 highlighter: new TableCellHighlighter(overviewUserdata, selectedUsers, 'reviewCountMinus1'),
                 description: 'Number of -1 reviews given by this user.',
-                header: (<span>+1<br/>given</span>),
+                header: (<span>-1<br/>given</span>),
                 cell: (record, index) => (
                     <Td key={'reviewCountMinus1' + index} column='reviewCountMinus1'
                         style={this.computeCellStyle(index, 'reviewCountMinus1')}>
