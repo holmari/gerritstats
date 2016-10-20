@@ -28,6 +28,7 @@ public class IdentityRecord {
     int reviewCountPlus1;
     int reviewCountMinus1;
     int reviewCountMinus2;
+    static String rev = "";
 
     // updated when commit or comments written by this user are added
     long firstActiveDate = Long.MAX_VALUE;
@@ -241,7 +242,18 @@ public class IdentityRecord {
         }
     }
 
-    public void addApprovalByThisIdentity(@Nonnull Commit.Identity patchSetAuthor, Approval approval) {
+    public void addApprovalByThisIdentity(@Nonnull Commit.PatchSet patchSet, Approval approval) {
+        // If revision already known, only 1st +2 approval is taken into account
+        if (approval.value == 2) {
+            if (rev.equals(patchSet.revision)) {
+                System.out.println(String.format("patchSet : '%s' : ignore approval for : '%s'", patchSet.revision, approval.grantedBy.username));
+                return;
+            } else {
+                rev = patchSet.revision;
+            }
+        }
+
+        Identity patchSetAuthor = patchSet.author;
         ReviewerData reviewerData = reviewRequestors.computeIfAbsent(patchSetAuthor, k -> new ReviewerData());
         reviewerData.approvalCount++;
         reviewerData.approvals.merge(approval.value, 1, Integer::sum);

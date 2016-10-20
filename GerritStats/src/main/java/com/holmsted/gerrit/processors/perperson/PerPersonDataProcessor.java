@@ -89,7 +89,7 @@ public class PerPersonDataProcessor extends CommitDataProcessor<PerPersonData> {
 
                 if (!grantedBy.equals(patchSetAuthor)) {
                     IdentityRecord record = getOrCreateRecord(grantedBy);
-                    record.addApprovalByThisIdentity(patchSetAuthor, approval);
+                    record.addApprovalByThisIdentity(patchSet, approval);
                 }
             }
 
