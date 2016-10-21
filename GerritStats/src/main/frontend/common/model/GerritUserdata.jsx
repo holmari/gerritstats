@@ -285,7 +285,7 @@ export default class GerritUserdata {
     }
 
     getAddedAsReviewerToCount(selectedUsers) {
-        return this.record.reviewersForOwnCommits.reduce(function(prev, value) {
+        return this.record.reviewRequestors.reduce(function(prev, value) {
             const isSelected = selectedUsers.isUserSelected(value.identity);
             return prev + (isSelected ? value.approvalData.addedAsReviewerCount : 0);
         }, 0);
