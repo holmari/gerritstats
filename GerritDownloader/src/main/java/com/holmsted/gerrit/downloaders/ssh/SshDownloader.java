@@ -87,7 +87,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
     abstract static class DataReader {
         private int overallCommitLimit;
-        private String projectNameList;
+        protected String gerritQuery;
 
         private GerritServer gerritServer;
         private GerritVersion gerritVersion;
@@ -111,12 +111,10 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return overallCommitLimit;
         }
 
-        public void setProjectNameList(String projectNameList) {
-            this.projectNameList = projectNameList;
-        }
+        public abstract void setGerritQuery(String projectNameList, String afterDate);
 
-        public String getProjectNameList() {
-            return projectNameList;
+        public String getGerritQuery() {
+            return gerritQuery;
         }
 
         public void setGerritVersion(@Nonnull GerritVersion gerritVersion) {
@@ -157,6 +155,17 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return items;
         }
 
+        @Override
+        public void setGerritQuery(String projectNameList, String afterDate) {
+            if (projectNameList.isEmpty()) {
+                throw new IllegalStateException("No project name defined!");
+            }
+            if (afterDate != null) {
+                System.out.println("--after-date parameter not supported with Gerrit prior to v2.9.");
+            }
+            this.gerritQuery = String.format("project:^%s", projectNameList);
+        }
+
         private List<JSONObject> readOutputWithStatusQueryUntilLimit(@Nonnull String statusQuery) {
             List<JSONObject> items = new ArrayList<>();
 
@@ -175,7 +184,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         private GerritOutput readOutputWithStatusQuery(String statusQuery) {
-            String projectNameList = getProjectNameList();
+            String gerritQuery = getGerritQuery();
             GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
             String resumeSortkeyArg = !Strings.nullToEmpty(resumeSortkey).isEmpty()
                     ?  "resume_sortkey:" + resumeSortkey : "";
@@ -185,7 +194,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
                     + "--all-approvals "
                     + "--comments "
                     + "%s ",
-                    projectNameList,
+                    gerritQuery,
                     statusQuery,
                     resumeSortkeyArg
             ));
@@ -205,7 +214,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         public GerritOutput readData() {
-            String projectNameList = getProjectNameList();
+            String gerritQuery = getGerritQuery();
             GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
 
             String output = sshCommand.exec(String.format("query %s "
@@ -214,7 +223,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
                             + "--comments "
                             + "--all-reviewers "
                             + createStartOffsetArg(),
-                    projectNameList
+                    gerritQuery
                     ));
 
             return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
@@ -239,6 +248,17 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
             return items;
         }
+
+        @Override
+        public void setGerritQuery(String projectNameList, String afterDate) {
+            if (projectNameList.isEmpty()) {
+                throw new IllegalStateException("No project name defined!");
+            }
+            if (afterDate != null) {
+                this.gerritQuery = String.format("project:^%s after:%s", projectNameList, afterDate);
+            }
+        }
+
 
         private String createStartOffsetArg() {
             return startOffset != 0 ? "--start " + startOffset + " " : "";
@@ -276,17 +296,9 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
         reader.setGerritServer(getGerritServer());
         reader.setOverallCommitLimit(getOverallCommitLimit());
-        reader.setProjectNameList(createProjectNameList());
+        reader.setGerritQuery(getProjectName(), getAfterDate());
         reader.setGerritVersion(gerritVersion);
 
         return reader;
-    }
-
-    @Nonnull
-    private String createProjectNameList() {
-        if (getProjectName().isEmpty()) {
-            throw new IllegalStateException("No project name defined!");
-        }
-        return String.format("project:^%s", getProjectName());
     }
 }

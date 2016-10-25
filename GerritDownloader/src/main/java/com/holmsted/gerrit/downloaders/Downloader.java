@@ -52,6 +52,7 @@ public class Downloader {
         for (String projectName : projectNames) {
             AbstractGerritStatsDownloader downloader = createDownloader();
             downloader.setOverallCommitLimit(commandLine.getCommitLimit());
+            downloader.setAfterDate(commandLine.getAfterDate());
             downloader.setProjectName(projectName);
             List<JSONObject> data = downloader.readData();
             if (data.isEmpty()) {
