@@ -10,6 +10,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.jar.Attributes;
@@ -54,6 +56,13 @@ public class CommandLineParser {
             + "will be a multiple of the limit set on the Gerrit server.")
     private int limit = SshDownloader.NO_COMMIT_LIMIT; // NOPMD
 
+    @Parameter(names = {"-a", "--after-date"},
+            description = "If specified, commits older than this date won't be downloaded."
+            + "Format should be in the form yyyy-mm-dd",
+            required = false,
+            converter = DateConverter.class)
+     private String afterDate;
+
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
 
@@ -81,6 +90,20 @@ public class CommandLineParser {
                 }
 
                 return result;
+            }
+        }
+    }
+
+    public static class DateConverter implements IStringConverter<String> {
+        @Override
+        public String convert(String value) {
+            try {
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                dateFormat.setLenient(false);
+                dateFormat.parse(value);
+                return value;
+            } catch (ParseException e) {
+                throw new ParameterException("Bad Date format " + value);
             }
         }
     }
@@ -151,6 +174,10 @@ public class CommandLineParser {
 
     public int getCommitLimit() {
         return limit;
+    }
+
+    public String getAfterDate() {
+        return afterDate;
     }
 
     public void printUsage() {
