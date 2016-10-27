@@ -256,6 +256,8 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             }
             if (afterDate != null) {
                 this.gerritQuery = String.format("project:^%s after:%s", projectNameList, afterDate);
+            } else {
+                this.gerritQuery = String.format("project:^%s", projectNameList);
             }
         }
 
