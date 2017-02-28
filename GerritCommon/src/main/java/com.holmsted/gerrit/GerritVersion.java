@@ -21,8 +21,9 @@ public final class GerritVersion {
         } else if (versionParts.length == 2) {
             // Output format for older Gerrit versions: "gerrit version X.YY-ZZ-gitsha"
             String[] dotVersionParts = versionParts[1].split("-");
-            minor = safeValueOf(dotVersionParts[0]);
-            patch = safeValueOf(dotVersionParts[1]);
+            
+            minor = dotVersionParts.length > 0 ? safeValueOf(dotVersionParts[0]) : -1; 
+            patch = dotVersionParts.length > 1 ? safeValueOf(dotVersionParts[1]) : -1;
         } else {
             minor = -1;
             patch = -1;
