@@ -34,33 +34,28 @@ export default class PerMonthStatsPanel extends React.Component {
         return elements;
     }
 
-    renderCommitCounts(commitTable, year) {
-        return this.getElementsPerMonth(commitTable, year, 'getPrintableMonthlyItemCount');
+    renderCounts(table, year) {
+        return this.getElementsPerMonth(table, year, 'getPrintableMonthlyItemCount');
     }
 
-    renderCommentCounts(commentTable, year) {
-        return this.getElementsPerMonth(commentTable, year, 'getPrintableMonthlyItemCount');
+    renderMoMChange(table, year) {
+        return this.getElementsPerMonth(table, year, 'getDisplayableMonthOnMonthChange');
     }
 
-    renderCommitsMoMChange(commitTable, year) {
-        return this.getElementsPerMonth(commitTable, year, 'getDisplayableMonthOnMonthChange');
-    }
-
-    renderCommitsQoQChange(commitTable, year) {
-        return this.getElementsPerMonth(commitTable, year, 'getDisplayableQuarterOnQuarterChange');
-    }
-
-    renderCommentsMoMChange(commentTable, year) {
-        return this.getElementsPerMonth(commentTable, year, 'getDisplayableMonthOnMonthChange');
-    }
-
-    renderCommentsQoQChange(commentTable, year) {
-        return this.getElementsPerMonth(commentTable, year, 'getDisplayableQuarterOnQuarterChange');
+    renderQoQChange(table, year) {
+        return this.getElementsPerMonth(table, year, 'getDisplayableQuarterOnQuarterChange');
     }
 
     renderPerYearStats() {
         const commitTable = this.props.userdata.datedCommitTable;
-        const years = this.props.userdata.datedCommitTable.getActiveYears();
+        const commentTable = this.props.userdata.datedCommentTable;
+        var years = commitTable.getActiveYears().concat(commentTable.getActiveYears());
+        years.sort(function(l, r) {
+            return (l > r) ? -1 : ((l < r) ? 1 : 0);
+        });
+        years = years.filter(function(item, pos, a) {
+            return !pos || item != a[pos - 1];
+        });
 
         const elements = [];
         years.forEach(function(year) {
@@ -90,37 +85,37 @@ export default class PerMonthStatsPanel extends React.Component {
             elements.push(
                 <tr key={keyPrefix + '_2'} className='commitsSection'>
                     <th>Commits</th>
-                    {this.renderCommitCounts(commitTable, year)}
+                    {this.renderCounts(commitTable, year)}
                 </tr>
             );
             elements.push(
                 <tr key={keyPrefix + '_3'} className='commentsSection'>
                     <th>Comments</th>
-                    {this.renderCommentCounts(commitTable, year)}
+                    {this.renderCounts(commentTable, year)}
                 </tr>
             );
             elements.push(
                 <tr key={keyPrefix + '_4'} className='commitsMoMSection'>
                     <th>Commits MoM %</th>
-                    {this.renderCommitsMoMChange(commitTable, year)}
+                    {this.renderMoMChange(commitTable, year)}
                 </tr>
             );
             elements.push(
                 <tr key={keyPrefix + '_5'} className='commitsQoQSection'>
                     <th>Commits QoQ %</th>
-                    {this.renderCommitsQoQChange(commitTable, year)}
+                    {this.renderQoQChange(commitTable, year)}
                 </tr>
             );
             elements.push(
                 <tr key={keyPrefix + '_6'} className='commentsMoMSection'>
                     <th>Comments MoM %</th>
-                    {this.renderCommentsMoMChange(commitTable, year)}
+                    {this.renderMoMChange(commentTable, year)}
                 </tr>
             );
             elements.push(
                 <tr key={keyPrefix + '_7'} className='commentsQoQSection'>
                     <th>Comments QoQ %</th>
-                    {this.renderCommentsQoQChange(commitTable, year)}
+                    {this.renderQoQChange(commentTable, year)}
                 </tr>
             );
         }.bind(this));
