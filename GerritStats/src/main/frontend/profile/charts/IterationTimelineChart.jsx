@@ -141,7 +141,7 @@ export default class IterationTimelineChart {
                               .attr('y1', yPos);
             this.helpTextLabel.attr('x', xPos + 15);
             this.helpTextLabel.attr('y', centerY + (this.height / 4));
-            this.helpTextLabel.text(moment(selection.data()[0].date).format('LLLL'));
+            this.helpTextLabel.text(moment(selection.data()[0].createdOnDate).format('LLLL'));
         } else {
             this.verticalGuide.style('visibility', 'hidden');
             this.helpTextLabel.style('visibility', 'hidden');
