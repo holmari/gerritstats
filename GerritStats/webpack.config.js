@@ -11,35 +11,35 @@ module.exports = {
             {
                 test: /\.jsx?$/,
                 exclude: /node_modules/,
-                loader: 'babel',
+                loader: 'babel-loader',
             },
             {
                 test: /\.s?css$/,
-                loaders: ['style', 'css', 'sass'],
+                loaders: ['style-loader', 'css-loader', 'sass-loader'],
             },
             {
                 test: /\.html/,
-                loader: 'html',
+                loader: 'html-loader',
             },
             {
                 test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'url?limit=10000&mimetype=application/font-woff'
+                loader: 'url-loader?limit=10000&mimetype=application/font-woff'
             },
             {
                 test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'url?limit=10000&mimetype=application/octet-stream'
+                loader: 'url-loader?limit=10000&mimetype=application/octet-stream'
             },
             {
                 test: /\.eot(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'file'
+                loader: 'file-loader'
             },
             {
                 test: /\.svg(\?v=\d+\.\d+\.\d+)?$/,
-                loader: 'url?limit=10000&mimetype=image/svg+xml'
+                loader: 'url-loader?limit=10000&mimetype=image/svg+xml'
             },
             {
               test: /\.(png|jpg)$/,
-              loader: 'url?limit=8192'
+              loader: 'url-loader?limit=8192'
             }
         ],
     },
