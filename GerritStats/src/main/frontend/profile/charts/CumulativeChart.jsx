@@ -1,7 +1,7 @@
 import moment from 'moment';
 
 import * as d3 from 'd3';
-import legend from 'd3-svg-legend/no-extend';
+import legend from 'd3-svg-legend';
 import {getDefaultXAxisTimeFormat} from '../../common/charts/D3Utils';
 
 /*
