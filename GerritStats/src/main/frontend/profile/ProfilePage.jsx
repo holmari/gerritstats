@@ -79,10 +79,12 @@ export default class ProfilePage extends React.Component {
             };
             return (
                 <div>
+                    <a name='overall' ref='overallHashLink'></a>
                     <ReviewsGivenPanel {...componentProps} />
                     <ReviewsReceivedPanel {...componentProps} />
                     <CommitsPanel {...componentProps} />
                     <ClearFloat />
+                    <a name='reviewers' ref='reviewersHashLink'></a>
                     <ReviewersAndApprovalsView {...componentProps} />
                     <ClearFloat />
                     <TeamGraphView {...componentProps} />
@@ -96,12 +98,15 @@ export default class ProfilePage extends React.Component {
                     <ClearFloat />
                     <CumulativeStatisticsPanel {...componentProps} />
                     <ClearFloat />
+                    <a name='iteration' ref='iterationHashLink'></a>
                     <IterationView {...componentProps} />
                     <ClearFloat />
+                    <a name='perMonth' ref='perMonthHashLink'></a>
                     <PerMonthStatsPanel {...componentProps} />
                     <ClearFloat />
                     <ProjectsContributedToPanel {...componentProps} />
                     <ClearFloat />
+                    <a name='comments' ref='commentsHashLink'></a>
                     <ReviewCommentsPanel {...componentProps} />
                 </div>
             );
@@ -122,10 +127,16 @@ export default class ProfilePage extends React.Component {
                 { key: 'comments', displayName: 'Comments', }
             ]),
             onSelectedListener: function(selectedKey) {
-                if (selectedKey == 'overview') {
-                    this.refs.overviewHashLink.scrollIntoView();
-                } else if (selectedKey == 'teamGraph') {
-                    this.refs.teamGraphHashLink.scrollIntoView();
+                if (selectedKey == 'overall') {
+                    this.refs.overallHashLink.scrollIntoView();
+                } else if (selectedKey == 'reviewers') {
+                    this.refs.reviewersHashLink.scrollIntoView();
+                } else if (selectedKey == 'iteration') {
+                    this.refs.iterationHashLink.scrollIntoView();
+                } else if (selectedKey == 'perMonth') {
+                    this.refs.perMonthHashLink.scrollIntoView();
+                } else if (selectedKey == 'comments') {
+                    this.refs.commentsHashLink.scrollIntoView();
                 }
             }.bind(this),
         };

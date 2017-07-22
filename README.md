@@ -81,6 +81,12 @@ developers.
 ./gerrit_stats.sh --file gerrit-json-out.txt --branches master --include developer1@domain.com,developer2@domain.com,...developer5@domain.com --list-commits-exceeding-patch-set-count 5
 ```
 
+## How to develop the UI
+
+ 1. ./gradlew assemble (or use e.g. IntelliJ to build)
+ 2. cd GerritStats && npm run generateData -- -f your_data_file.json
+ 3. npm run webpack-watch
+ 4. Open the output in GerritStats/out-html and start development.
 
 ## Screenshots
 
