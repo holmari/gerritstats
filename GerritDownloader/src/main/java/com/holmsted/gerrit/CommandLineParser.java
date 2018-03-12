@@ -63,6 +63,13 @@ public class CommandLineParser {
             converter = DateConverter.class)
      private String afterDate;
 
+    @Parameter(names = {"-b", "--before-date"},
+            description = "If specified, commits younger than this date won't be downloaded."
+            + "Format should be in the form yyyy-mm-dd",
+            required = false,
+            converter = DateConverter.class)
+     private String beforeDate;
+
     @Nonnull
     private final JCommander jCommander = new JCommander(this);
 
@@ -178,6 +185,10 @@ public class CommandLineParser {
 
     public String getAfterDate() {
         return afterDate;
+    }
+
+    public String getBeforeDate() {
+        return beforeDate;
     }
 
     public void printUsage() {

@@ -111,7 +111,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             return overallCommitLimit;
         }
 
-        public abstract void setGerritQuery(String projectNameList, String afterDate);
+        public abstract void setGerritQuery(String projectNameList, String afterDate, String beforeDate);
 
         public String getGerritQuery() {
             return gerritQuery;
@@ -156,7 +156,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         @Override
-        public void setGerritQuery(String projectNameList, String afterDate) {
+        public void setGerritQuery(String projectNameList, String afterDate, String beforeDate) {
             if (projectNameList.isEmpty()) {
                 throw new IllegalStateException("No project name defined!");
             }
@@ -250,15 +250,17 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
 
         @Override
-        public void setGerritQuery(String projectNameList, String afterDate) {
+        public void setGerritQuery(String projectNameList, String afterDate, String beforeDate) {
             if (projectNameList.isEmpty()) {
                 throw new IllegalStateException("No project name defined!");
             }
+            this.gerritQuery = String.format("project:{^%s}", projectNameList);
             if (afterDate != null) {
-                this.gerritQuery = String.format("project:{^%s} after:{%s}", projectNameList, afterDate);
-            } else {
-                this.gerritQuery = String.format("project:{^%s}", projectNameList);
-            }
+                this.gerritQuery += String.format(" after:{%s}", afterDate);
+                }
+            if (beforeDate != null) {
+                this.gerritQuery += String.format(" before:{%s}", beforeDate);
+                }
         }
 
 
@@ -298,7 +300,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
         reader.setGerritServer(getGerritServer());
         reader.setOverallCommitLimit(getOverallCommitLimit());
-        reader.setGerritQuery(getProjectName(), getAfterDate());
+        reader.setGerritQuery(getProjectName(), getAfterDate(), getBeforeDate());
         reader.setGerritVersion(gerritVersion);
 
         return reader;

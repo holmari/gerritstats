@@ -18,6 +18,7 @@ public abstract class AbstractGerritStatsDownloader {
 
     private int overallCommitLimit = NO_COMMIT_LIMIT;
     private String afterDate;
+    private String beforeDate;
 
     public AbstractGerritStatsDownloader(@Nonnull GerritServer gerritServer) {
         this.gerritServer = gerritServer;
@@ -54,8 +55,16 @@ public abstract class AbstractGerritStatsDownloader {
         afterDate = date;
     }
 
+    public void setBeforeDate(String date) {
+        beforeDate = date;
+    }
+
     public String getAfterDate() {
         return afterDate;
+    }
+
+    public String getBeforeDate() {
+        return beforeDate;
     }
 
     /**
