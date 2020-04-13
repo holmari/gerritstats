@@ -26,3 +26,8 @@ GerritStats/node_modules
 
 # Velocity template engine
 velocity.log
+
+# Eclipse
+**/.classpath
+**/.project
+**/.settings
