@@ -70,8 +70,8 @@ public class CommandLineParser {
     }
 
     public CommandLineParser() {
-        URLClassLoader loader = (URLClassLoader) getClass().getClassLoader();
-        URL url = loader.findResource("META-INF/MANIFEST.MF");
+        ClassLoader loader = getClass().getClassLoader();
+        URL url = loader.getResource("META-INF/MANIFEST.MF");
         try {
             Manifest manifest = new Manifest(url.openStream());
             Attributes attr = manifest.getMainAttributes();
