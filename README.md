@@ -12,7 +12,8 @@ as well as a per-developer page that lists all their review comments and links b
 
 There are two separate command-line tools:
 
-* GerritDownloader, which downloads JSON data from the server
+* GerritDownloader, which downloads JSON data from the server using either ssh to the Gerrit query API,
+or curl/wget via https to the Gerrit REST API.
 * GerritStats, which parses the json output provided by GerritDownloader, and generates HTML output.
 
 ## Demo
@@ -25,7 +26,7 @@ http://gerritstats-demo.firebaseapp.com
 
 The tool should work fine on OS X and Linux. Windows is not supported; if it works, it's not intended.
 
-Java 8 is required.
+Java Development Kit version 8 or later is required to build and run the tool.
 
 ```
 # Prerequisite: if using OS X, install brew from http://brew.sh
@@ -57,7 +58,7 @@ Fetching data from Gerrit can take a while. Use GerritDownloader to get the JSON
 ./gerrit_downloader.sh --server gerrit.instance.on.inter.nets --project YourProjectName --limit 7500 --output-dir gerrit_out/
 ```
 
-The above command will download all data from the given Gerrit server and given project, and store the data in .json format in the given output directory.
+The above command will use ssh to download all data from the given Gerrit server and given project, and store the data in .json format in the given output directory.
 
 If you have multiple projects in Gerrit and want to take a look at all the data, omit the --project argument. This will download data for all projects you have
 access to:

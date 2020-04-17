@@ -17,6 +17,11 @@ public final class JsonUtils {
     }
 
     @Nonnull
+    public static JSONArray readJsonArray(String jsonString) {
+        return new JSONArray(new JSONTokener(jsonString));
+    }
+
+    @Nonnull
     public static List<String> readStringArray(JSONArray array) {
         List<String> list = new ArrayList<>();
         for (int i = 0; i < array.length(); ++i) {

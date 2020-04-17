@@ -13,8 +13,7 @@ public final class GerritStatsDownloaderMain {
             return;
         }
 
-        Downloader downloader = new Downloader(commandLine);
-        downloader.download();
+        new Downloader(commandLine).download();
     }
 
     private GerritStatsDownloaderMain() {

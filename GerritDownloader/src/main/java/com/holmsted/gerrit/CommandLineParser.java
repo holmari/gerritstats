@@ -1,15 +1,8 @@
 package com.holmsted.gerrit;
 
-import com.beust.jcommander.IStringConverter;
-import com.beust.jcommander.JCommander;
-import com.beust.jcommander.Parameter;
-import com.beust.jcommander.ParameterException;
-import com.holmsted.gerrit.downloaders.ssh.SshDownloader;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -20,24 +13,40 @@ import java.util.jar.Manifest;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.beust.jcommander.IStringConverter;
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
+import com.holmsted.gerrit.GerritServer.Cli;
+import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
+
 @SuppressWarnings("unused")
 public class CommandLineParser {
 
     private static final String DEFAULT_OUTPUT_DIR = "out";
 
     @Parameter(names = {"-s", "--server"},
-            description = "Read output from Gerrit server URL and given port, in format server:port. "
-                    + "If port is omitted, defaults to 29418.",
+            description = "Download from Gerrit server name and port, in format gerrit.my.org:port. "
+                    + "Some SSH servers require format user@gerrit.my.org:port. "
+                    + "If port is omitted, defaults to a value appropriate for the CLI tool; "
+                    + "e.g., ssh uses port 29418; curl and wget use https on port 443.",
             arity = 1,
             required = true,
             converter = ServerAndPort.Converter.class)
     private ServerAndPort serverAndPort;
-
+    
     @Parameter(names = {"-i", "--private-key"},
-            description = "The SSH private key to access the server. Defaults to ~/.ssh/id_rsa.",
-            required = false)
+            description = "The SSH private key to access the server. Defaults to ~/.ssh/id_rsa",
+            arity = 1)
     private String privateKey;
 
+    @Parameter(names = {"-c", "--command-line"},
+            description = "The command-line tool used to query the Gerrit server. "
+                    + "Options are ssh, curl and wget; curl and wget use https protocol. "
+                    + "If omitted, defaults to ssh.",
+            arity = 1)
+    private String cliTool;
+    
     @Parameter(names = {"-p", "--project"},
             description = "The Gerrit project from which to retrieve stats. This parameter can appear multiple times. "
                     + "If omitted, stats will be retrieved from all projects.")
@@ -46,6 +55,7 @@ public class CommandLineParser {
     @Parameter(names = {"-o", "--output-dir"},
             description = "The directory into which the json output will be written into. "
                     + "If multiple projects are specified, each is downloaded into its own file.",
+            arity = 1,
             required = true)
     private String outputDir;
 
@@ -54,19 +64,17 @@ public class CommandLineParser {
             + "If omitted, stats will be retrieved until no further records are available. "
             + "This value is an approximation; the actual number of downloaded commit data "
             + "will be a multiple of the limit set on the Gerrit server.")
-    private int limit = SshDownloader.NO_COMMIT_LIMIT; // NOPMD
+    private int limit = AbstractGerritStatsDownloader.NO_COMMIT_LIMIT; // NOPMD
 
     @Parameter(names = {"-a", "--after-date"},
-            description = "If specified, commits older than this date won't be downloaded."
+            description = "If specified, commits older than this date won't be downloaded. "
             + "Format should be in the form yyyy-mm-dd",
-            required = false,
             converter = DateConverter.class)
      private String afterDate;
 
     @Parameter(names = {"-b", "--before-date"},
-            description = "If specified, commits younger than this date won't be downloaded."
+            description = "If specified, commits younger than this date won't be downloaded. "
             + "Format should be in the form yyyy-mm-dd",
-            required = false,
             converter = DateConverter.class)
      private String beforeDate;
 
@@ -81,7 +89,6 @@ public class CommandLineParser {
             @Override
             public ServerAndPort convert(String value) {
                 ServerAndPort result = new ServerAndPort();
-
                 int protocolSeparator = value.indexOf("://");
                 int portSeparator = value.lastIndexOf(':');
                 int serverNameEnd = value.length();
@@ -95,7 +102,6 @@ public class CommandLineParser {
                 if (result.serverName.endsWith("/")) {
                     result.serverName = result.serverName.substring(0, result.serverName.length() - 1);
                 }
-
                 return result;
             }
         }
@@ -134,9 +140,13 @@ public class CommandLineParser {
         } catch (ParameterException e) {
             return false;
         }
-
+        try {
+            Cli.valueOf(getCliTool().toUpperCase());
+        }
+        catch (IllegalArgumentException ex) {
+            return false;
+        }
         outputDir = resolveOutputDir(outputDir);
-
         return getServerName() != null;
     }
 
@@ -168,6 +178,10 @@ public class CommandLineParser {
             return privateKey;
         }
         return System.getProperty("user.home") + "/.ssh/id_rsa";
+    }
+
+    public String getCliTool() {
+        return cliTool != null ? cliTool : "ssh";
     }
 
     @Nullable

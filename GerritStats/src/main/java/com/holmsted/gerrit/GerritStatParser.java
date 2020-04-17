@@ -39,11 +39,14 @@ public class GerritStatParser {
         try {
             JSONObject object = JsonUtils.readJsonString(jsonFileData);
             int gerritStatsVersion = object.optInt("gerritStatsVersion");
-            if (gerritStatsVersion == 0) {
+            if (gerritStatsVersion == GerritStatsVersion.LEGACY.ordinal())
                 data = parseLegacyFormatData(jsonFileData);
-            } else {
-                data = parseJsonObject(object);
-            }
+            else if (gerritStatsVersion == GerritStatsVersion.SSH.ordinal())
+                data = parseSshJsonObject(object);
+            else if (gerritStatsVersion == GerritStatsVersion.REST.ordinal())
+                data = parseRestJsonObject(object);
+            else
+                throw new IllegalArgumentException("Unexpected stats version: " + gerritStatsVersion);
         } catch (JSONException e) {
             // the earlier versions of GerritDownloader output were not valid json, but
             // instead files with line-by-line json.
@@ -53,8 +56,12 @@ public class GerritStatParser {
         return data;
     }
 
+    private GerritData parseRestJsonObject(@Nonnull JSONObject rootObject) {
+    	return null;
+    }
+
     @Nonnull
-    private GerritData parseJsonObject(@Nonnull JSONObject rootObject) {
+    private GerritData parseSshJsonObject(@Nonnull JSONObject rootObject) {
         JSONArray jsonCommits = rootObject.getJSONArray("commits");
         GerritVersion gerritVersion = GerritVersion.fromString(rootObject.getString("gerritVersion"));
         ParserContext context = new ParserContext(gerritVersion);

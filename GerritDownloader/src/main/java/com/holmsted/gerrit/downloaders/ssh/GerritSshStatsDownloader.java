@@ -1,27 +1,32 @@
 package com.holmsted.gerrit.downloaders.ssh;
 
-import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
-import com.holmsted.gerrit.GerritServer;
-import com.holmsted.gerrit.GerritVersion;
-import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
-import com.holmsted.json.JsonUtils;
-
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public class SshDownloader extends AbstractGerritStatsDownloader {
+import org.json.JSONObject;
 
-    public static final int NO_COMMIT_LIMIT = -1;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.holmsted.gerrit.GerritStatsVersion;
+import com.holmsted.gerrit.GerritVersion;
+import com.holmsted.gerrit.downloaders.AbstractDataReader;
+import com.holmsted.gerrit.downloaders.AbstractGerritStatsDownloader;
+import com.holmsted.json.JsonUtils;
+
+public class GerritSshStatsDownloader extends AbstractGerritStatsDownloader {
 
     @Nonnull
     private final GerritVersion gerritVersion;
 
+    /**
+     * Represents metadata returned on the last line by the gerrit query API:
+     * <pre>
+     * {"type":"stats","rowCount":2,"runningTimeMilliseconds:15}
+     * </pre>
+     */
     static class QueryMetadata {
         final int rowCount;
         final int runtimeMsec;
@@ -40,7 +45,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         private QueryMetadata(JSONObject metadata) {
             moreChanges = metadata.optBoolean("moreChanges");
             rowCount = metadata.optInt("rowCount");
-            runtimeMsec = metadata.optInt("runTimeMilliseconds");
+            runtimeMsec = metadata.optInt("runningTimeMilliseconds");
             resumeSortkey = metadata.optString("resumeSortKey");
         }
     }
@@ -52,12 +57,11 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         @Nonnull
         private final GerritVersion gerritVersion;
 
-        public GerritOutput(@Nonnull String output, @Nonnull GerritVersion gerritVersion) {
-            List<String> strings = Arrays.asList(output.split("\n"));
-
+        public GerritOutput(@Nonnull String text, @Nonnull GerritVersion gerritVersion) {
+            // Answers a list of changes (JSON objects), one per physical line
+            List<String> strings = Arrays.asList(text.split("\n"));
             String lastLine = strings.get(strings.size() - 1);
             this.metadata = Preconditions.checkNotNull(QueryMetadata.fromOutputString(lastLine));
-
             for (int i = 0; i < strings.size() - 1; ++i) {
                 this.output.add(new JSONObject(strings.get(i)));
             }
@@ -85,47 +89,6 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
     }
 
-    abstract static class DataReader {
-        private int overallCommitLimit;
-        protected String gerritQuery;
-
-        private GerritServer gerritServer;
-        private GerritVersion gerritVersion;
-
-        @Nonnull
-        public abstract List<JSONObject> readUntilLimit();
-
-        public void setGerritServer(@Nonnull GerritServer gerritServer) {
-            this.gerritServer = gerritServer;
-        }
-
-        public GerritServer getGerritServer() {
-            return gerritServer;
-        }
-
-        public void setOverallCommitLimit(int overallCommitLimit) {
-            this.overallCommitLimit = overallCommitLimit;
-        }
-
-        public int getOverallCommitLimit() {
-            return overallCommitLimit;
-        }
-
-        public abstract void setGerritQuery(String projectNameList, String afterDate, String beforeDate);
-
-        public String getGerritQuery() {
-            return gerritQuery;
-        }
-
-        public void setGerritVersion(@Nonnull GerritVersion gerritVersion) {
-            this.gerritVersion = gerritVersion;
-        }
-
-        public GerritVersion getGerritVersion() {
-            return gerritVersion;
-        }
-    }
-
     /**
      * Data reader with Gerrit pre-2.9 support. The following problems are being worked around:
      * <p>
@@ -133,7 +96,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
      *    queries for open, merged and abandoned commits.
      * 2) the resume/limit behavior is not implemented in pre-2.9, so resume_sortKey is used instead.
      */
-    static class LegacyDataReader extends DataReader {
+    static class LegacyDataReader extends AbstractDataReader {
 
         private String resumeSortkey;
 
@@ -185,19 +148,18 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
         private GerritOutput readOutputWithStatusQuery(String statusQuery) {
             String gerritQuery = getGerritQuery();
-            GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
+            GerritSshCommand command = new GerritSshCommand((GerritSshServer) getGerritServer());
             String resumeSortkeyArg = !Strings.nullToEmpty(resumeSortkey).isEmpty()
                     ?  "resume_sortkey:" + resumeSortkey : "";
 
-            String output = sshCommand.exec(String.format("query %s %s "
-                    + "--format=JSON "
-                    + "--all-approvals "
-                    + "--comments "
-                    + "%s ",
-                    gerritQuery,
-                    statusQuery,
-                    resumeSortkeyArg
-            ));
+            String output = command.exec("query", //
+                    gerritQuery, //
+                    statusQuery, //
+                    "--format=JSON", //
+                    "--all-approvals", //
+                    "--comments", //
+                    resumeSortkeyArg 
+            );
 
             return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
         }
@@ -206,7 +168,7 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
     /**
      * Reads data from Gerrit versions 2.9 and higher.
      */
-    static class DefaultDataReader extends DataReader {
+    static class DefaultDataReader extends AbstractDataReader {
         private int startOffset;
 
         public void setStartOffset(int startOffset) {
@@ -215,17 +177,14 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
         public GerritOutput readData() {
             String gerritQuery = getGerritQuery();
-            GerritSshCommand sshCommand = new GerritSshCommand(getGerritServer());
-
-            String output = sshCommand.exec(String.format("query %s "
-                            + "--format=JSON "
-                            + "--all-approvals "
-                            + "--comments "
-                            + "--all-reviewers "
-                            + createStartOffsetArg(),
-                    gerritQuery
-                    ));
-
+            GerritSshCommand sshCommand = new GerritSshCommand((GerritSshServer)getGerritServer());
+            String output = sshCommand.exec("query", //
+                    gerritQuery, //
+                    "--format=JSON", //
+                    "--all-approvals", //
+                    "--comments", //
+                    "--all-reviewers",//
+                    createStartOffsetArg());
             return new GerritOutput(Strings.nullToEmpty(output), getGerritVersion());
         }
 
@@ -269,9 +228,13 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
         }
     }
 
-    public SshDownloader(@Nonnull GerritServer gerritServer, @Nonnull GerritVersion gerritVersion) {
+    public GerritSshStatsDownloader(@Nonnull GerritSshServer gerritServer, @Nonnull GerritVersion gerritVersion) {
         super(gerritServer);
         this.gerritVersion = gerritVersion;
+    }
+
+    public int getGerritStatsVersion() {
+        return GerritStatsVersion.SSH.ordinal();
     }
 
     /**
@@ -286,19 +249,19 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
             System.out.println("Reading all commit data from " + getGerritServer());
         }
 
-        DataReader reader = createDataReader();
+        AbstractDataReader reader = createDataReader();
         return reader.readUntilLimit();
     }
 
     @Nonnull
-    private DataReader createDataReader() {
-        DataReader reader;
+    private AbstractDataReader createDataReader() {
+        AbstractDataReader reader;
         if (gerritVersion.isAtLeast(2, 9)) {
             reader = new DefaultDataReader();
         } else {
             reader = new LegacyDataReader();
         }
-        reader.setGerritServer(getGerritServer());
+        reader.setGerritServer((GerritSshServer)getGerritServer());
         reader.setOverallCommitLimit(getOverallCommitLimit());
         reader.setGerritQuery(getProjectName(), getAfterDate(), getBeforeDate());
         reader.setGerritVersion(gerritVersion);
