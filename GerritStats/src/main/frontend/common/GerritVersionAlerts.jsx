@@ -14,10 +14,11 @@ export default class GerritVersionAlerts extends React.Component {
         };
     }
 
+    // Version 3.1 must pass the "atLeast" test against 2.9 even tho 1 < 9.
     isGerritVersionAtLeast(major, minor) {
         var gerritVersion = this.props.datasetOverview['gerritVersion'] || {};
-        return gerritVersion['major'] >= major
-            && gerritVersion['minor'] >= minor;
+        return gerritVersion['major'] > major || 
+            (gerritVersion['major'] == major && gerritVersion['minor'] >= minor);
     }
 
     isGerritVersionUnknown() {
