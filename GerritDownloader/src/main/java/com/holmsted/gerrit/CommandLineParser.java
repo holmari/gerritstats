@@ -26,7 +26,8 @@ public class CommandLineParser {
     private static final String DEFAULT_OUTPUT_DIR = "out";
 
     @Parameter(names = {"-s", "--server"},
-            description = "Read output from Gerrit server URL and given port, in format server:port. "
+            description = "Download from Gerrit server name and port, in format server:port. "
+                    + "Some servers require a username; e.g., mylogin@gerrit.project.org. "
                     + "If port is omitted, defaults to 29418.",
             arity = 1,
             required = true,
