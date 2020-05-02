@@ -55,8 +55,9 @@ public final class GerritVersion {
         }
     }
 
+    // Version 3.1 must pass the "isAtLeast" test against 2.9 even tho 1 < 9.
     public boolean isAtLeast(int expectedMajor, int expectedMinor) {
-        return this.major >= expectedMajor && this.minor >= expectedMinor;
+        return this.major > expectedMajor || (this.major == expectedMajor && this.minor >= expectedMinor);
     }
 
     public boolean isAtLeast(@Nonnull GerritVersion otherVersion) {
