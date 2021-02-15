@@ -4,12 +4,11 @@ import com.beust.jcommander.IStringConverter;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
-import com.holmsted.gerrit.downloaders.ssh.SshDownloader;
+import com.holmsted.gerrit.downloaders.ssh.SshDownloaderFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,6 +18,8 @@ import java.util.jar.Manifest;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import static com.holmsted.gerrit.downloaders.GerritCommitDownloader.NO_COMMIT_LIMIT;
 
 @SuppressWarnings("unused")
 public class CommandLineParser {
@@ -55,7 +56,7 @@ public class CommandLineParser {
             + "If omitted, stats will be retrieved until no further records are available. "
             + "This value is an approximation; the actual number of downloaded commit data "
             + "will be a multiple of the limit set on the Gerrit server.")
-    private int limit = SshDownloader.NO_COMMIT_LIMIT; // NOPMD
+    private int limit = NO_COMMIT_LIMIT; // NOPMD
 
     @Parameter(names = {"-a", "--after-date"},
             description = "If specified, commits older than this date won't be downloaded."

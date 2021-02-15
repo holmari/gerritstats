@@ -6,12 +6,12 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
-public abstract class ProjectLister {
+public abstract class GerritProjectLister {
 
     @Nonnull
     private final GerritServer gerritServer;
 
-    public ProjectLister(@Nonnull GerritServer gerritServer) {
+    public GerritProjectLister(@Nonnull GerritServer gerritServer) {
         this.gerritServer = gerritServer;
     }
 

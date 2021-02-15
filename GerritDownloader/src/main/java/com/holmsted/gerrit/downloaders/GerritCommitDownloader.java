@@ -1,32 +1,36 @@
 package com.holmsted.gerrit.downloaders;
 
 import com.holmsted.gerrit.GerritServer;
-
-import org.json.JSONObject;
-
-import java.util.List;
+import com.holmsted.gerrit.GerritVersion;
 
 import javax.annotation.Nonnull;
 
-public abstract class AbstractGerritStatsDownloader {
+public abstract class GerritCommitDownloader {
     public static final int NO_COMMIT_LIMIT = -1;
 
     @Nonnull
     private final GerritServer gerritServer;
-
+    private final GerritVersion gerritVersion;
     private String projectName;
-
     private int overallCommitLimit = NO_COMMIT_LIMIT;
     private String afterDate;
     private String beforeDate;
 
-    public AbstractGerritStatsDownloader(@Nonnull GerritServer gerritServer) {
+
+    public GerritCommitDownloader(@Nonnull GerritServer gerritServer,@Nonnull GerritVersion gerritVersion) {
         this.gerritServer = gerritServer;
+        this.gerritVersion = gerritVersion;
     }
+
 
     @Nonnull
     public GerritServer getGerritServer() {
         return gerritServer;
+    }
+
+    @Nonnull
+    public GerritVersion getGerritVersion() {
+        return gerritVersion;
     }
 
     public void setProjectName(String projectName) {
@@ -67,9 +71,15 @@ public abstract class AbstractGerritStatsDownloader {
         return beforeDate;
     }
 
+
+    /**
+     * @return true if there is more data to read (using the {@link #readData()}
+     */
+    public abstract boolean hasMoreData();
+
     /**
      * Reads data from the server. Returns data in JSON-like format, which can be parsed by
      * GerritStats tool.
      */
-    public abstract List<JSONObject> readData();
+    public abstract GerritCommitData readData();
 }
