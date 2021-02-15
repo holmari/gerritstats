@@ -1,3 +1,17 @@
+# MAINTENANCE
+
+TL;DR: This tool is unmaintained.
+
+If you need a GitHub version of this tool, go to https://github.com/holmari/repostats .
+
+I originally built this tool in my spare time while working for Nokia, my former employer.
+Gerrit is an awesome code review tool, but I have not used Gerrit at work for several years.
+
+I rewrote GerritStats in early 2021 so it works for GitHub - https://github.com/holmari/repostats .
+Its initial version does not have support for Gerrit, but it's designed in a way that it's easy to
+extend to include support for Gerrit's REST API. A bit of TypeScript needs to be written to make
+the data loading and analysis for Gerrit analysis and connectivity work. PRs very much accepted!
+
 # GerritStats
 
 This project provides tools to display statistics from a Gerrit repository.
