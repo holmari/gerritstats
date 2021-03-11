@@ -7,7 +7,10 @@ allprojects {
     group = 'com.holmsted.gerrit'
 
     dependencies {
-        compile 'com.google.code.findbugs:annotations:3.0.1'
+        implementation 'com.google.code.findbugs:annotations:3.0.1'
+        implementation 'com.google.guava:guava:18.0'
+        implementation 'org.json:json:20140107'
+        implementation 'com.beust:jcommander:1.48'
     }
 
     repositories {

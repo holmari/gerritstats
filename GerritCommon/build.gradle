@@ -1,5 +1,6 @@
+plugins {
+    id 'java-library'
+}
 dependencies {
-    compile "org.json:json:20140107"
-    compile group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.0'
-    compile group: 'com.google.guava', name: 'guava', version: '18.0'
+    implementation 'com.google.code.findbugs:jsr305:3.0.0'
 }
