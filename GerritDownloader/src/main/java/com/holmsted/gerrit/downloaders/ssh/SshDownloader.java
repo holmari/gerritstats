@@ -30,18 +30,14 @@ public class SshDownloader extends AbstractGerritStatsDownloader {
 
         static QueryMetadata fromOutputString(String output) {
             JSONObject lastLineData = JsonUtils.readJsonString(output);
-            if (lastLineData.get("rowCount") != null) {
-                return new QueryMetadata(lastLineData);
-            } else {
-                return null;
-            }
+            return new QueryMetadata(lastLineData);
         }
 
         private QueryMetadata(JSONObject metadata) {
-            moreChanges = metadata.optBoolean("moreChanges");
-            rowCount = metadata.optInt("rowCount");
-            runtimeMsec = metadata.optInt("runTimeMilliseconds");
-            resumeSortkey = metadata.optString("resumeSortKey");
+            moreChanges = metadata.has("moreChanges")?metadata.optBoolean("moreChanges"):false;
+            rowCount = metadata.has("rowCount")?metadata.optInt("rowCount"):0;
+            runtimeMsec = metadata.has("runTimeMilliseconds")?metadata.optInt("runTimeMilliseconds"):0;
+            resumeSortkey = metadata.has("resumSortKey")?metadata.optString("resumeSortKey"):"";
         }
     }
 

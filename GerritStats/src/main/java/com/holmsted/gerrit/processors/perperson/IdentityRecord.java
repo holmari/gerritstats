@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.net.URL;
 
 import javax.annotation.Nonnull;
 
@@ -84,8 +85,15 @@ public class IdentityRecord {
         }
 
         public static GerritProject fromCommit(Commit commit) {
+            String projectUrl = commit.url.toString();
+            try {
+                URL commitUrl = new URL(commit.url.toString());
+                projectUrl = commitUrl.getProtocol() + "://" + commitUrl.getHost();
+            } catch (Exception e) {
+                System.out.println(String.format("Format url: %s failed with: %s", commit.url.toString(), e.toString()));
+            }
             String url = String.format("%s/#/q/project:%s",
-                    commit.url.substring(0, commit.url.lastIndexOf('/')),
+                    projectUrl,
                     commit.project);
             return new GerritProject(commit.project, url);
         }
